@@ -1,0 +1,2 @@
+<input type="file" name="<?= $field->tablename ?>_<?= $field->name ?>" class="file_upload <?= $field->class ?>" value="<?= $field->value ?>" />
+<input type="hidden" name="<?= $field->tablename ?>_<?= $field->name ?>" value="<?= $field->value ?>" />
