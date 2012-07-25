@@ -1,0 +1,1 @@
+<input type="text" value="<?= $field->value ?>" readonly="readonly" />

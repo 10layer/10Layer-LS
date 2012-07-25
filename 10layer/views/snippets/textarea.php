@@ -1,0 +1,1 @@
+<textarea name="<?= $field->tablename ?>_<?= $field->name ?>" class="<?= $field->class ?> <?= ($field->showcount) ? 'countchars' : '' ?> <?= is_numeric($field->showcount) ? 'countdown' : '' ?>" <?= is_numeric($field->showcount) ? 'max="'.$field->showcount.'"' : '' ?>><?= trim($field->value) ?></textarea>
