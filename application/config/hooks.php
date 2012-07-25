@@ -10,7 +10,13 @@
 |
 */
 
-
+$hook['post_controller_constructor'][] = array(
+	'class'    => 'Tlsecurity',
+	'function' => 'securityHook',
+	'filename' => 'Tlsecurity.php',
+	'filepath' => 'libraries/',
+	'params'   => array()
+);
 
 /* End of file hooks.php */
 /* Location: ./application/config/hooks.php */

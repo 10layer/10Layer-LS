@@ -73,7 +73,20 @@ if (defined('ENVIRONMENT'))
  *
  */
 	$application_folder = 'application';
+	
+/*
+ *---------------------------------------------------------------
+ * 10LAYER FOLDER NAME
+ *---------------------------------------------------------------
+ *
+ * Defines the folder for 10Layer-specific content.
+ *
+ * NO TRAILING SLASH!
+ *
+ */
 
+	$tenlayer_folder = '10layer';
+	
 /*
  * --------------------------------------------------------------------
  * DEFAULT CONTROLLER
@@ -174,7 +187,7 @@ if (defined('ENVIRONMENT'))
 
 	// Name of the "system folder"
 	define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
-
+	
 
 	// The path to the "application" folder
 	if (is_dir($application_folder))
@@ -189,6 +202,15 @@ if (defined('ENVIRONMENT'))
 		}
 
 		define('APPPATH', BASEPATH.$application_folder.'/');
+	}
+	
+	if (is_dir($tenlayer_folder)) {
+		define('TLPATH', $tenlayer_folder.'/');
+	} else {
+		if ( ! is_dir(BASEPATH.$tenlayer_folder.'/')) {
+			exit("Your 10Layer folder path does not appear to be set correctly. Please open the following file and correct this: ".SELF);
+		}
+		define('TLPATH', $tenlayer_folder.'/');
 	}
 
 /*
