@@ -171,7 +171,7 @@
  */
 	$RTR =& load_class('Router', 'core');
 	$RTR->_set_routing();
-
+	
 	// Set any routing overrides that may exist in the main index file
 	if (isset($routing))
 	{
@@ -242,12 +242,17 @@
 	// Load the local application controller
 	// Note: The Router class automatically validates the controller path using the router->_validate_request().
 	// If this include fails it means that the default controller in the Routes.php file is not resolving to something valid.
-	if ( ! file_exists(APPPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php'))
+	if ( ! file_exists(APPPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php') && ! file_exists(TLPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php'))
 	{
 		show_error('Unable to load your default controller. Please make sure the controller specified in your Routes.php file is valid.');
 	}
-
-	include(APPPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php');
+	
+	if (file_exists(APPPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php')) {
+		include(APPPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php');
+	} else {
+		include(TLPATH.'controllers/'.$RTR->fetch_directory().$RTR->fetch_class().'.php');
+	}
+	
 
 	// Set a mark point for benchmarking
 	$BM->mark('loading_time:_base_classes_end');
@@ -261,6 +266,7 @@
  *  loader class can be called via the URI, nor can
  *  controller functions that begin with an underscore
  */
+ 
 	$class  = $RTR->fetch_class();
 	$method = $RTR->fetch_method();
 
@@ -289,7 +295,6 @@
 			show_404("{$class}/{$method}");
 		}
 	}
-
 /*
  * ------------------------------------------------------
  *  Is there a "pre_controller" hook?

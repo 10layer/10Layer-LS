@@ -124,10 +124,10 @@ class CI_Loader {
 	public function __construct()
 	{
 		$this->_ci_ob_level  = ob_get_level();
-		$this->_ci_library_paths = array(APPPATH, BASEPATH);
-		$this->_ci_helper_paths = array(APPPATH, BASEPATH);
-		$this->_ci_model_paths = array(APPPATH);
-		$this->_ci_view_paths = array(APPPATH.'views/'	=> TRUE);
+		$this->_ci_library_paths = array(APPPATH, BASEPATH, TLPATH);
+		$this->_ci_helper_paths = array(APPPATH, BASEPATH, TLPATH);
+		$this->_ci_model_paths = array(APPPATH, TLPATH);
+		$this->_ci_view_paths = array(APPPATH.'views/'	=> TRUE, TLPATH.'views/' => TRUE);
 
 		log_message('debug', "Loader Class Initialized");
 	}
@@ -899,7 +899,6 @@ class CI_Loader {
 		foreach (array(ucfirst($class), strtolower($class)) as $class)
 		{
 			$subclass = APPPATH.'libraries/'.$subdir.config_item('subclass_prefix').$class.'.php';
-
 			// Is this a class extension request?
 			if (file_exists($subclass))
 			{

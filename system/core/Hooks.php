@@ -175,7 +175,11 @@ class CI_Hooks {
 
 		if ( ! file_exists($filepath))
 		{
-			return FALSE;
+			$filepath = TLPATH.$data['filepath'].'/'.$data['filename'];
+
+			if ( ! file_exists($filepath)) {	
+				return false;
+			}
 		}
 
 		// -----------------------------------
