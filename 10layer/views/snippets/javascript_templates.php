@@ -428,8 +428,13 @@
 	<button id="contentselectButton_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_rich_select">Select <%= field.label %></button>
 	<% $(document.body).data('onsave', update_rich) %>
 	<%= _.template($('#button-new-template').html(), { field: field }) %>
-	<div id='link_results_<%= field.contenttype %>_<%= field.name %>'><%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.data.urlid, content_id: field.data.content_id, tablename: field.tablename }) %></div>
+	<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
+		<% if(field.data) { %>
+			<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.data.urlid, content_id: field.data.content_id, tablename: field.tablename }) %>
+		<% } %>
+	</div>
 	<div id="contentselect_<%= field.contenttype %>_<%= field.name %>" class="<%= field.contenttype %>_<%= field.name %>-select popup wide"></div>
+	<% console.log('End') %>
 </script>
 
 <script type='text/template' id='create-field-rich'>

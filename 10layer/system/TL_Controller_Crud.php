@@ -93,7 +93,7 @@ class TL_Controller_Create extends TL_Controller_CRUD {
 			
 			if (!$returndata["error"]) { //Memcached submission and save
 				//$this->cachesave($this->_contenttypeurlid,$contentobj->content_id);			
-				$this->messaging->post_action("create",array($this->_contenttypeurlid,$finalobj->urlid));
+				//$this->messaging->post_action("create",array($this->_contenttypeurlid,$finalobj->urlid));
 			}
 			return $returndata;
 		}
@@ -346,8 +346,8 @@ class TL_Controller_Edit extends TL_Controller_CRUD {
 			}
 			
 			//Tell the world
-			$this->messaging->post_action("update_content",array($this->_contenttypeurlid,$urlid));
-			$this->messaging->post_action("edit",array($this->_contenttypeurlid,$urlid));
+			//$this->messaging->post_action("update_content",array($this->_contenttypeurlid,$urlid));
+			//$this->messaging->post_action("edit",array($this->_contenttypeurlid,$urlid));
 			$this->checkCallback("onAfterAction",$contentobj);
 			
 			return $returndata;
@@ -736,7 +736,7 @@ class TL_Controller_Delete extends TL_Controller_CRUD {
 		$contentobj->delete();
 		$this->checkCallback("onAfterDelete",$contentobj);
 		//if (!$returndata["error"]) { //Memcached submission
-			$this->messaging->post_action("delete",array($this->_contenttypeurlid,$urlid));
+			//$this->messaging->post_action("delete",array($this->_contenttypeurlid,$urlid));
 			//$this->cachereset($this->_contenttypeurlid,$contentobj->urlid);
 		//}
 		
@@ -1167,7 +1167,7 @@ class TL_Controller_CRUD extends CI_Controller {
 		//$this->session->set_userdata("contenttype",$this->_contenttypeurlid);
 		//Send where we are thru Stomp
 		$stompinfo=array("user"=>$this->model_user->get_by_id($this->session->userdata("id")), "url"=>$this->uri->segment_array());
-		$this->messaging->post_message("all",json_encode($stompinfo));
+		//$this->messaging->post_message("all",json_encode($stompinfo));
 	}
 	
 	/**

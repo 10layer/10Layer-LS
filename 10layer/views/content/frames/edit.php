@@ -2,15 +2,14 @@
 	$data["menu1_active"]="edit";
 	$data["menu2_active"]="edit/".$type;
 	$this->load->view('templates/header',$data);
-	link_js("/tlresources/file/js/forms.js");
-	link_js("/tlresources/file/jquery/jquery.form.js?1");
-	link_js("/tlresources/file/js/forms/default.js");
+	link_js("/resources/js/forms.js");
+	//link_js("/tlresources/file/jquery/jquery.form.js?1");
+	//link_js("/resources/js/forms/default.js");
 	ckeditor();
-	//tinymce();
 ?>
-<script src="/tlresources/file/js/underscore-min.js"></script>
-<script src="/tlresources/file/js/jquery.pagination.js"></script>
-<script src="/tlresources/file/js/davis.min.js"></script>
+<script src="/resources/js/underscore-min.js"></script>
+<script src="/resources/js/jquery.pagination.js"></script>
+<script src="/resources/js/davis.min.js"></script>
 <script>
 	var currentpage=false;
 	
@@ -432,6 +431,7 @@
 		<input type='hidden' name='action' value='submit' />
 		<% _.each(data.fields, function(field) { %>
 			<% if (!field.hidden) { %>
+				<% console.log(field.type) %>
 				<%= _.template($('#edit-field-'+field.type).html(), { field: field, urlid: urlid, content_type: content_type  }) %>
 			<% } %>
 		<% }); %>

@@ -42,10 +42,6 @@
 				
 				$("#menu2_scrollr").show();
 				
-				$("#menu2_scrollr").button({
-					icons: { primary:"ui-icon-triangle-1-s" },
-					text: false
-				});
 				var showMenu=false;
 				$("#menu2_scrollr").click(function() {
 					if (showMenu) {
@@ -87,15 +83,7 @@
 					$(this).removeClass("active");
 				}
 			});
-			<?php
-				$uid=$this->session->userdata("id");
-
-				if (!empty($uid)) {
-			?>
-			cometInit(<?= $uid ?>, "localhost", <?= $this->config->item("stomp_port") ?>);
-			<?php
-				}
-			?>
+			
 		});
 	</script>
 	<?php print $this->autoloader->javascript(); ?>
