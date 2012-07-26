@@ -20,9 +20,12 @@ class Exists {
 	 * @return boolean
 	 */
 	protected function _docheck($directory, $file, $ext=".php") {
-		$path = APPPATH.$directory.'/'.$file.$ext;
-		if (file_exists($path) || file_exists(strtolower($path))) {
-			return file_exists($path) || file_exists(strtolower($path));
+		$path_list = array(APPPATH, TLPATH);
+		foreach($path_list as $pl) {
+			$path = $pl.$directory.'/'.$file.$ext;
+			if (file_exists($path) || file_exists(strtolower($path))) {
+				return file_exists($path) || file_exists(strtolower($path));
+			}
 		}
 		
 		// Check packages
