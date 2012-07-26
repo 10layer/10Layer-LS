@@ -21,6 +21,7 @@
 	?>
 	
 	<script type="text/javascript" src="/resources/jquery/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="/resources/bootstrap/js/bootstrap.min.js"></script>
 	<script language="javascript">
 		<?php
 			if (empty($menu1_active)) {
@@ -91,8 +92,10 @@
 	<div class="navbar navbar-fixed-top">
 		<div class="navbar-inner">
 			<div class="container">
-	
-				<div id="menu1">
+				<ul id="menu1" class="nav">
+					<li id="logo" class="brand">
+						<img src="/resources/images/logo_navbar.png" />
+					</li>
 		<?php
 			if (isset($menu1)) {
 				$this->load->view_if_exists("menus/main/".$menu1);
@@ -101,24 +104,22 @@
 			}
 		?>
 		
-				</div>
+				</ul>
 				
 				<div id="menu2" class="redgradient_nohover smallshadow">	
 					<div id="menu2_container">
 		<?php
 			if (isset($menu2)) {
-				$this->load->view_if_exists("menus/sub/".$menu2);
+				//$this->load->view_if_exists("menus/sub/".$menu2);
 			} else {
-				$this->load->view_by_uri("menus/sub/");
+				//$this->load->view_by_uri("menus/sub/");
 			}
 		?>
 					</div>
 		
 				</div>
 	
-				<div id="logo">
-					<img src="/resources/images/logo_square_90.png" />
-				</div>
+				
 			</div>
 		</div>
 	</div>
