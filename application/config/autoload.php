@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('database','session', 'platforms', 'autoloader', 'exists', 'publications', 'messaging', 'checkout', 'datatransformations', 'tlsecurity', 'versions');
+$autoload['libraries'] = array('database','session', 'platforms', 'autoloader', 'exists', 'publications', 'messaging', 'checkout', 'datatransformations', 'tlsecurity', 'versions','tluserprefs');
 
 
 /*
@@ -64,7 +64,7 @@ $autoload['libraries'] = array('database','session', 'platforms', 'autoloader', 
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','string');
+$autoload['helper'] = array('url','string','javascript');
 
 
 /*

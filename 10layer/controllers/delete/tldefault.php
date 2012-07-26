@@ -1,5 +1,5 @@
 <?php
-require_once(APPPATH.'third_party/10layer/system/TL_Controller_Crud.php');
+require_once('10layer/system/TL_Controller_Crud.php');
 /**
  * TLDefault class.
  * 

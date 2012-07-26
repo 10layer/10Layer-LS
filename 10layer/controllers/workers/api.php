@@ -250,7 +250,7 @@
 				require_once(APPPATH.'controllers/edit/tldefault.php');
 				$tlcontroller=new TLDefault();
 			} else {
-				require_once(APPPATH.'third_party/10layer/system/TL_Controller_Crud.php');
+				require_once(TLPATH.'system/TL_Controller_Crud.php');
 				$tlcontroller=new TL_Controller_Edit();
 			}
 			$result=$tlcontroller->submit($content_type, $urlid);
@@ -280,7 +280,7 @@
 				require_once(APPPATH.'controllers/create/tldefault.php');
 				$tlcontroller=new TLDefault();
 			} else {
-				require_once(APPPATH.'third_party/10layer/system/TL_Controller_Crud.php');
+				require_once(TLPATH.'10layer/system/TL_Controller_Crud.php');
 				$tlcontroller=new TL_Controller_Create();
 			}
 			$result=$tlcontroller->submit($content_type);
