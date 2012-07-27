@@ -383,7 +383,7 @@
 		<div id="listSearchContainer">
 			<%= _.template($('#listing-template-search').html(), { search: data.search, content_type: content_type }) %>
 		</div>
-		<div id='pagination'></div>
+		<div id='pagination' class='pagination'></div>
 		<div id='content-table'>
 			<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
 		</div>
@@ -398,28 +398,30 @@
 </script>
 
 <script type='text/template' id='listing-template-content'>
-		<table>
-			<tr> 
-				<th>Title</th> 
-				<th>Last Edit</th>
-				<th>Edited by</th> 
-				<th>Start Date</th>
-				<th>Live</th>
-				<th>Workflow</th>
-				<th></th>
-			</tr>
-	<% var x=0; _.each(content, function(item) { %>
-			<tr class="<%= ((x % 2) == 0) ? 'odd' : '' %> content-item" id="row_<%= item.id %>">
-				<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= content_type %>/<%= item.urlid %>' content_id='<%= item.id %>' content_urlid='<%= item.urlid %>' class='content-title-link'><%= item.title %></a></td>
-				<td><%= item.last_modified %></td>
-				<td class='ajax_autoload' url='/workers/content/jsongetlasteditor/<%= content_type %>/<%= item.urlid %>' ></td>
-				<td><%= item.start_date %></td>
-				<td class="<%= (item.live==1) ? 'green' : 'red' %>"><%= (item.live==1) ? 'Live' : 'Not live' %></td>
-				<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
-				<td class='ajax_auto_link_check' url='/list/jsonfilelist/<%= content_type %>/<%= item.urlid %>' ></td>
-			</tr>
-	<% x++; }); %>
-		</table>
+	<table class='table table-bordered table-striped table-condensed'>
+	    <thead>
+	    <tr>
+	    	<th>Title</th> 
+	    	<th>Last Edit</th>
+	    	<th>Edited by</th> 
+	    	<th>Start Date</th>
+	    	<th>Live</th>
+	    	<th>Workflow</th>
+	    </tr>
+	    </thead>
+	    <tbody>
+		<% var x=0; _.each(content, function(item) { %>
+	    <tr id="row_<%= item.id %>">
+	    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
+	    	<td><%= item.last_modified %></td>
+	    	<td class='ajax_autoload' url='/workers/content/jsongetlasteditor/<%= content_type %>/<%= item._id %>' ></td>
+	    	<td><%= item.start_date %></td>
+	    	<td class="<%= (item.live==1) ? 'green' : 'red' %>"><%= (item.live==1) ? 'Live' : 'Not live' %></td>
+	    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
+	    </tr>
+		<% x++; }); %>
+	    </tbody>
+	</table>
 </script>
 
 
@@ -427,7 +429,7 @@
 <script type='text/template' id='edit-template'>
 	<div id="edit-content" class="boxed wide">
 		<h2>Edit - <%= data.content_type %></h2>
-		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>edit/ajaxsubmit/<%= content_type %>/<%= urlid %>'>
+		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>edit/ajaxsubmit/<%= content_type %>/<%= urlid %>' class='well form-horizontal'>
 		<input type='hidden' name='action' value='submit' />
 		<% _.each(data.fields, function(field) { %>
 			<% if (!field.hidden) { %>
