@@ -105,26 +105,11 @@
 		?>
 		
 				</ul>
-				
-				<div id="menu2" class="redgradient_nohover smallshadow">	
-					<div id="menu2_container">
-		<?php
-			if (isset($menu2)) {
-				//$this->load->view_if_exists("menus/sub/".$menu2);
-			} else {
-				//$this->load->view_by_uri("menus/sub/");
-			}
-		?>
-					</div>
-		
-				</div>
-	
-				
 			</div>
 		</div>
 	</div>
 	
-	<div class="container" style="margin-top: 120px">
+	<div class="container" style="margin-top: 60px">
 	
 		<div id="cookiecrumbs"><?= cookiecrumb() ?></div>
 		<?php
