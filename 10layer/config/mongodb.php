@@ -7,7 +7,7 @@ $config['mongo_host'] = "localhost";
 $config['mongo_port'] = 27017;
 
 // The database you want to work from (required)
-$config['mongo_db'] = "TenLayer";
+$config['mongo_db'] = "mgtest";
 
 // Leave blank if Mongo is not running in auth mode
 $config['mongo_username'] = "";

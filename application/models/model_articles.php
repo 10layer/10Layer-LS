@@ -2,10 +2,7 @@
 
 class Model_Articles extends Model_Content {
 	public $order_by=array(
-		"content.last_modified DESC",
-		"start_date DESC",
-		"title ASC",
-		
+		"last_modified desc",
 	);
 	
 	public $fields=array(
@@ -37,7 +34,7 @@ class Model_Articles extends Model_Content {
 			"type"=>"textarea",
 			"rules"=>array("required","maxlen"=>150),
 			"transformations"=>array("safetext"),
-			"libraries"=>array("semantic"=>true,"search"=>"fulltext",),
+			//"libraries"=>array("semantic"=>true,"search"=>"fulltext",),
 			"showcount"=>150,
 		),
 		array(
@@ -45,7 +42,7 @@ class Model_Articles extends Model_Content {
 			"type"=>"textarea",
 			"rules"=>array("required",),
 			"class"=>"richedit",
-			"libraries"=>array("semantic"=>true,"search"=>"fulltext",),
+			//"libraries"=>array("semantic"=>true,"search"=>"fulltext",),
 		),
 		array(
 			"name"=>"mainpic",

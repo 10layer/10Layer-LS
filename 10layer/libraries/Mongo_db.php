@@ -456,7 +456,14 @@ class Mongo_db {
 	
 	public function order_by($fields = array()) {
 		foreach($fields as $col => $val):
-			if($val == -1 || $val === FALSE || strtolower($val) == 'desc'):
+			if (is_numeric($col)) {
+				if (strpos(strtolower($val), ' desc') !== false) {
+					$parts=explode(' ',$val);
+					$this->sorts[$parts[0]] = -1;
+				} else {
+					$this->sorts[$val] = 1;
+				}
+			} else if($val == -1 || $val === FALSE || strtolower($val) == 'desc'):
 				$this->sorts[$col] = -1; 
 			else:
 				$this->sorts[$col] = 1;
@@ -475,7 +482,10 @@ class Mongo_db {
 	*	@usage : $this->mongo_db->limit($x);
 	*/
 	
-	public function limit($x = 99999) {
+	public function limit($x = 99999, $offset=-1) {
+		if ($offset > -1) {
+			$this->offset($offset);
+		}
 		if($x !== NULL && is_numeric($x) && $x >= 1)
 			$this->limit = (int) $x;
 		return($this);
@@ -526,7 +536,7 @@ class Mongo_db {
 			show_error("In order to retreive documents from MongoDB, a collection name must be passed", 500);
 		$results = array();
 		$documents = $this->db->{$collection}->find($this->wheres, $this->selects)->limit((int) $this->limit)->skip((int) $this->offset)->sort($this->sorts);
-		
+
 		$returns = array();
 		
 		foreach($documents as $doc):

@@ -308,32 +308,12 @@
 		 * @return object
 		 */
 		public function getAll($limit=false, $start=false, $all=false) {
-			
-			$selecteds=$this->input->get("selected"); //This needs to change. We shouldn't be reading inputs on the model
-			if(!empty($selecteds)) {
-				$this->db->where_not_in("content.id",$selecteds);
+			$query=$this->mongo_db->where(array('content_type'=>$this->content_type->urlid))->limit($limit, $start)->order_by($this->order_by)->get('content');
+			$results = array();
+			foreach($query as $item) {
+				$results[] = (object) $item;
 			}
-			$this->limit($limit, $start);
-			$this->_prepGetAllQuery($all);
-			//$this->db->group_by("content.urlid");
-			$query=$this->db->get("content");
-			//print $this->db->last_query();
-			$results = $query->result();
 			return $results;
-			//$container = array();
-			
-			/*foreach($results as $item){
-				//Get the last admin to work on this item and set as tl_admin. tl_admin=false if the user isn't found.
-				$urlid = $item->urlid;
-				$result = $this->mongo_db->where(array("urlid"=>$urlid))->order_by("last_modified"=>"DESC")->limit(1)->get("tl_content_versions");
-				$item->tl_admin=false;
-				if (isset($result[0]->user_id) AND $result[0]->user_id != "") {
-					$item->tl_admin=$this->db->get_where("tl_users",array("id"=>$result[0]->user_id))->row();
-				}
-				array_push($container, $item);
-			}*/
-			
-			//return $container; //$query->result();
 		}
 		
 		/**
@@ -346,12 +326,7 @@
 		 * @return object
 		 */
 		public function getContent($id) {
-			if (is_numeric($id)) {
-				$query=$this->db->get_where("content",array("id"=>$id));
-			} else {
-				$query=$this->db->get_where("content",array("urlid"=>$id));
-			}
-			return $query->row();
+			return $this->mongo_db->get_where("content",array("_id"=>$id));
 		}
 		
 		/**
@@ -384,23 +359,7 @@
 		 * @return int
 		 */
 		public function count($extensions=false) {
-			$this->_prepQuery();
-			if ($extensions) {
-				echo $extensions;
-				$this->db->join($this->content_type->table_name, "content.id={$this->content_type->table_name}.content_id");
-			}
-			
-			/*$time = date("Y-m-d");
-			$now = date("Y-m-d", strtotime(date("Y-m-d", strtotime($time)) . " +1 day")) ;
-			$start = date("Y-m-d", strtotime(date("Y-m-d", strtotime($time)) . " -90 days")) ;
-			$this->db->where("content.start_date <=", $now);
-			$this->db->where("content.start_date >=", $start);*/
-
-			
-			$this->db->select("COUNT(*) AS count",false);
-			$query=$this->db->get("content");
-			
-			return $query->row()->count;
+			return $this->mongo_db->where(array('content_type'=>$this->content_type->urlid))->count('content');
 		}
 		
 		/**
@@ -497,7 +456,7 @@
 				$this->db->where("content_platforms.platform_id",$this->platform->id);
 			}
 		}
-		
+				
 		protected function _prepGetAllQuery($all=false) {
 			$this->_prepQuery();
 			//This breaks all the other sites
@@ -527,41 +486,16 @@
 		 * @return int
 		 */
 		public function searchCount($content_type, $searchstr) {
-			$this->setContentType($content_type);
-			$this->setPlatform($this->platforms->id());
-			$tables=array("content");
 			$contentobj=new TLContent();
 			$contentobj->setContentType($content_type);
 			$fields=$contentobj->getFields();
-			$matches=array();
-			$likes=array();
-			$fields=$contentobj->getFields();
+			$searchfields = array("content_type"=>$content_type);
 			foreach($fields as $field) {
 				if (isset($field->libraries["search"])) {
-					if ($field->libraries["search"]=="fulltext") {
-						$matches[]=$field->tablename.".".$field->name;
-					} elseif ($field->libraries["search"]=="like") {
-						$likes[]=$field->tablename.".".$field->name;
-					}
-					if (!in_array($field->tablename,$tables)) {
-						$tables[]=$field->tablename;
-					}
+					$this->mongo_db->like($field->name, $searchstr);
 				}
 			}
-			if (!empty($matches)) {
-				$this->db->or_where("MATCH (".implode(",",$matches).") AGAINST (".$this->db->escape($searchstr).")",false, false);
-			}
-			foreach($likes as $like) {
-				$this->db->or_where($like." LIKE ".$this->db->escape("%".$searchstr."%"), "", false);
-			}			
-			foreach($tables as $table) {
-				if ($table!="content") {
-					$this->db->join($table, "content.id=$table.content_id");
-				}
-			}
-			
-			//$this->_prepQuery();
-			return $this->count();
+			return $this->mongo_db->where($searchfields)->count('content');
 		}
 		
 		/**
@@ -577,49 +511,21 @@
 		 * @return object
 		 */
 		public function search($content_type, $searchstr,$limit,$start=0) {
-			$tables=array("content");
-			$this->setContentType($content_type);
-			$this->setPlatform($this->platforms->id());
 			$contentobj=new TLContent();
 			$contentobj->setContentType($content_type);
 			$fields=$contentobj->getFields();
-			$matches=array();
-			$likes=array();
-			$fields=$contentobj->getFields();
-			$this->db->select("content.*, title AS value");
+			$searchfields = array("content_type"=>$content_type);
 			foreach($fields as $field) {
 				if (isset($field->libraries["search"])) {
-					if ($field->libraries["search"]=="fulltext") {
-						$matches[]=$field->tablename.".".$field->name;
-					} elseif ($field->libraries["search"]=="like") {
-						$likes[]=$field->tablename.".".$field->name;
-					}
-					if (!in_array($field->tablename,$tables)) {
-						$tables[]=$field->tablename;
-					}
+					$this->mongo_db->like($field->name, $searchstr);
 				}
 			}
-			if (!empty($matches)) {
-				$this->db->select("MATCH (".implode(",",$matches).") AGAINST (".$this->db->escape($searchstr).") AS score",false, false);
-				$this->db->order_by("last_modified","DESC");
-				$this->db->order_by("score","DESC");
-				
-				foreach($this->order_by as $ob) {
-					$this->db->order_by($ob);
-				}
-				$this->db->or_where("MATCH (".implode(",",$matches).") AGAINST (".$this->db->escape($searchstr).")",false, false);
-			} 
-			foreach($likes as $like) {
-				$this->db->or_where($like." LIKE ".$this->db->escape("%".$searchstr."%"));
+			$query=$this->mongo_db->where($searchfields)->limit($limit, $start)->order_by($this->order_by)->get('content');
+			$results = array();
+			foreach($query as $item) {
+				$results[] = (object) $item;
 			}
-		
-			foreach($tables as $table) {
-				if ($table!="content") {
-					$this->db->join($table, "content.id=$table.content_id");
-				}
-			}
-			
-			return $this->getAll($limit,$start);
+			return $results;
 		}
 		
 		/**

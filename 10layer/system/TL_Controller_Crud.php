@@ -848,9 +848,9 @@ class TL_Controller_List extends TL_Controller_CRUD {
 		$searchstring=$this->input->get_post('searchstring');
 		$this->_pg_offset=$this->input->get_post('offset');
 		if (!empty($searchstring)) {
-			$data["content"]=$this->content->search($this->_contenttypeurlid,$searchstring,$this->_pg_perpage, $this->_pg_offset);
-			$data["count"]=$this->content->searchCount($this->_contenttypeurlid,$searchstring);
 			$data["search"]=$searchstring;
+			$data["count"]=$this->content->searchCount($this->_contenttypeurlid,$searchstring);
+			$data["content"]=$this->content->search($this->_contenttypeurlid,$searchstring,$this->_pg_perpage, $this->_pg_offset);
 		} else {
 			$data["content"]=$this->content->getAll($this->_pg_perpage, $this->_pg_offset);
 			$data["count"]=$this->content->count();
