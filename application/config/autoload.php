@@ -80,7 +80,7 @@ $autoload['helper'] = array('url','string','javascript');
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array('10layer');
 
 
 /*

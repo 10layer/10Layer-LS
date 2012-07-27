@@ -57,8 +57,8 @@
 			    $this->ci->session->unset_userdata($data);
 			    $result=$this->doLogin();
 			    if ($result) {
-			    	$this->ci->load->library("tluserprefs");
-			    	$this->ci->tluserprefs->user_setup();
+			    	/*$this->ci->load->library("tluserprefs");
+			    	$this->ci->tluserprefs->user_setup();*/
 			    	return true;
 			    } else {
 			    	$data["error"]=1;
@@ -114,15 +114,11 @@
 		protected function checkStatus() {
 			//$status_id=$this->ci->session->userdata("status_id");
 			//print $this->ci->session->userdata("id");
-			$status_id=$this->ci->model_user->get_user_status($this->ci->session->userdata("id"));
-			//print $status_id;
-			if ($status_id==1) {
+			$status=$this->ci->model_user->get_user_status($this->ci->session->userdata("id"));
+			if ($status=="Active") {
 				return true;
 			}
-			//$data=array("id"=>false,"name"=>false,"urlid"=>false);
-			//$this->ci->session->unset_userdata($data);
-			$status=$this->ci->model_user->get_status($status_id);
-			$this->ci->load->view("user/denied",array("status"=>"You cannot log in to your account. Your account status is: {$status->name}"));
+			$this->ci->load->view("user/denied",array("status"=>"You cannot log in to your account. Your account status is: {$status}"));
 			print $this->ci->output->get_output();
 			die();
 		}
@@ -167,7 +163,7 @@
 				while(!empty($pieces)) {
 					array_pop($pieces);
 					$url="/".implode("/",$pieces);
-					if ($url==$allowedurl->url) {
+					if ($url==$allowedurl) {
 						$this->_permissionDeny();
 					}
 				}

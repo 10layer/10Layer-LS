@@ -18,6 +18,13 @@ class Model_Articles extends Model_Content {
 			),
 		),
 		array(
+			"name"=>"source",
+			"type"=>"reverse",
+			"rules"=>array("required",),
+			"contenttype"=>"source",
+			"tablename"=>"sources",
+		),
+		array(
 			"name"=>"end_date",
 			"tablename"=>"content",
 			"hidden"=>true,
@@ -95,14 +102,13 @@ class Model_Articles extends Model_Content {
 			"rules"=>array("required",),
 			"tablename"=>"site_sections",
 		),
+		
 		array(
-			"name"=>"source",
-			"type"=>"reverse",
-			"rules"=>array("required",),
-			"contenttype"=>"source",
-			"tablename"=>"sources",
+			"name"=>"Test",
+			"type"=>"select",
+			"options"=>array("Test 1", "test2", "test3"),
+			"value"=>1,
 		),
-
 		array(
 			"name"=>"special_focus",
 	    	"label"=>"Special Focus",

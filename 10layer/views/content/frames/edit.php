@@ -10,10 +10,12 @@
 <script src="/resources/js/underscore-min.js"></script>
 <script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/js/davis.min.js"></script>
+<link rel="stylesheet" href="/resources/chosen/chosen.css">
+<script src="/resources/chosen/chosen.jquery.js"></script>
+
 <script>
 	var currentpage=false;
 	
-		
 	$(function() {
 		
 		$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
@@ -215,7 +217,9 @@
 			$.getJSON("<?= base_url() ?>edit/jsonedit/"+content_type+"/"+urlid+"?jsoncallback=?", function(data) {
 				$('#dyncontent').html(_.template($("#edit-template").html(), {data:data, content_type: content_type, urlid: urlid }));
 				init_form();
+				$(".chzn-select").chosen();
 			});
+			
 		}
 		
 		$(document).on('click', '#dosubmit_right', function() {
@@ -276,14 +280,6 @@
 			viewer.readAsDataURL(file);
 			
 		});
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		function uploadCanceled(e) {
 			$(document.body).data("saving",false);
@@ -401,7 +397,7 @@
 	<table class='table table-bordered table-striped table-condensed'>
 	    <thead>
 	    <tr>
-	    	<th>Title</th> 
+	    	<th>Title</th>
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
 	    	<th>Start Date</th>
@@ -414,7 +410,7 @@
 	    <tr id="row_<%= item.id %>">
 	    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 	    	<td><%= item.last_modified %></td>
-	    	<td class='ajax_autoload' url='/workers/content/jsongetlasteditor/<%= content_type %>/<%= item._id %>' ></td>
+	    	<td></td>
 	    	<td><%= item.start_date %></td>
 	    	<td class="<%= (item.live==1) ? 'green' : 'red' %>"><%= (item.live==1) ? 'Live' : 'Not live' %></td>
 	    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
