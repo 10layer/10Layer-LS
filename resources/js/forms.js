@@ -473,7 +473,8 @@ function uploadComplete(data) {
         	content_type=$(document.body).data('content_type');
         	urlid=$(document.body).data('urlid');
         	$.ajax({ type: "GET", url: "<?= base_url() ?>/workflow/change/advance/"+content_type+"/"+urlid, async:false});
-        	location.href="/workers/content/unlock/"+content_type+"/"+urlid;
+        	location.href="/edit/"+content_type;
+        	//location.href="/workers/content/unlock/"+content_type+"/"+urlid;
         } else {
         	$("#msgdialog").dialog({
     	        modal: true,
