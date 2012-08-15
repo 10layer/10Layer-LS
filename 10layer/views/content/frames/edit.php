@@ -423,9 +423,9 @@
 
 
 <script type='text/template' id='edit-template'>
-	<div id="edit-content" class="boxed wide">
+	<div id="edit-content" class="row">
 		<h2>Edit - <%= data.content_type %></h2>
-		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='well form-horizontal'>
+		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
 		<input type='hidden' name='action' value='submit' />
 		<input type='hidden' name='id' value='<%= urlid %>' />
 		<% _.each(data.meta, function(field) { 
