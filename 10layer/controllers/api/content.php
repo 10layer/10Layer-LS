@@ -114,6 +114,72 @@
 			$this->returndata();
 		}
 		
+		/**
+		 * save function.
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function save() {
+			if (!$this->secure) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="You do not have permission to save";
+				$this->returndata();
+				return false;
+			}
+			$content_type=$this->get_content_type();
+			if (empty($content_type)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Content type not found";
+				$this->returndata();
+				return false;
+			}
+			$contentobj=new TLContent();
+			$contentobj->setContentType($content_type);
+			//Populate
+			foreach($contentobj->getFields() as $field) {
+				if ($field->readonly) {
+					continue;
+				}
+				$fieldval=$this->input->post($field->tablename."_".$field->name);
+				if (empty($fieldval)) {
+					$contentobj->{$field->name}="";
+				} else {
+					$contentobj->{$field->name}=$fieldval;
+				}
+			}
+			//Files
+			//Transform
+			$contentobj->transformFields();
+			//Validate
+			$validation=$contentobj->validateFields();
+			if (!$validation["passed"]) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Failed to save {$content_type}";
+				$this->data["info"]=$validation["failed_messages"];
+				$this->returndata();
+				return false;
+			}
+			//Save
+			$data=$contentobj->getData();
+			$this->id();
+			unset($data->id);
+			unset($data->urlid);
+			unset($data->content_id);
+			$data->last_modified=date("Y-m-d H:i:s");
+			$user=$this->model_user->get_by_id($this->session->userdata("id"));
+			$data->last_editor=$user->name;
+			$result=$this->mongo_db->upsert('content', $data);
+			if (!$result) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Failed to save {$content_type} - Mongo DB error";
+				$this->returndata();
+				return false;
+			}
+			$this->data["msg"]="Saved $content_type";
+			$this->returndata();
+		}
+		
 		//Callbacks
 		
 		/**
@@ -223,35 +289,64 @@
 		 * @return void
 		 */
 		protected function meta() {
-			$content_type=$this->input->get_post("content_type");
-			if (empty($content_type)) {
-				$id=$this->input->get_post("id");
-				$this->mongo_db->state_save();
-				$result=$this->mongo_db->get_where("content", array("_id"=>$id));
-				if (empty($result)) {
-					$this->data["error"]=true;
-					$this->data["msg"][]="Could not find content ID $id";
-					return true;
-				}
-				$this->mongo_db->state_restore();
-				$content_type=$result[0]->content_type;
-			}
+			$content_type=$this->get_content_type();
 			if (empty($content_type)) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Could not find content type to retrieve meta information";
 				return true;
 			}
 			//This is still old-skool system. Needs to change
-			$content_type_row=$this->db->get_where("content_types", array("urlid"=>$content_type))->row();
-			if (!isset($content_type_row->model)) {
+			$fields=$this->get_field_data($content_type);
+			if (empty($fields)) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Could not find model for content type $content_type to retrieve meta information";
 				return true;
 			}
-			$contentobj=new TLContent();
-			$contentobj->setContentType($content_type);
-			$fields=$contentobj->getFields();
 			$this->data["meta"]=$fields;
+		}
+		
+		/**
+		 * get_content_type function.
+		 * 
+		 * @access protected
+		 * @return String content_type
+		 */
+		protected function get_content_type() {
+			$content_type=$this->input->get_post("content_type");
+			if (empty($content_type)) {
+				$id=$this->input->get_post("id");
+				if (empty($id)) {
+					return false;
+				}
+				$this->mongo_db->state_save();
+				$result=$this->mongo_db->get_where("content", array("_id"=>$id));
+				if (empty($result)) {
+					$this->data["error"]=true;
+					$this->data["msg"][]="Could not find content ID $id";
+					return false;
+				}
+				$this->mongo_db->state_restore();
+				$content_type=$result[0]->content_type;
+			}
+			return $content_type;
+		}
+		
+		/**
+		 * get_field_data function.
+		 * 
+		 * @access protected
+		 * @param String $content_type
+		 * @return array
+		 */
+		protected function get_field_data($content_type) {
+			try {
+				$contentobj=new TLContent();
+				$contentobj->setContentType($content_type);
+				$fields=$contentobj->getFields();
+				return $fields;
+			} catch(Exception $e) {
+				return false;
+			}
 		}
 		
 		/**

@@ -85,7 +85,10 @@
 		}
 		
 		public function get_by_id($id) {
-			return $this->mongo_db->get_where("users",array("_id"=>$id));
+			$this->mongo_db->state_save();
+			$users=$this->mongo_db->get_where("users",array("_id"=>$id));
+			$this->mongo_db->state_restore();
+			return $users[0];
 		}
 		
 		public function get_by_urlid($urlid) {
