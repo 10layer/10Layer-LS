@@ -23,35 +23,30 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input id='autocomplete_view_<%= field.tablename %>_<%= field.name %>' type='text' tablename='<%= field.tablename %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />		
-			<div class="aligner">
-			<ul class="items_container">
-			
-			<%
-				if (field.data) {
-					var x=0;
-					_.each(field.data, function(data) {
-						var value=data.content_id;
-						title=data.fields.title.value;
-						data.content_type=field.contenttype;
-						data.tablename=field.tablename;
-						data.fieldname=field.name;
-						data.multiple=field.multiple;
-			%>
-						<%= _.template($('#field-autocomplete-item').html(), { field: data }) %>
-			<%
-					});
-				}
-			%>
-			
-			</ul>
-			</div>
-			
+			<div class="row">
+			<input id='autocomplete_view_<%= field.tablename %>_<%= field.name %>' type='text' tablename='<%= field.tablename %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
 			<% if ((field.external==1) && (field.hidenew==false)) { %>
 			<%= _.template($('#button-new-template').html(), { field: field }) %>
 			<%
 				}
 			%>
+			</div>
+			<div class="items_container row">
+			
+			<%
+				if (field.value) {
+					if (!_.isArray(field.value)) {
+						field.value=[field.value];
+					}
+					_.each(field.value, function(urlid) {
+			%>
+						<%= _.template($('#field-autocomplete-item').html(), { urlid: urlid, field: field }) %>
+			<%
+					});
+				}
+			%>
+			</div>
+			
 		</div>
 	</div>
 </script>
@@ -76,18 +71,15 @@
 
 <script type='text/template' id='field-autocomplete-item'>
 	<%
-		var title=field.fields.title.value;
 		console.log(field);
 	%>
-	<li class="autocomplete_item">
-		<span class="ui-icon ui-icon-arrowthick-2-n-s float-left" style="margin:10px;"></span>
-		<span class="remover ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" role="button" aria-disabled="false">
-			<span class="ui-button-icon-primary ui-icon ui-icon-circle-close"></span>
-			<span class="ui-button-text">
-				<%= title %>
-			</span></span>
-	<input id="autocomplete_<%= field.content_type %>_<%= field.fieldname %>_<%= field.content_id %>" type="hidden" name="<%= field.tablename %>_<%= field.fieldname %><%= (field.multiple==1) ? '[]' : '' %>" value="<%= field.content_id %>"  />
-	</li>
+	<div class="autocomplete_item span2 well">
+		<button class="close">&times;</button>
+		<span class="ui-button-text">
+			<%= urlid %>
+		</span>
+		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.tablename %>_<%= field.name %><%= (field.multiple==1) ? '[]' : '' %>" value="<%= urlid %>"  />
+	</div>
 </script>
 
 <script type='text/template' id='edit-field-boolean'>
@@ -411,10 +403,10 @@
 				var url='/list/jsonlist/'+field.contenttype;
 				$.get(url, function(data) {
 					_.each(data.content, function(item) {
-						$('#'+field.name+'-hook').append('<option value="'+item.content_id+'" '+((item.content_id==field.value) ? 'selected="selected"' : '')+'>'+item.title+'</option>');
+						$('#'+field.name+'-hook').append('<option value="'+item._id+'" '+((item._id==field.value) ? 'selected="selected"' : '')+'>'+item.title+'</option>');
 						
 					});
-					$(".chzn-select").trigger("liszt:updated");
+					$("#"+field.name+"-hook").trigger("liszt:updated");
 				}); 
 			%>
 			</select>
@@ -443,12 +435,12 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<button id="contentselectButton_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_rich_select">Select <%= field.label %></button>
+			<button id="contentselectButton_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_rich_select btn">Select <%= field.label %></button>
 			<% $(document.body).data('onsave', update_rich) %>
 			<%= _.template($('#button-new-template').html(), { field: field }) %>
 			<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
-				<% if(field.data) { %>
-					<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.data.urlid, content_id: field.data.content_id, tablename: field.tablename }) %>
+				<% if(field.value) {  %>
+					<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.value, tablename: field.tablename }) %>
 				<% } %>
 			</div>
 			<div id="contentselect_<%= field.contenttype %>_<%= field.name %>" class="<%= field.contenttype %>_<%= field.name %>-select popup wide"></div>
@@ -461,15 +453,18 @@
 </script>
 
 <script type='text/template' id='field-rich-item'>
-	<div class="link_results">
-		<div class="rich_overlay">
-			<div class="rich_overlay_remove">Remove</div>
-			<div class="new-window rich_overlay_edit" href="/edit/picture/<%= urlid %>">Edit</div>
+	<div class="row">
+		<a href="/edit/picture/<%= urlid %>" class="btn" target="_top">Edit</a>
+		<div class="link_results">
+			<div class="rich_overlay">
+				<button class="close">&times;</button>
+				
+			</div>
+			<div class="selectitem">
+				<div class="thumbnail span6"><img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/460/200" /></div>
+			</div>
+			<input type='hidden' name='<%= tablename %>_<%= fieldname %>' value='<%= urlid %>' />
 		</div>
-		<div class="selectitem">
-			<div class="selectitem-image"><img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/500/150" /></div>
-		</div>
-		<input type='hidden' name='<%= tablename %>_<%= fieldname %>' value='<%= content_id %>' />
 	</div>
 </script>
 
@@ -626,7 +621,7 @@
 </script>
 
 <script type='text/template' id='button-new-template'>
-	<button id="new_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_new">New <%= field.label %></button>
+	<button id="new_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_new btn">New <%= field.label %></button>
 	<div class='popup' id='new_dialog_<%= field.tablename %>_<%= field.name %>'></div>
 </script>
 
