@@ -627,6 +627,32 @@ class Mongo_db {
 	
 	/**
 	*	--------------------------------------------------------------------------------
+	*	UPSERT
+	*	--------------------------------------------------------------------------------
+	*
+	*	Updates or insert a single document
+	*
+	*	@usage: $this->mongo_db->upsert('foo', $data = array());
+	*/
+	
+	public function upsert($collection = "", $data = array()) {
+		if(empty($collection))
+			show_error("No Mongo collection selected to update", 500);
+		if(count($data) == 0 )
+			show_error("Nothing to update in Mongo collection or update is not an array", 500);
+		
+		try {
+			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('safe' => TRUE, 'multiple' => FALSE, 'upsert'=>TRUE ));
+			$this->_clear();
+			return(TRUE);
+		} catch(MongoCursorException $e) {
+			show_error("Update of data into MongoDB failed: {$e->getMessage()}", 500);
+		}
+		
+	}
+	
+	/**
+	*	--------------------------------------------------------------------------------
 	*	UPDATE_ALL
 	*	--------------------------------------------------------------------------------
 	*
