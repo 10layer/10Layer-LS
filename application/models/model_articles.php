@@ -103,12 +103,7 @@ class Model_Articles extends Model_Content {
 			"tablename"=>"site_sections",
 		),
 		
-		array(
-			"name"=>"Test",
-			"type"=>"select",
-			"options"=>array("Test 1", "test2", "test3"),
-			"value"=>1,
-		),
+		
 		array(
 			"name"=>"special_focus",
 	    	"label"=>"Special Focus",
