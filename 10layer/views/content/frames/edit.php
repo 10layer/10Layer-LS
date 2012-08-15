@@ -431,7 +431,6 @@
 			field.value = data.content[field.name];
 		%>
 			<% if (!field.hidden) { %>
-				<% console.log(field) %>
 				<%= _.template($('#edit-field-'+field.type).html(), { field: field, urlid: urlid, content_type: content_type  }) %>
 			<% } %>
 		<% }); %>
