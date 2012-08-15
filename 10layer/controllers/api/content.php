@@ -1,0 +1,314 @@
+<?php
+	/**
+	 * Content class
+	 * 
+	 * @extends CI_Controller
+	 */
+	class Content extends CI_Controller {
+		
+		protected $secure=false;
+		protected $_render=true;
+		private $_start_time=0;
+		public $vars=array();
+		public $data;
+		
+		/**
+		 * __construct function.
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function __construct() {
+			$this->_start_time=microtime(true);
+			parent::__construct();
+			$this->load->library("tlsecurity");
+			$this->tlsecurity->ignore_security();
+			$this->secure=$this->_check_secure();
+			if (!$this->secure) {
+				$this->mongo_db->where(array("live"=>"1"));
+				$this->mongo_db->where_gte("major_version", "4");
+			}
+			$this->data=array(
+				"error"=>false,
+				"timestamp"=>time(),
+				"msg"=>"",
+				"content"=>array()
+			);
+			$this->vars=array_merge($_GET, $_POST);
+			if (empty($this->vars)) {
+				$this->data["error"]=true;
+				$this->data["msg"]="No GET or POST variables";
+				$this->returndata();
+				return true;
+			}
+		}
+		
+		/**
+		 * index function.
+		 * 
+		 * Shortcut to "listing", so you don't need to call the listing
+		 * method in your url.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function index() {
+			$this->listing();
+		}
+		
+		/**
+		 * listing function.
+		 * 
+		 * Used to return a list, but can also return a single item, 
+		 * although in that case "get" would be faster. Includes a 
+		 * total count.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function listing() {
+			$this->_render=false;
+			$this->count();
+			$this->_render=true;
+			$this->_check_callbacks();
+			$this->data["content"]=$this->mongo_db->get("content");
+			$this->returndata();
+			return true;
+		}
+		
+		/**
+		 * count function.
+		 * 
+		 * Returns a count matching the criteria
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function count() {
+			$this->_check_callbacks();
+			$content_type=$this->input->get_post("content_type");
+			if (!empty($content_type)) {
+				$this->mongo_db->where(array("content_type"=>$content_type));
+			}
+			$this->data["count"]=$this->mongo_db->count("content");
+			$this->returndata();
+			return true;
+		}
+		
+		/**
+		 * get function.
+		 * 
+		 * Returns a single item, a bit faster than listing because we
+		 * don't do a count.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function get() {
+			$this->_check_callbacks();
+			$this->data["count"]=1;
+			$this->mongo_db->limit(1);
+			$this->data["criteria"]["limit"]=1;
+			$content=$this->mongo_db->get("content");
+			$this->data["content"]=$content[0];
+			$this->returndata();
+		}
+		
+		//Callbacks
+		
+		/**
+		 * content_type function.
+		 * 
+		 * Only return content of a certain type
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function content_type() {
+			$content_type=$this->input->get_post("content_type");
+			if (!empty($content_type)) {
+				$this->mongo_db->where(array("content_type"=>$content_type));
+			}
+		}
+		
+		/**
+		 * limit function.
+		 * 
+		 * Limit results. Usually a good idea.
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function limit() {
+			$limit=$this->input->get_post("limit");
+			if (!empty($limit)) {
+				$this->mongo_db->limit($limit);
+				$this->data["criteria"]["limit"]=$limit;
+			}
+		}
+		
+		/**
+		 * offset function.
+		 * 
+		 * Listing offset
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function offset() {
+			$offset=$this->input->get_post("offset");
+			if (!empty($offset)) {
+				$this->mongo_db->offset($offset);
+				$this->data["criteria"]["offset"]=$offset;
+			}
+		}
+		
+		/**
+		 * order_by function.
+		 * 
+		 * Order by - can be an array, and can have DESC to order descending
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function order_by() {
+			$order_by=$this->input->get_post("order_by");
+			if (!empty($order_by)) {
+				if (!is_array($order_by)) {
+					$order_by=array($order_by);
+				}
+				$this->mongo_db->order_by($order_by);
+				$this->data["criteria"]["order_by"]=$order_by;
+			}
+		}
+		
+		/**
+		 * id function.
+		 * 
+		 * Return content matching ID
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function id() {
+			$id=$this->input->get_post("id");
+			if (!empty($id)) {
+				$this->mongo_db->where(array("_id"=>$id));
+				$this->data["criteria"]["id"]=$id;
+			}
+		}
+		
+		/**
+		 * fields function.
+		 * 
+		 * Send a list of fields to limit amount of data returned
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function fields() {
+			$fields=$this->input->get_post("fields");
+			if (!is_array($fields)) {
+				$fields=array($fields);
+			}
+			$this->mongo_db->select($fields);
+		}
+		
+		/**
+		 * meta function.
+		 * 
+		 * Return meta data about the fields
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function meta() {
+			$content_type=$this->input->get_post("content_type");
+			if (empty($content_type)) {
+				$id=$this->input->get_post("id");
+				$this->mongo_db->state_save();
+				$result=$this->mongo_db->get_where("content", array("_id"=>$id));
+				if (empty($result)) {
+					$this->data["error"]=true;
+					$this->data["msg"][]="Could not find content ID $id";
+					return true;
+				}
+				$this->mongo_db->state_restore();
+				$content_type=$result[0]->content_type;
+			}
+			if (empty($content_type)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Could not find content type to retrieve meta information";
+				return true;
+			}
+			//This is still old-skool system. Needs to change
+			$content_type_row=$this->db->get_where("content_types", array("urlid"=>$content_type))->row();
+			if (!isset($content_type_row->model)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Could not find model for content type $content_type to retrieve meta information";
+				return true;
+			}
+			$contentobj=new TLContent();
+			$contentobj->setContentType($content_type);
+			$fields=$contentobj->getFields();
+			$this->data["meta"]=$fields;
+		}
+		
+		/**
+		 * _check_callbacks function.
+		 * 
+		 * @access private
+		 * @return void
+		 */
+		private function _check_callbacks() {
+			foreach($this->vars as $key=>$val) {
+				if (method_exists($this, $key)) {
+					call_user_func(array($this, $key));
+				}
+			}
+		}
+		
+		/**
+		 * _check_secure function.
+		 * 
+		 * Returns true if we've sent a valid API key, else false
+		 *
+		 * @access private
+		 * @return boolean
+		 */
+		private function _check_secure() {
+			$api_key=$this->input->get_post("api_key");
+			$api_key=trim($api_key);
+			if (empty($api_key)) {
+				return false;
+			}
+			$comp_api_key=$this->config->item('api_key');
+			if (empty($comp_api_key)) {
+				return false;
+			}
+			if ($comp_api_key==$api_key) {
+				return true;
+			}
+			return false;
+		}
+		
+		/**
+		 * returndata function.
+		 * 
+		 * If $this->_render is true, print the results as json
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function returndata() {
+			$end_time=microtime(true);
+			$processing_time=$end_time-$this->_start_time;
+			$this->data["processing_time"]=$processing_time;
+			if ($this->_render) {
+				$this->load->view("json",array("data"=>$this->data));
+			}
+		}
+	}
+
+/* End of file content.php */
+/* Location: ./system/application/controllers/api/ */
