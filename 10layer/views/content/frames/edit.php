@@ -88,7 +88,7 @@
 			});
 			$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: content_type, data:data}));
 				update_pagination(content_type, data.count, 0, 100 );
 				update_autos();
@@ -107,7 +107,7 @@
 			$('#content-table').html("Loading...");
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				//update_pagination( data.count, offset, data.perpage );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -126,7 +126,7 @@
 			$('#pagination').html('');
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				update_pagination( content_type, data.count, offset, 100 );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -244,7 +244,7 @@
 				$(document.body).data('saving', true);
 				var formData = new FormData($('#contentform')[0]);
 				$.ajax({
-					url: "<?= base_url() ?>/workers/api/update/"+content_type+"/"+urlid+"/<?= $this->config->item('api_key') ?>",  //server script to process data
+					url: "<?= base_url() ?>api/content/save?api_key=<?= $this->config->item('api_key') ?>&id="+urlid,  //server script to process data
 					type: 'POST',
 					xhr: function() {  // custom xhr
 					    myXhr = $.ajaxSettings.xhr();
@@ -410,7 +410,7 @@
 	    <tr id="row_<%= item.id %>">
 	    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 	    	<td><%= item.last_modified %></td>
-	    	<td></td>
+	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
 	    	<td><%= item.start_date %></td>
 	    	<td class="<%= (item.live==1) ? 'green' : 'red' %>"><%= (item.live==1) ? 'Live' : 'Not live' %></td>
 	    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
@@ -425,8 +425,9 @@
 <script type='text/template' id='edit-template'>
 	<div id="edit-content" class="boxed wide">
 		<h2>Edit - <%= data.content_type %></h2>
-		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>edit/ajaxsubmit/<%= content_type %>/<%= urlid %>' class='well form-horizontal'>
+		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='well form-horizontal'>
 		<input type='hidden' name='action' value='submit' />
+		<input type='hidden' name='id' value='<%= urlid %>' />
 		<% _.each(data.meta, function(field) { 
 			field.value = data.content[field.name];
 		%>
