@@ -71,7 +71,7 @@ class TLContent {
 		}
 		foreach($this->fields as $key=>$field) {
 			if ($name==$key) {
-				if ($this->fields[$key]->multiple) {
+				if (($this->fields[$key]->multiple) && (!is_array($val))) {
 					$this->fields[$key]->value[]=$val;
 				} else {
 					$this->fields[$key]->value=$val;
