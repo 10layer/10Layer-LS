@@ -334,9 +334,58 @@
 			$db->content->ensureIndex(array("mg_original"=>1, "section"=>1));
 			$db->content->ensureIndex("tag");
 			$db->content->ensureIndex("author");
+			$db->content->ensureIndex("last_modified");
+			$db->content->ensureIndex("title");
+			$db->content->ensureIndex(array("content_type"=>1, "title"=>1));
 			$time_end=microtime(true);
 			$time=$time_end-$time_start;
 			print "Indexes created. Took $time seconds.\n\n";
+		}
+		
+		public function export_users($dbname) {
+			$time_start=microtime(true);
+			$connection = new Mongo("mongodb://localhost");
+			$db = $connection->selectDB($dbname);
+			//First we move all the users
+			$users=$this->db->select('tl_users.*, tl_user_status.name AS status')->join('tl_user_status', 'tl_users.status_id=tl_user_status.id')->get("tl_users")->result();
+			foreach($users as $user) {
+				//Move all the permissions
+				$permissions=$this->db->select('tl_permissions.name')->where('user_id', $user->id)->join('tl_permissions', 'tl_permissions_users_link.permission_id = tl_permissions.id')->get('tl_permissions_users_link')->result();
+				foreach($permissions as $permission) {
+					$user->permissions[]=url_title(strtolower($permission->name));
+				}
+				//Move all the roles
+				$roles=$this->db->select('tl_roles.name')->where('user_id', $user->id)->join('tl_roles', 'tl_roles_users_link.role_id = tl_roles.id')->get('tl_roles_users_link')->result();
+				foreach($roles as $role) {
+					$user->roles[]=url_title(strtolower($role->name));
+				}
+				$user->_id=$user->urlid;
+				unset($user->urlid);
+				unset($user->id);
+				$db->users->insert($user);
+			}
+			//Now we process the urls to deny and allow
+			$perms=$this->db->get('tl_permissions')->result();
+			foreach($perms as $perm) {
+				$permarr=array();
+				$name=url_title(strtolower($perm->name));
+				$urls = $this->db->select('tl_permissions_urls.url')->where('permission_id', $perm->id)->get('tl_permissions_urls')->result();
+				foreach($urls as $url) {
+					$permarr["deny"][] = $url->url;
+				}
+				$permarr["_id"] = $name;
+				$db->permissions->insert($permarr);
+			}
+			//Excluded paths
+			$excluded=$this->db->get('tl_security_exclude_paths')->result();
+			$tmp=array();
+			foreach($excluded as $path) {
+				$tmp[]=$path->path;
+			}
+			$db->permissions->insert(array("_id"=>"all", "allow"=>$tmp));
+			$time_end=microtime(true);
+			$time=$time_end-$time_start;
+			print "Users created. Took $time seconds.\n\n";
 		}
 		
 		public function speedtest($mongodbname, $couchdbname, $limit=100) {
