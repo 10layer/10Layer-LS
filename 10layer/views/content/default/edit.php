@@ -27,7 +27,7 @@
 			$("#dodone_right").click(function() {
 				$("#contentform").submit();
 				$.ajax({ type: "GET", url: "<?= base_url() ?>/workflow/change/advance/<?= $contenttype ?>/<?= $urlid ?>", async:false});
-				location.href="/workers/content/unlock/<?= $contenttype ?>/<?= $urlid ?>";
+				//location.href="/workers/content/unlock/<?= $contenttype ?>/<?= $urlid ?>";
 			});
 			$("#dodelete_right").click(function() {
 				$("#dialog-delete-confirm").dialog({
@@ -45,7 +45,7 @@
 				});
 			});
 			$(window).unload(function() {
-				$.ajax({ type: "GET", url: "<?= base_url() ?>/workers/content/unlock/<?= $contenttype ?>/<?= $urlid ?>", async:false});
+				//$.ajax({ type: "GET", url: "<?= base_url() ?>/workers/content/unlock/<?= $contenttype ?>/<?= $urlid ?>", async:false});
 			});
 			$("#workflows").load("/workflow/change/status/<?= $contenttype ?>/<?= $urlid ?>");
 			$("#workflow_next").live("click", function() {
