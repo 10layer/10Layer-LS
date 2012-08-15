@@ -38,6 +38,8 @@ class Mongo_db {
 	public $wheres = array();
 	private $sorts = array();
 	
+	private $cache=false;
+	
 	private $limit = 999999;
 	private $offset = 0;
 	
@@ -837,6 +839,46 @@ class Mongo_db {
 		if(empty($collection))
 			show_error("No Mongo collection specified to remove all indexes from", 500);
 		return($this->db->{$collection}->getIndexInfo());
+	}
+	
+	
+	/**
+	 * state_save function.
+	 * 
+	 * Back up our current Mongo_DB state so we can do some other
+	 * stuff. Return to this state with state_restore().
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function state_save() {
+		$this->cache=array(
+			"wheres"=>$this->wheres,
+			"selects"=>$this->selects,
+			"limit"=>$this->limit,
+			"offset"=>$this->offset,
+			"sorts"=>$this->sorts
+		);
+		$this->_clear();
+	}
+	
+	/**
+	 * state_restore function.
+	 * 
+	 * Call after we've done some other stuff to return to a
+	 * previous state
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function state_restore() {
+		if (!is_array($this->cache)) {
+			return true;
+		}
+		$this->_clear();
+		foreach($this->cache as $key=>$val) {
+			$this->$key=$val;
+		}
 	}
 	
 
