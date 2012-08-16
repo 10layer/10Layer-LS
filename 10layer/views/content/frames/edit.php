@@ -88,7 +88,7 @@
 			});
 			$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: content_type, data:data}));
 				update_pagination(content_type, data.count, 0, 100 );
 				update_autos();
@@ -107,7 +107,7 @@
 			$('#content-table').html("Loading...");
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				//update_pagination( data.count, offset, data.perpage );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -126,7 +126,7 @@
 			$('#pagination').html('');
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { searchstring: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
 				update_pagination( content_type, data.count, offset, 100 );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -387,7 +387,7 @@
 </script>
 
 <script type='text/template' id='listing-template-search'>
-	<input content_type='<%= content_type %>' type="text" id="list-search" value="<%= (search=='') ? 'Search' : search %>" />
+	<input content_type='<%= content_type %>' type="text" id="list-search" value="<%= (search) ? search : 'Search' %>" />
 	<span id="loading_icon" style="display:none;">
 		<img src="/tlresources/file/images/loader.gif" />
 	</span>

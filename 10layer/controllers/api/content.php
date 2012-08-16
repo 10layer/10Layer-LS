@@ -265,6 +265,22 @@
 		}
 		
 		/**
+		 * search function.
+		 * 
+		 * Searches title for a search string
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function search() {
+			$search=$this->input->get_post("search");
+			if (!empty($search)) {
+				$this->mongo_db->like("title", $search);
+				$this->data["criteria"]["search"]=$search;
+			}
+		}
+		
+		/**
 		 * fields function.
 		 * 
 		 * Send a list of fields to limit amount of data returned
