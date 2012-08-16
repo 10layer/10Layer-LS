@@ -20,33 +20,33 @@
 
 <script type='text/template' id='edit-field-autocomplete'>
 	<!-- edit-field-autocomplete -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<div class="row">
-			<input id='autocomplete_view_<%= field.tablename %>_<%= field.name %>' type='text' tablename='<%= field.tablename %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
-			<% if ((field.external==1) && (field.hidenew==false)) { %>
-			<%= _.template($('#button-new-template').html(), { field: field }) %>
-			<%
-				}
-			%>
-			</div>
-			<div class="items_container row">
-			
-			<%
-				if (field.value) {
-					if (!_.isArray(field.value)) {
-						field.value=[field.value];
+	<div class="row">
+		<div class='control-group span6'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls'>
+				<input id='autocomplete_view_<%= field.tablename %>_<%= field.name %>' type='text' tablename='<%= field.tablename %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+				<% if ((field.external==1) && (field.hidenew==false)) { %>
+				<%= _.template($('#button-new-template').html(), { field: field }) %>
+				<%
 					}
-					_.each(field.value, function(urlid) {
-			%>
-						<%= _.template($('#field-autocomplete-item').html(), { urlid: urlid, field: field }) %>
-			<%
-					});
-				}
-			%>
+				%>
+				</div>
+				<div class="items_container offset1 span8">
+				
+				<%
+					if (field.value) {
+						if (!_.isArray(field.value)) {
+							field.value=[field.value];
+						}
+						_.each(field.value, function(urlid) {
+				%>
+							<%= _.template($('#field-autocomplete-item').html(), { urlid: urlid, field: field }) %>
+				<%
+						});
+					}
+				%>
+				
 			</div>
-			
 		</div>
 	</div>
 </script>
@@ -70,9 +70,6 @@
 </script>
 
 <script type='text/template' id='field-autocomplete-item'>
-	<%
-		console.log(field);
-	%>
 	<div class="autocomplete_item span2 well">
 		<button class="close">&times;</button>
 		<span class="ui-button-text">
@@ -84,10 +81,12 @@
 
 <script type='text/template' id='edit-field-boolean'>
 	<!-- edit-field-boolean -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<input type='checkbox' name='<%= field.tablename %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.value==1) ? "checked='checked'" : '' %> />
+	<div class="row">
+		<div class='control-group span8'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls'>
+				<input type='checkbox' name='<%= field.tablename %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.value==1) ? "checked='checked'" : '' %> />
+			</div>
 		</div>
 	</div>
 </script>
@@ -114,10 +113,12 @@
 
 <script type='text/template' id='edit-field-checkbox'>
 	<!-- edit-field-checkbox -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class="controls">
-			<input type='checkbox' name='<%= field.tablename %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.value==1) ? "checked='checked'" : '' %> />
+	<div class="row">
+		<div class='control-group span8'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class="controls">
+				<input type='checkbox' name='<%= field.tablename %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.value==1) ? "checked='checked'" : '' %> />
+			</div>
 		</div>
 	</div>
 </script>
@@ -162,30 +163,32 @@
 
 <script type='text/template' id='edit-field-deepsearch'>
 	<!-- edit-field-deepsearch -->
-	<div class='control-group deepsearch'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<input id="deepsearch_view_<%= field.tablename %>_<%= field.name %>" type="text" tablename="<%= field.tablename %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" class="deepsearch_input <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value="" <% (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
-			<br clear="both" />
-			<div class="deepsearch_results" style=" padding: 5px; background-color: #FFF; border: 1px #CCC solid; width:290px; height:300px; overflow:auto; float:left;"></div>
-			<div class="selected_results" style=" padding: 5px; background-color: #FFF; border: 1px #CCC solid; width:290px; height:300px; overflow:auto; float:right;">
-			<%
-				if (field.data) {
-					var x=0;
-					_.each(field.data, function(data) {
-						var value=data.content_id;
-						var title=data.fields.title.value;
-						var start_date=data.fields.start_date.value;
-			%>
-				<div class='deepsearch_selected_item'>
-				<input id="deepsearch_<%= field.contenttype %>_<%= field.name %>_<%= value %>" type="hidden" name="<%= field.tablename %>_<%= field.name %><%= (field.multiple==1) ? '[]' : '' %>" value="<%= value %>"  />
-				<span><%= title %> (<%= start_date %>)</span>
+	<div class="row">
+		<div class='control-group deepsearch span8'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls'>
+				<input id="deepsearch_view_<%= field.tablename %>_<%= field.name %>" type="text" tablename="<%= field.tablename %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" class="deepsearch_input <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value="" <% (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+				<br clear="both" />
+				<div class="deepsearch_results well span2" style="height:300px; overflow:auto; float:left;"></div>
+				<div class="selected_results well span2" style="height:300px; overflow:auto; ">
+				<%
+					if (field.data) {
+						var x=0;
+						_.each(field.data, function(data) {
+							var value=data.content_id;
+							var title=data.fields.title.value;
+							var start_date=data.fields.start_date.value;
+				%>
+					<div class='deepsearch_selected_item'>
+					<input id="deepsearch_<%= field.contenttype %>_<%= field.name %>_<%= value %>" type="hidden" name="<%= field.tablename %>_<%= field.name %><%= (field.multiple==1) ? '[]' : '' %>" value="<%= value %>"  />
+					<span><%= title %> (<%= start_date %>)</span>
+					</div>
+				
+<%				
+						});
+					}
+%>				
 				</div>
-			
-<%			
-					});
-				}
-%>			
 			</div>
 		</div>
 	</div>
@@ -272,7 +275,7 @@
 		<% } %>
 		<% if (field.linkformat && urlid) { %>
 			<label>Download link</label>
-			<div class='download_url'><input type='text' class='span9 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', field.value) %>' /></div>
+			<div class='download_url'><input type='text' class='span8 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', field.value) %>' /></div>
 		<% } %>
 		</div>
 	</div>
@@ -288,39 +291,44 @@
 
 <script type='text/template' id='edit-field-nesteditems'>
 	<!-- edit-field-nesteditems -->
-	<div class='contol-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls nested_container' contenttype="<%= field.contenttype %>"> 
-			<div class="selected_item">
-			
-				<input id="nestedselect_view_<%= field.tablename %>_<%= field.name %>" name="<%= field.tablename %>_<%= field.name %>" type="hidden" tablename="<%= field.tablename %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" class="nestedselect <%= field.class %>" value="<%= field.value %>" <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
-				<div class="nesteditems_item_label1"><%= (field.data) ? field.data.fields.title.value : '' %></div>
+	<div class="row">
+		<div class='contol-group'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls nested_container' contenttype="<%= field.contenttype %>">
+				<select class='chzn-select' data-placeholder="Choose <%= field.label %>" name='<%= field.tablename %>_<%= field.name %>' id='<%= field.name %>-hook'>
+				<option value="0"></option>
+			<% 
+				var url='/list/jsonnested/'+field.contenttype+'/1';
+				$.get(url, function(data) {
+					_.each(data.tree, function(item) {
+						var s="";
+						s="<optgroup label='"+item.title+"'>"+'<option value="'+item.urlid+'" '+((item.urlid==field.value) ? 'selected="selected"' : '')+'>'+item.title+'</option>';
+						_.each(item.children, function(child) {
+							s+='<option value="'+child.urlid+'" '+((child.urlid==field.value) ? 'selected="selected"' : '')+'>'+item.title+' - '+child.title+'</option>';
+						});
+						s+='</optgroup>';
+						$('#'+field.name+'-hook').append(s);
+						
+					});
+					$("#"+field.name+"-hook").trigger("liszt:updated");
+				}); 
+			%>
+				</select>
 			</div>
-			
-			<div class="nested_items"></div>
 		</div>
 	</div>
 </script>
 
-<script type='text/template' id='edit-field-nesteditems-list'>
-	<ul class='nested_tree'>
+<script type='text/template' id='edit-field-nesteditems-item'>
 	<% _.each(tree, function(item) { %>
-		<li label='<%= item.title %>' content_id='<%= (item.content_link_id) ? item.content_link_id : item.content_id %>' class='nested_section'>
-		<div> <%= item.title %></div>
-		<%= (item.children) ? _.template($('#edit-field-nesteditems-list').html(), {tree: item.children}) : '' %>
-		</li>
-	<% }); %>
-	</ul>
-</script>
-
-
-
-<script type='text/template' id='edit-field-nesteditems-list'>
-	<% _.each(tree, function(item) { %>
-		<li label='<%= item.title %>' content_id='<%= (item.content_link_id) ? item.content_link_id : item.content_id %>' class='nested_section'>
-		<%= item.title %>
-		<%= (item.children) ? _.template($('#edit-field-nesteditems-list').html(), {tree: item.children}) : '' %>
-		</li>
+		<% if (item.children) { %>
+		<optgroup label='<%= item.title %>'>
+			<option value='<%= item.urlid %>'  ><%= item.title %></option>
+			<%= (item.children) ? _.template($('#edit-field-nesteditems-list').html(), {tree: item.children}) : '' %>
+		</optgroup>
+		<% } else { %>
+			<option value='<%= item.urlid %>'><%= item.title %></option>
+		<% } %>
 	<% }); %>
 </script>
 
@@ -432,18 +440,20 @@
 
 <script type='text/template' id='edit-field-rich'>
 	<!-- edit-field-rich -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<button id="contentselectButton_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_rich_select btn">Select <%= field.label %></button>
-			<% $(document.body).data('onsave', update_rich) %>
-			<%= _.template($('#button-new-template').html(), { field: field }) %>
-			<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
-				<% if(field.value) {  %>
-					<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.value, tablename: field.tablename }) %>
-				<% } %>
+	<div class="row">
+		<div class='control-group span8'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls'>
+				<button id="contentselectButton_<%= field.tablename %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" tablename="<%= field.tablename %>" class="btn_rich_select btn">Select <%= field.label %></button>
+				<% $(document.body).data('onsave', update_rich) %>
+				<%= _.template($('#button-new-template').html(), { field: field }) %>
+				<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
+					<% if(field.value) {  %>
+						<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.value, tablename: field.tablename }) %>
+					<% } %>
+				</div>
+				<div id="contentselect_<%= field.contenttype %>_<%= field.name %>" class="<%= field.contenttype %>_<%= field.name %>-select popup wide"></div>
 			</div>
-			<div id="contentselect_<%= field.contenttype %>_<%= field.name %>" class="<%= field.contenttype %>_<%= field.name %>-select popup wide"></div>
 		</div>
 	</div>
 </script>
@@ -453,7 +463,6 @@
 </script>
 
 <script type='text/template' id='field-rich-item'>
-	<div class="row">
 		<a href="/edit/picture/<%= urlid %>" class="btn" target="_top">Edit</a>
 		<div class="link_results">
 			<div class="rich_overlay">
@@ -461,11 +470,10 @@
 				
 			</div>
 			<div class="selectitem">
-				<div class="thumbnail span6"><img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/460/200" /></div>
+				<div class="thumbnail"><img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/460/200" /></div>
 			</div>
 			<input type='hidden' name='<%= tablename %>_<%= fieldname %>' value='<%= urlid %>' />
 		</div>
-	</div>
 </script>
 
 <script type='text/template' id='field-rich-list'>
@@ -520,23 +528,25 @@
 
 <script type='text/template' id='edit-field-select'>
 	<!-- edit-field-select -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.tablename %>_<%= field.name %>'>
-			<option value="0"></option>
-			<% 
-			var keyadjust=0;
-			_.each(field.options, function(val, key) {
-				if (key==0) {
-					keyadjust=1;
-				}
-			});
-			%>
-			<% _.each(field.options, function(option, key) { %>
-				<option value='<%= ( key + keyadjust) %>' <%= (field.value==( key + keyadjust)) ? 'selected="selected"' : '' %> ><%= option %></option>
-			<% }); %>
-			</select>
+	<div class="row">
+		<div class='control-group'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class='controls'>
+				<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.tablename %>_<%= field.name %>'>
+				<option value="0"></option>
+				<% 
+				var keyadjust=0;
+				_.each(field.options, function(val, key) {
+					if (key==0) {
+						keyadjust=1;
+					}
+				});
+				%>
+				<% _.each(field.options, function(option, key) { %>
+					<option value='<%= ( key + keyadjust) %>' <%= (field.value==( key + keyadjust)) ? 'selected="selected"' : '' %> ><%= option %></option>
+				<% }); %>
+				</select>
+			</div>
 		</div>
 	</div>
 </script>
@@ -562,10 +572,12 @@
 
 <script type='text/template' id='edit-field-text'>
 	<!-- edit-field-text -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class="controls">
-			<input type='text' name='<%= field.tablename %>_<%= field.name %>' value='<%= field.value %>' class='span9 <%= field.class %>' />
+	<div class="row ">
+		<div class='control-group span8'>
+			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+			<div class="controls">
+				<input type='text' name='<%= field.tablename %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' />
+			</div>
 		</div>
 	</div>
 </script>
@@ -578,10 +590,12 @@
 
 <script type='text/template' id='edit-field-textarea'>
 	<!-- edit-field-textarea -->
-	<div class='control-group'>
-		<label class='<%= field.label_class %> control-label'><%= field.label %></label>
-		<div class="controls">
-			<textarea name='<%= field.tablename %>_<%= field.name %>' class='input-xlarge span9 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= field.value %></textarea>
+	<div class="row">
+		<div class='control-group span8'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<textarea name='<%= field.tablename %>_<%= field.name %>' class='input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= field.value %></textarea>
+			</div>
 		</div>
 	</div>
 </script>
