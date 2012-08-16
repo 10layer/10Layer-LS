@@ -16,6 +16,9 @@
 		 */
 		public function __construct() {
 			parent::__construct();
+			//Not a good idea for production server
+			$this->load->library("tlsecurity");
+			$this->tlsecurity->ignore_security();
 		}
 		
 		protected function _content($content_type, $limit=2, $start=0) {
