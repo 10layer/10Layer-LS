@@ -389,7 +389,7 @@
 <script type='text/template' id='listing-template-search'>
 	<input content_type='<%= content_type %>' type="text" id="list-search" value="<%= (search) ? search : 'Search' %>" />
 	<span id="loading_icon" style="display:none;">
-		<img src="/tlresources/file/images/loader.gif" />
+		<!--<img src="/tlresources/file/images/loader.gif" />-->
 	</span>
 </script>
 
@@ -423,8 +423,10 @@
 
 
 <script type='text/template' id='edit-template'>
-	<div id="edit-content" class="row">
-		<h2>Edit - <%= data.content_type %></h2>
+<div class="row">
+	<% console.log(data); %>
+	<div id="edit-content" class="span9">
+		<h2>Edit</h2>
 		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
 		<input type='hidden' name='action' value='submit' />
 		<input type='hidden' name='id' value='<%= urlid %>' />
@@ -437,26 +439,27 @@
 		<% }); %>
 		</form>
 	</div>
-	<div id="sidebar" class="pin">
+	<div id="sidebar" class="span2 well">
 		<div id="sidebar_accordian">
-			<h3><a href="#">Actions</a></h3>
+			
 			<div>
-				<button id="dodone_right" content_type="<%= content_type %>" urlid="<%= urlid %>">Done</button><br />
+				<button id="dodone_right" content_type="<%= content_type %>" urlid="<%= urlid %>" class="btn btn-primary btn-large">Done</button><br />
 				<br />
-				<button id="dosubmit_right">Save</button><br />
+				<button id="dosubmit_right" class="btn btn-success btn-large">Save</button><br />
 				<br />
 			</div>
 			<!--<h3><a href="#">Versions</a></h3>
 			<div>
-				<button id="dofork_right" class="ui-button-text-icons ui-button ui-widget ui-state-default ui-corner-all " role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-arrowthickstop-1-n"></span>Fork</button><br />
+				<button id="dofork_right" class="btn" role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-arrowthickstop-1-n"></span>Fork</button><br />
 				<br />
-				<button id="dolink_right" class="ui-button-text-icons ui-button ui-widget ui-state-default ui-corner-all " role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-link"></span>Link</button><br />
+				<button id="dolink_right" class="btn" role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-link"></span>Link</button><br />
 				<br />
 			</div>-->
 			<h3><a href="#">Workflow</a></h3>
 			<div id="workflows"></div>
 		</div>
 	</div>
+</div>
 </script>
 
 <script type='text/template' id='create-popup-template'>

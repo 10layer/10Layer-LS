@@ -224,12 +224,13 @@ function get_wordcount(sender) {
 
 function init_form() {
 
-	$($('.nested_container')).each(function(index) {
+	/*$($('.nested_container')).each(function(index) {
 		var container = $(this);
 		var content_type = $(this).attr("contenttype");
 		var items = container.children().eq(1);
 		    	
     	$.getJSON('/list/jsonnested/'+content_type+'/1?jsoncallback=?', function(data) {
+    		console.log(data);
   				items.html(_.template($('#edit-field-nesteditems-list').html(), data));
   				
   				$(".nested_section").live("click", function(){
@@ -246,7 +247,7 @@ function init_form() {
 				});				
 
 		});
-	});
+	});*/
 	
 	$(".chzn-select").chosen();
 	
