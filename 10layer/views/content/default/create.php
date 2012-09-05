@@ -1,14 +1,11 @@
 <script language="javascript">
 	var contenttype="<?= $contenttype ?>";
 </script>
-<?php
-	link_js("/tlresources/file/js/forms.js");
-	link_js("/tlresources/file/jquery/jquery.form.js");
-	link_js("/tlresources/file/js/forms/default.js");
-?>
+
 <div id="create-content" class="boxed wide">
 <h2><?php echo $heading; ?></h2>
-	<form id="contentform" method="post" enctype="multipart/form-data" action="/create/ajaxsubmit/<?= $contenttype ?>">
+	<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
+		
 		<input type="hidden" name="action" value="submit" />
 		<?php 
 			$this->formcreator->drawFields();

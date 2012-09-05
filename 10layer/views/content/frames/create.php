@@ -2,15 +2,14 @@
 	$data["menu1_active"]="create";
 	$data["menu2_active"]="create/".$type;
 	$this->load->view('templates/header',$data);
-	link_js("/tlresources/file/js/forms.js");
-	link_js("/tlresources/file/jquery/jquery.form.js?1");
-	link_js("/tlresources/file/js/forms/default.js");
+	link_js("/resources/js/forms.js");
 	ckeditor();
-	//tinymce();
 ?>
-<script src="/tlresources/file/js/underscore-min.js"></script>
-<script src="/tlresources/file/js/jquery.pagination.js"></script>
-<script src="/tlresources/file/js/davis.min.js"></script>
+
+<script src="/resources/js/davis.min.js"></script>
+<link rel="stylesheet" href="/resources/chosen/chosen.css">
+<script src="/resources/chosen/chosen.jquery.js"></script>
+
 <script language="javascript">
 	$(function() {
 		//Set the API key
@@ -279,6 +278,39 @@
 		});
 
 	});
+</script>
+
+<script type='text/template' id='create-template'>
+	<%	
+		if (typeof popup == 'undefined') {
+			popup = false;
+		}
+	%>
+	<div id="create-content" class="boxed wide">
+		<h2>Create - <%= content_type %></h2>
+		<form id='form_create_<%= content_type %>' class='form-horizontal span12 <%= (popup) ? "popupform" : "contentform" %>' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+		<input type='hidden' name='action' value='submit' />
+		<% _.each(data.fields, function(field) { %>
+			<% if (!field.hidden) { %>
+				<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
+			<% } %>
+		<% }); %>
+		<% if (popup) { %>
+		<button contenttype="<%= content_type %>" fieldname="<%= name %>" class='dosubmit_popup'>Save</button>
+		<% } %>
+		</form>
+	</div>
+	<% if (popup == false) { %>
+	<div id="sidebar" class="pin">
+		<div id="sidebar_accordian">
+			<h3><a href="#">Actions</a></h3>
+			<div>
+				<button id="dosubmit_right">Save</button><br />
+				<br />
+			</div>
+		</div>
+	</div>
+	<% } %>
 </script>
 
 <?php
