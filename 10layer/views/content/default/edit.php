@@ -4,7 +4,7 @@
 	var contentId="<?= $id ?>";
 	var contentTypeId="<?= $contenttype_id ?>";
 </script>
-<div id="create-content" class="boxed wide">
+<div id="edit-content" class="boxed wide">
 <h2><?php echo $heading; ?></h2>
 	
 	<form id="contentform" method="post" enctype="multipart/form-data" action="/edit/ajaxsubmit/<?= $contenttype ?>/<?= $urlid ?>">
