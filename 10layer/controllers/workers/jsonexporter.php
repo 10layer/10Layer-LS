@@ -329,6 +329,41 @@
 			$this->index_mongodb($dbname);
 		}
 		
+		public function set_workflows($dbname) {
+			$data=array(
+				array(
+					"_id"=>"initial_creation",
+					"name"=>"Initial creation",
+					"id"=>0,
+				),
+				array(
+					"_id"=>"subbing",
+					"name"=>"Subbing",
+					"id"=>1,
+				),
+				array(
+					"_id"=>"editing",
+					"name"=>"Editing",
+					"id"=>2,
+				),
+				array(
+					"_id"=>"queued_for_publishing",
+					"name"=>"Queued for publishing",
+					"id"=>3,
+				),
+				array(
+					"_id"=>"published",
+					"name"=>"Published",
+					"id"=>4,
+				),
+			);
+			$connection = new Mongo("mongodb://localhost");
+			$db = $connection->selectDB($dbname);
+			foreach($data as $row) {
+				$db->workflow->insert($row);
+			}
+		}
+		
 		public function index_mongodb($dbname) {
 			$time_start=microtime(true);
 			$connection = new Mongo("mongodb://localhost");
