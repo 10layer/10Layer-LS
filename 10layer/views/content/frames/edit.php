@@ -3,11 +3,8 @@
 	$data["menu2_active"]="edit/".$type;
 	$this->load->view('templates/header',$data);
 	link_js("/resources/js/forms.js");
-	//link_js("/tlresources/file/jquery/jquery.form.js?1");
-	//link_js("/resources/js/forms/default.js");
 	ckeditor();
 ?>
-<script src="/resources/js/underscore-min.js"></script>
 <script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/js/davis.min.js"></script>
 <link rel="stylesheet" href="/resources/chosen/chosen.css">
@@ -455,7 +452,7 @@
 				<button id="dolink_right" class="btn" role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-link"></span>Link</button><br />
 				<br />
 			</div>-->
-			<h3><a href="#">Workflow</a></h3>
+			<h3>Workflow</h3>
 			<div id="workflows"></div>
 		</div>
 	</div>
