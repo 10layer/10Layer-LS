@@ -131,7 +131,7 @@
 
 <script type='text/template' id='create-field-date'>
 	<!-- create-field-date -->
-	<%= _.template($('#create-field-date').html(), {field: field} ) %>
+	<%= _.template($('#edit-field-date').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-datetime'>
@@ -202,11 +202,30 @@
 </script>
 
 <script type='text/template' id='edit-field-external'>
-	<%= _.template($("#old-fields-template").html(), { field: field, urlid: urlid, content_type: content_type }) %>
+	<!-- edit-field-external -->
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class='controls'>
+			<select class='chzn-select' data-placeholder="Choose <%= field.label %>" name='<%= field.tablename %>_<%= field.name %>' id='<%= field.name %>-hook'>
+				<option value="0"></option>
+			<% 
+			$.get(field.options, function(data) {
+				var parts=data.split("\n");
+				_.each(parts, function(value) {
+					$('#'+field.name+'-hook').append('<option value="'+value+'" '+((value==field.value) ? 'selected="selected"' : '')+'>'+value+'</option>');
+						
+				});
+				$("#"+field.name+"-hook").trigger("liszt:updated");
+			}); 
+			%>
+			</select>
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='create-field-external'>
-	<%= _.template($("#old-fields-create-template").html(), { field: field, content_type: content_type }) %>
+	<!-- create-field-external -->
+	<%= _.template($('#edit-field-external').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-file'>
@@ -228,17 +247,17 @@
 <script type='text/template' id='edit-field-hidden'>
 	<!-- edit-field-hidden -->
 	<% if (field.multiple) { 
-		_.each(field.value, function(value) { %>
-			<input type='hidden' name='<%= field.tablename %>_<%= field.name %>[]' value='<%= value %>' />
-	<% 	});
+			_.each(field.value, function(value) { %>
+				<input type='hidden' name='<%= field.tablename %>_<%= field.name %>[]' value='<%= (value) ? value : '' %>' />
+	<% 		});
 		} else { %>
-	<input type='hidden' name='<%= field.tablename %>_<%= field.name %>' value='<%= field.value %>' />
+			<input type='hidden' name='<%= field.tablename %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' />
 	<% } %>
 </script>
 
 <script type='text/template' id='create-field-hidden'>
 	<!-- create-field-hidden -->
-	<input type='hidden' name='<%= field.tablename %>_<%= field.name %>' value='' />
+	<%= _.template($('#edit-field-hidden').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-image'>
@@ -262,10 +281,12 @@
 </script>
 
 <script type='text/template' id='create-field-image'>
-	<div class='field-image'>
-	<label class='<%= field.label_class %>'><%= field.label %></label>
-	<input type="file" name="<%= field.tablename %>_<%= field.name %>" class="file_upload <%= field.class %>" />
-	<br clear='both' />
+	<!-- edit-field-image -->
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class='controls'>
+			<input type="file" name="<%= field.tablename %>_<%= field.name %>" class="file_upload <%= field.class %>" />
+		</div>
 	</div>
 </script>
 
@@ -524,22 +545,8 @@
 </script>
 
 <script type='text/template' id='create-field-select'>
-	<label class='<%= field.label_class %>'><%= field.label %></label>
-	<select class='<%= field.class %>' name='<%= field.tablename %>_<%= field.name %>'>
-	<option value="0"></option>
-	<% 
-	var keyadjust=0;
-	_.each(field.options, function(val, key) {
-		if (key==0) {
-			keyadjust=1;
-		}
-	});
-	%>
-	<% _.each(field.options, function(option, key) { %>
-		<option value='<%= ( key + keyadjust) %>' <%= (field.value==( key + keyadjust) ) ? 'selected="selected"' : '' %> ><%= option %></option>
-	<% }); %>
-	</select>
-	<br clear='both' />
+	<!-- create-field-select -->
+	<%= _.template($('#edit-field-select').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-text'>
@@ -547,19 +554,14 @@
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class="controls">
-				<input type='text' name='<%= field.tablename %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' />
+				<input type='text' name='<%= field.tablename %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' />
 			</div>
 		</div>
 </script>
 
 <script type='text/template' id='create-field-text'>
 	<!-- create-field-text -->
-		<div class='control-group'>
-			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-			<div class="controls">
-				<input type='text' name='<%= field.tablename %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' />
-			</div>
-		</div>
+	<%= _.template($('#edit-field-text').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-textarea'>
