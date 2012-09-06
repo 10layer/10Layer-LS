@@ -22,7 +22,7 @@ class Model_Videos extends Model_Content {
 		array(
 	    	"name"=>"filename",
 	    	"type"=>"external",
-	    	"options"=>"http://athena.mg.co.za/mediaEngine/status.php?selected=",
+	    	"options"=>"http://local.10layerls.com/resources/tests/external_test.html",
 	    ),
 	    array(
 	    	"name"=>"caption",
