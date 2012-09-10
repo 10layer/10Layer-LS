@@ -162,14 +162,27 @@
 			}
 			//Save
 			$data=$contentobj->getData();
-			$this->id();
+			$urlid=$contentobj->fields["urlid"]->value;
 			unset($data->id);
 			unset($data->urlid);
 			unset($data->content_id);
 			$data->last_modified=date("Y-m-d H:i:s");
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
 			$data->last_editor=$user->name;
-			$result=$this->mongo_db->upsert('content', $data);
+			
+			$id=$this->input->get_post("id");
+			if (!empty($id)) {
+				//Update
+				$this->id();
+				$result=$this->mongo_db->upsert('content', $data);
+			} else {
+				$data->content_type=$content_type;
+				$data->timestamp=date("Y-m-d H:i:s");
+				$data->_id=$urlid;
+				$result=$this->mongo_db->insert('content', $data);
+			}
+			//unset($data->id);
+			$this->data["id"]=$urlid;
 			if (!$result) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Failed to save {$content_type} - Mongo DB error";
