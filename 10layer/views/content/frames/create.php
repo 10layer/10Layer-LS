@@ -24,9 +24,9 @@
 			});
 			
 			this.before('/create/:content_type', function(req) {
-				if ($(document.body).data('content_type') == req.params['content_type'] && $(document.body).data('page')=='list') {
+				/*if ($(document.body).data('content_type') == req.params['content_type'] && $(document.body).data('page')=='list') {
 					return false;
-				}
+				}*/
 			});
 		
 			this.get('#', function(req) {});
@@ -63,7 +63,7 @@
 		
 		$(document).on('click', '#dosubmit_right', function() {
 			if (!$(document.body).data('saving')) {
-				$("#contentform").submit();
+				save();
 			}
 			return false;
 		});
@@ -73,30 +73,23 @@
 		});
 		
 		$("#dyncontent").ajaxComplete(function() {
-			cl.hide();
+			//cl.hide();
 		});
 		
 		$("#dyncontent").ajaxStart(function() {
-			cl.show();
+			//cl.show();
 		});
 		
-		/*$("#dyncontent").load("<?= base_url()."create/fullview/$type" ?>", function() {
-			if ($(".richedit").length) {
-//				init_tinymce();
-				initCKEditor();
-			}
-			
-			$(".datepicker").datepicker({dateFormat:"yy-mm-dd"});
-		});*/
-		
-		$("#dyncontent").delegate("#contentform","submit",function() {
-			$(document).data("saving",true);
+		function save() {
+			for ( instance in CKEDITOR.instances )
+				CKEDITOR.instances[instance].updateElement();
 			content_type=$(document.body).data('content_type');
+			urlid=$(document.body).data('urlid');
 			if (!$(document.body).data('saving')) {
 				$(document.body).data('saving', true);
 				var formData = new FormData($('#contentform')[0]);
 				$.ajax({
-					url: "<?= base_url() ?>/workers/api/insert/"+content_type+"/<?= $this->config->item('api_key') ?>",  //server script to process data
+					url: "<?= base_url() ?>api/content/save?api_key=<?= $this->config->item('api_key') ?>&content_type="+content_type,  //server script to process data
 					type: 'POST',
 					xhr: function() {  // custom xhr
 					    myXhr = $.ajaxSettings.xhr();
@@ -117,108 +110,36 @@
 					processData: false
 				});
 			}
-			/*$(this).ajaxSubmit({
-				iframe: true,
-				dataType: "json",
-				beforeSubmit: function(a,f,o) {
-					o.dataType = "json";
-					$(document).data("saving",true);
-				},
-				success: function(data) {
-					$(document).data("saving",false);
-					if (data.error) {
-						$("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>"+data.msg+"</strong><br /><br /> "+data.info+"</p></div>");
-						$("#msgdialog").dialog({
-							modal: true,
-							buttons: {
-								Ok: function() {
-									$( this ).dialog( "close" );
-								}
-							}
-						});
-					} else {
-						$("#msgdialog").html("<div class='ui-state-highlight' style='padding: 5px'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: .3em;'></span><strong>Saved</strong></p></div>");
-						$("#msgdialog").dialog({
-							modal: true,
-							buttons: {
-								"Create another": function() {
-									location.href="<?= base_url() ?>create/"+$(document.body).data('content_type');
-								},
-								"Reuse info": function() {
-									$(this).dialog( "close" );
-								},
-								"Edit": function() {
-									location.href="<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.data.urlid;
-								}
-							}
-						});
-					}
-				},
-				error: function(e) {
-					$(document).data("saving",false);
-					$("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>Error</strong><br /> Problem communicating with the server: "+e.error+"</p></div>");
-					$("#msgdialog").dialog({
-						modal: true,
-						buttons: {
-							Ok: function() {
-								$(this).dialog("close");
-							}
-						}
-					});
-				},
-			});*/
-			return false;
-		});
+		}
 		
 		function uploadBefore(e) {}
 		
 		function uploadProgress(e) {
-			//console.log("Upload progress");
-			//console.log(e);
+			console.log("Upload progress");
+			console.log(e);
 		}
 		
 		function uploadComplete(data) {
 			$(document.body).data("saving",false);
 			if (data.error) {
-			    $("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>"+data.msg+"</strong><br /><br /> "+data.info+"</p></div>");
-			    $("#msgdialog").dialog({
-			    	modal: true,
-			    	buttons: {
-			    		Ok: function() {
-			    			$( this ).dialog( "close" );
-			    		}
-			    	}
-			    });
-			} else {
-			    $("#msgdialog").html("<div class='ui-state-highlight' style='padding: 5px'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: .3em;'></span><strong>Saved</strong></p></div>");
-			    $("#msgdialog").dialog({
-			    	modal: true,
-			    	buttons: {
-			    		"Create another": function() {
-			    			location.href="<?= base_url() ?>create/"+$(document.body).data('content_type');
-			    		},
-			    		"Reuse info": function() {
-			    			$(this).dialog( "close" );
-			    		},
-			    		"Edit": function() {
-			    			location.href="<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.data.urlid;
-			    		}
-			    	}
-			    });
-			}
-		}
-		
-		function uploadFailed(e) {
-			$(document.body).data("saving",false);
-			$("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>Error</strong><br /> Problem communicating with the server: "+e.statusText+"</p></div>");
-			$("#msgdialog").dialog({
-				modal: true,
-				buttons: {
-					Ok: function() {
-						$(this).dialog("close");
+				$("#msgdialog-header").html("Error");
+				var info = (data.info) ? data.info : '';
+				if (_.isArray(info)) {
+					var tmp='';
+					for(var x=0; x<info.length; x++) {
+						tmp+="<li>"+info[x]+"</li>";
 					}
 				}
-			});
+				info="<ul>"+tmp+"</li>";
+				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
+				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+			    $("#msgdialog").modal();
+			} else {
+				$("#msgdialog-header").html("Saved");
+				$("#msgdialog-body").html("<p>Content has been successfully saved</p>");
+				$("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				$("#msgdialog").modal();
+			}
 		}
 		
 		$("#dyncontent").delegate(".add-relation","click",function() {
@@ -228,52 +149,6 @@
 				"/create/fullview/"+$(this).attr("contenttype")+"/embed"
 			);
 			$("#createdialog").data("fieldname",fieldname);
-			return false;
-		});
-		
-		
-		$("#createdialog").delegate("#contentform","submit",function() {
-		//Handles the submit for a new item
-			$("#createdialog #contentform").ajaxSubmit({
-				dataType: "json",
-				iframe: true,
-				
-				beforeSubmit: function(a,f,o) {
-					o.dataType = "json";
-				},
-				success: function(data) {
-					if (data.error) {
-						$("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>"+data.msg+"</strong><br /> "+data.info+"</p></div>");
-						$("#msgdialog").dialog({
-							modal: true,
-							buttons: {
-								Ok: function() {
-									$(this).dialog("close");
-								}
-							}
-						});
-					} else {
-						$("#msgdialog").html("<div class='ui-state-highlight' style='padding: 5px'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: .3em;'></span><strong>Saved</strong></p></div>");
-						var title=data.data.title;
-						var id=data.data.id;
-						var fieldname=$("#createdialog").data("fieldname");
-						var newoption="<option value='"+id+"'>"+title+"</option>";
-						$("."+fieldname).prepend(newoption);
-						$("."+fieldname).val(id);
-						//$("#dyncontent").find()
-						$("#createdialog").dialog("close");
-						$("#msgdialog").dialog({
-							modal: true,
-							buttons: {
-								Ok: function() {
-									$(this).dialog("close");
-								}
-							}
-						});
-					}
-					
-				}
-			});
 			return false;
 		});
 
@@ -288,7 +163,7 @@
 	%>
 	<div id="create-content" class="boxed wide">
 		<h2>Create - <%= content_type %></h2>
-		<form id='form_create_<%= content_type %>' class='form-horizontal span12 <%= (popup) ? "popupform" : "contentform" %>' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+		<form id='contentform' class='form-horizontal span12 <%= (popup) ? "popupform" : "contentform" %>' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
 		<input type='hidden' name='action' value='submit' />
 		<% _.each(data.fields, function(field) { %>
 			<% if (!field.hidden) { %>
@@ -300,25 +175,34 @@
 		<% } %>
 		</form>
 	</div>
-	<% if (popup == false) { %>
-	<div id="sidebar" class="pin">
-		<div id="sidebar_accordian">
-			<h3><a href="#">Actions</a></h3>
-			<div>
-				<button id="dosubmit_right">Save</button><br />
-				<br />
-			</div>
-		</div>
-	</div>
-	<% } %>
 </script>
 
 <?php
 	$this->load->view("snippets/javascript_templates");
 ?>
+<div class="navbar navbar-fixed-bottom">
+	<div class="navbar-inner">
+		<div class="container">
+			<ul class="nav">
+				<li><button class="btn btn-primary" id="dosubmit_right">Save</button></li>
+			</ul>
+		</div>
+	</div>
+</div>
 
+<div class="modal hide fade" id="msgdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="msgdialog-header"></h3>
+	</div>
+	<div class="modal-body" id="msgdialog-body">
+	</div>
+	<div class="modal-footer">
+		<div id="msgdialog-buttons" class="btn-group">
+		</div>
+	</div>
+</div>
 
-<div id="msgdialog"></div>
 <div id="createdialog"></div>
 <div id="dyncontent">
 

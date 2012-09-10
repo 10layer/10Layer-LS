@@ -169,4 +169,13 @@
 		
 	</div>
 </div>
+<div class="navbar navbar-fixed-bottom">
+	<div class="navbar-inner">
+		<div class="container">
+			<ul class="nav">
+				<li><button class="btn btn-primary" id="dosubmit_right">Save</button></li>
+			</ul>
+		</div>
+	</div>
+</div>
 <br clear="both" />

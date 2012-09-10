@@ -320,15 +320,10 @@
 				success: function(data) {
 					if (data.error) {
 						allow_done=false;
-						$("#msgdialog").html("<div class='ui-state-error' style='padding: 5px'><p><span class='ui-icon ui-icon-alert' style='float: left; margin-right: .3em;'></span><strong>"+data.msg+"</strong><br /> "+data.info+"</p></div>");
-						$("#msgdialog").dialog({
-							modal: true,
-							buttons: {
-								Ok: function() {
-									$(this).dialog("close");
-								}
-							}
-						});
+						$("#msgdialog-header").html("Error");
+						$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+data.info+"</p>");
+						$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+						$("#msgdialog").modal();
 					} else {
 						allow_done=true;
 						$("#msgdialog").html("<div class='ui-state-highlight' style='padding: 5px'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: .3em;'></span><strong>Saved</strong></p></div>");
@@ -436,25 +431,18 @@
 		<% }); %>
 		</form>
 	</div>
-	<div id="sidebar" class="span2 well">
-		<div id="sidebar_accordian">
-			
-			<div>
-				<button id="dodone_right" content_type="<%= content_type %>" urlid="<%= urlid %>" class="btn btn-primary btn-large">Done</button><br />
-				<br />
-				<button id="dosubmit_right" class="btn btn-success btn-large">Save</button><br />
-				<br />
+	<div class="navbar navbar-fixed-bottom">
+		<div class="navbar-inner">
+			<div class="container">
+				<ul class="nav">
+					<li><button class="btn btn-primary" id="dosubmit_right">Done</button></li>
+					<li class="divider-vertical"></li>
+					<li><button id="dosubmit_right" class="btn btn-success">Save</button><br /></li>
+					<!--<span id="workflows"></span>-->
+				</ul>
 			</div>
-			<!--<h3><a href="#">Versions</a></h3>
-			<div>
-				<button id="dofork_right" class="btn" role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-arrowthickstop-1-n"></span>Fork</button><br />
-				<br />
-				<button id="dolink_right" class="btn" role="button" aria-disabled="false"><span class="ui-button-text"><span class="ui-button-icon-primary ui-icon ui-icon-link"></span>Link</button><br />
-				<br />
-			</div>-->
-			<h3>Workflow</h3>
-			<div id="workflows"></div>
 		</div>
+		
 	</div>
 </div>
 </script>
@@ -509,11 +497,22 @@
 	$this->load->view("snippets/javascript_templates");
 ?>
 
-<div id="msgdialog"></div>
+<div class="modal hide fade" id="msgdialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="msgdialog-header"></h3>
+	</div>
+	<div class="modal-body" id="msgdialog-body">
+	</div>
+	<div class="modal-footer">
+		<div id="msgdialog-buttons" class="btn-group">
+		</div>
+	</div>
+</div>
+
 <div id="dyncontent">
 </div>
 <div id="createdialog"></div>
 <?php
 	$this->load->view("templates/footer");
-
 ?>
