@@ -585,15 +585,22 @@ class Mongo_db {
 	public function insert($collection = "", $insert = array()) {
 		if(empty($collection))
 			show_error("No Mongo collection selected to insert into", 500);
-		if(count($insert) == 0 || !is_array($insert))
+		if(count($insert) == 0)
 			show_error("Nothing to insert into Mongo collection or insert is not an array", 500);
 		
 		try {
 			$this->db->{$collection}->insert($insert, array('safe' => TRUE));
-			if(isset($insert['_id']))
-				return($insert['_id']);
-			else
-				return(FALSE);
+			if (is_array($insert)) {
+				if(isset($insert['_id'])) {
+					return($insert['_id']);
+				} 
+			} else {
+				if (isset($insert->_id)) {
+					return $insert->_id;
+				}
+			}
+			return(FALSE);
+			
 		} catch(MongoCursorException $e) {
 			show_error("Insert of data into MongoDB failed: {$e->getMessage()}", 500);
 		}
