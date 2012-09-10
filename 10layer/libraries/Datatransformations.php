@@ -126,9 +126,9 @@ class Datatransformations {
 	 */
 	public function safe_urlid($urlid, $tablename, $field) {
 		$ci=&get_instance();
-		$query=$ci->db->get_where($tablename, array($field=>$urlid));
+		$query=$ci->mongo_db->get_where("content", array("_id"=>$urlid), 1);
 		$addnum=0;
-		while ($query->num_rows()!=0) {
+		while (sizeof($query) > 0) {
 			$newnum="";
 			while (is_numeric(substr($urlid,-1))) {
 				$newnum=substr($urlid,-1).$newnum;
@@ -141,7 +141,7 @@ class Datatransformations {
 				$urlid=$urlid.$addnum;
 			}
 			
-			$query=$ci->db->get_where($tablename, array($field=>$urlid));
+			$query=$ci->mongo_db->get_where("content", array("_id"=>$urlid), 1);
 		}
 		return $urlid;
 	}
