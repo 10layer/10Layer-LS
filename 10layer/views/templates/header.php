@@ -8,7 +8,6 @@
 	<link rel="home" href="<?= base_url() ?>" title="Home" />
 	
 	<link rel="stylesheet" href="/resources/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, projection" charset="utf-8" />
-	<link rel="stylesheet" href="/resources/bootstrap/css/bootstrap-responsive.min.css" type="text/css" media="screen, projection" charset="utf-8" />
 	<link rel="stylesheet" href="/resources/css/style.css" type="text/css" media="screen, projection" charset="utf-8" />
 	
 	<?php
