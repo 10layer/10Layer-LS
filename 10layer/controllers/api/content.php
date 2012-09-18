@@ -193,6 +193,21 @@
 			$this->returndata();
 		}
 		
+		/**
+		 * blank function.
+		 * 
+		 * Used to return data without doing a MongoDB lookup, for instance to get the meta data for a content type
+		 * @access public
+		 * @return void
+		 */
+		public function blank() {
+			$this->_check_callbacks();
+			$this->data["count"]=0;
+			$this->data["criteria"]["limit"]=0;
+			$this->data["content"]=false;
+			$this->returndata();
+		}
+		
 		//Callbacks
 		
 		/**
