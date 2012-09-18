@@ -6,7 +6,7 @@
 	 *
 	 * @extends Controller
 	 */
-	class JsonExporter extends CI_Controller {
+	class Jsonexporter extends CI_Controller {
 
 		/**
 		 * __construct function.
@@ -362,6 +362,29 @@
 			foreach($data as $row) {
 				$db->workflow->insert($row);
 			}
+			print "Workflows set";
+		}
+		
+		public function import_types($dbname) {
+			$types=$this->db->get("content_types")->result();
+			$data=array();
+			foreach($types as $type) {
+				$row=new stdClass;
+				$urlid=$type->urlid;
+				$this->load->model($type->model, $urlid);
+				$row->fields = $this->{$urlid}->fields;
+				$row->_id = $type->urlid;
+				$row->name = $type->name;
+				$row->collection = $type->collection;
+				$row->order_by = $this->{$urlid}->order_by;
+				$data[]=$row;
+			}
+			$connection = new Mongo("mongodb://localhost");
+			$db = $connection->selectDB($dbname);
+			foreach($data as $row) {
+				$db->content_types->insert($row);
+			}
+			print "Types imported";
 		}
 		
 		public function index_mongodb($dbname) {
