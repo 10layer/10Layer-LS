@@ -63,5 +63,13 @@
 	?>
 	</ul>
 </li>
-<li class="menuitem"><?= anchor("manage","Manage") ?></li>
+<li class="menuitem dropdown">
+	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
+	<ul class="dropdown-menu">
+		<li class="menuitem"><a href="<?= base_url() ?>manage/healthchecks">Health Check</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>manage/users">Users</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>manage/content_types">Content Types</a></li>
+		
+	</ul>
+</li>
 <li class="menuitem"><?= anchor("user/logout","Logout") ?></li>
