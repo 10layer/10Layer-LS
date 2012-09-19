@@ -1,5 +1,4 @@
 <?php
-	require_once('10layer/system/Model_Crud.php');
 	require_once('10layer/system/TL_Content.php');
 	
 	/**
