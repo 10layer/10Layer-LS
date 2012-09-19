@@ -34,7 +34,7 @@
 		 * @param array $ruleset. (default: array())
 		 * @return void
 		 */
-		public function validate($fieldname,$name,$value,$ruleset=array()) {
+		public function validate($fieldname, $name, $value, $ruleset=array()) {
 			if (!is_array($ruleset)) {
 				$ruleset=explode("|",$ruleset);
 			}
@@ -50,9 +50,7 @@
 				}
 			}
 			$ruleset=$tmparr;
-			//print_r($ruleset);
 			foreach($ruleset as $key=>$rulevalue) {
-				
 				$result=$this->$key($value,$rulevalue);
 				if (!$result) {
 					$this->passed=false;

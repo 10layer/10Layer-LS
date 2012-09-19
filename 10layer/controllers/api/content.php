@@ -134,14 +134,13 @@
 				$this->returndata();
 				return false;
 			}
-			$contentobj=new TLContent();
-			$contentobj->setContentType($content_type);
+			$contentobj=new TLContent($content_type);
 			//Populate
 			foreach($contentobj->getFields() as $field) {
 				if ($field->readonly) {
 					continue;
 				}
-				$fieldval=$this->input->post($field->tablename."_".$field->name);
+				$fieldval=$this->input->post($field->contenttype."_".$field->name);
 				if (empty($fieldval)) {
 					$contentobj->{$field->name}="";
 				} else {
@@ -384,8 +383,7 @@
 		 */
 		protected function get_field_data($content_type) {
 			try {
-				$contentobj=new TLContent();
-				$contentobj->setContentType($content_type);
+				$contentobj=new TLContent($content_type);
 				$fields=$contentobj->getFields();
 				return $fields;
 			} catch(Exception $e) {
