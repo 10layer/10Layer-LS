@@ -3,9 +3,9 @@
 /**
  * TLContent class.
  * 
- * A type of ORM for describing content and relationships between content
+ * An ORM for describing content and relationships between content
  *
- * Call with an urlid or content id to autopopulate, or construct and then call setContentType for a clear TLContent
+ * Call with an urlid or content id to autopopulate, or construct and then call setContentType for a empty TLContent
  *
  * @package 10Layer
  * @subpackage Core
@@ -48,9 +48,10 @@ class TLContent {
 	 */
 	public $content_type=false;
 	
-	public function __construct($urlid=false, $contenttype_id=false, $level=0) {
+	public function __construct($content_type, $urlid=false, $level=0) {
+		$this->setContentType($content_type);
 		if (!empty($urlid)) {
-			$this->_getContent($urlid, $contenttype_id, $level);
+			$this->_getContent($urlid, $level);
 		}
 	}
 	
@@ -90,29 +91,15 @@ class TLContent {
 	 * @param mixed $id
 	 * @return boolean
 	 */
-	protected function _getContent($id, $contenttype_id=false, $level=0) {
+	protected function _getContent($id, $level=0) {
 		$ci=&get_instance();
-		if (!empty($contenttype_id)) {
-			$this->setContentType($contenttype_id);
-		}
-		if (is_numeric($id)) {
-			$ci->db->where("content.id",$id);
-		} else {
-			$ci->db->where("content.urlid",$id);
-		}
-		if (!empty($this->content_type)) {
-			$ci->db->where("content_type_id",$this->content_type->id);
-		}
-		$query=$ci->db->get("content");
+		$ci->mongo_db->where("_id",$id);
+		$ci->db->where("content_type", $this->content_type->_id);
+		$query=$ci->mongo_db->get("content");
 		if (empty($query->row()->urlid)) {
 			show_error("Failed to find content id $id");
-			//Rather throw this error
-			//throw new Exception("Failed to find content id $id");
 		}
-		$this->urlid=$query->row()->urlid;
-		$this->content_id=$query->row()->id;
-		
-		$this->setContentType($query->row()->content_type_id);
+		$this->urlid=$query->row()->_id;
 		$this->_setData($level);
 		return true;
 	}
@@ -150,7 +137,11 @@ class TLContent {
 	 */
 	public function _setData($level=0) {
 		$ci=&get_instance();
-		$ci->db->join($this->content_type->table_name, "content.id={$this->content_type->table_name}.content_id");
+		$result=$ci->mongo_db->get_where("content", array("_id"=>$this->content_id));
+		foreach($result[0] as $row) {
+			$this->$key=$value;
+		}
+		/*$ci->db->join($this->content_type->table_name, "content.id={$this->content_type->table_name}.content_id");
 		$ci->db->where("content.id",$this->content_id);
 		$query=$ci->db->get("content");
 		foreach($query->row() as $key=>$value) {
@@ -183,7 +174,6 @@ class TLContent {
 		foreach($query->result() as $row) {
 			$level++;
 			$tmp=new TLContent($row->content_link_id, false, $level);
-			//print_r("Item {$tmp->urlid}<br />\n");
 			if (!empty($row->fieldname)) {
 				foreach($this->fields as $key=>$field) {
 					if ($field->name==$row->fieldname) {
@@ -218,7 +208,7 @@ class TLContent {
 					}
 				}
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -232,19 +222,13 @@ class TLContent {
 	 */
 	public function setContentType($id) {
 		$ci=&get_instance();
-		$ci->db->select("content_types.*");
-		$ci->db->from("content_types");
-		if (is_numeric($id)) {
-			$ci->db->where("content_types.id",$id);
-		} else {
-			$ci->db->where("content_types.urlid",$id);
-		}
-		$query=$ci->db->get();
-		if (empty($query->row()->id)) {
+		$ci->mongo_db->state_save();
+		$query=$ci->mongo_db->get_where("content_types", array("_id"=>$id));
+		$ci->mongo_db->state_restore();
+		if (empty($query)) {
 			show_error("Could not find content type $id");
-		}
-		$this->content_type=$query->row();
-		$ci->load->model($this->content_type->model);
+		}		
+		$this->content_type=$query[0];
 		$this->populateFields();
 	}
 	
@@ -271,18 +255,7 @@ class TLContent {
 	 */
 	public function populateFields() {
 		$ci=&get_instance();
-		$model=false;
-		if (!empty($ci->{$this->content_type->model})) {
-			$model=&$ci->{$this->content_type->model};
-		} else {
-			if (!empty($ci->content)) {
-				$model=&$ci->content;
-			}
-		}
-		if (empty($model)) {
-			show_error("Content type model not found");
-		}
-		foreach($model->fields as $field) {
+		foreach($this->content_type->fields as $field) {
 			$this->addField($field);
 		}
 		$this->getOptions();
@@ -300,22 +273,10 @@ class TLContent {
 	 * @return void
 	 */
 	protected function addField($field) {
-		if (empty($field["tablename"])) {
-			if (!empty($field["contenttype"])) {
-				$ci=&get_instance();
-				$query=$ci->db->where("urlid",$field["contenttype"])->get("content_types");
-				if ($query->num_rows()>0) {
-					$field["tablename"]=$query->row()->tablename;
-				}
-			} else {
-				$field["tablename"]=$this->content_type->table_name;
-			}
-			
-		}
 		if (empty($field["contenttype"])) {
-			$field["contenttype"]=$this->content_type->urlid;
+			$field["contenttype"]=$this->content_type->_id;
 		}
-		if ($field["contenttype"]!=$this->content_type->urlid) {
+		if ($field["contenttype"]!=$this->content_type->_id) {
 			$field["external"]=true;
 		}
 		$this->fields[$field["name"]]=new TLField($field);
@@ -366,22 +327,15 @@ class TLContent {
 		$ci=&get_instance();
 		foreach($this->fields as $key=>$field) {
 			if (($field->type=="select") && empty($this->fields[$key]->options)) {
-				$result=$ci->db->get_where("content_types",array("urlid"=>$field->contenttype));
-				if(!empty($result->row()->id)) {
-					$content_type_id=$result->row()->id;
-					$ci->db->select("content.urlid, content.title, content.id AS content_id");
-					$ci->db->order_by("title ASC");
-					$ci->db->where("content_type_id",$content_type_id);
-					$query=$ci->db->get("content");
-					foreach($query->result() as $result) {
-						$this->fields[$key]->options[$result->content_id]=$result->title;
+				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->sort("title DESC")->get("content");
+				if(!empty($result)) {
+					foreach($result() as $item) {
+						$this->fields[$key]->options[$item->_id]=$item->title;
 					}
 				}
 			}
 		}
 	}
-	
-	
 	
 	/**
 	* transformFields function.
@@ -489,7 +443,7 @@ class TLContent {
 		$ci=&get_instance();
 		$ci->load->library("validation");
 		foreach($this->fields as $field) {
-			$ci->validation->validate($field->name,$field->label,$field->value,$field->rules);
+			$ci->validation->validate($field->name, $field->label, $field->value, $field->rules);
 		}
 		return $ci->validation->results();
 	}
