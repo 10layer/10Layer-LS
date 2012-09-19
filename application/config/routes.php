@@ -40,7 +40,6 @@
 
 $route['default_controller'] = "home";
 
-$route['list/(:any)']='list/tldefault/$1';
 
 $route['delete/(:any)']='delete/tldefault/$1';
 $route['404_override'] = '';
