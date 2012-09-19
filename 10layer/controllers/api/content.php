@@ -121,6 +121,13 @@
 		 * @return void
 		 */
 		public function save() {
+
+			if(empty($_POST) || empty($_GET)){
+				$this->data["error"]=true;
+				$this->data["msg"][]="We did not receive data";
+				$this->returndata();
+				return false;
+			}
 			if (!$this->secure) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="You do not have permission to save";
