@@ -48,11 +48,8 @@ class TLContent {
 	 */
 	public $content_type=false;
 	
-	public function __construct($content_type, $urlid=false, $level=0) {
+	public function __construct($content_type) {
 		$this->setContentType($content_type);
-		if (!empty($urlid)) {
-			$this->_getContent($urlid, $level);
-		}
 	}
 	
 	/**
@@ -80,136 +77,7 @@ class TLContent {
 			}
 		}
 	}
-	
-	
-	/**
-	 * _getContent function.
-	 * 
-	 * Internal function to populate the object with content
-	 *
-	 * @access protected
-	 * @param mixed $id
-	 * @return boolean
-	 */
-	protected function _getContent($id, $level=0) {
-		$ci=&get_instance();
-		$ci->mongo_db->where("_id",$id);
-		$ci->db->where("content_type", $this->content_type->_id);
-		$query=$ci->mongo_db->get("content");
-		if (empty($query->row()->urlid)) {
-			show_error("Failed to find content id $id");
-		}
-		$this->urlid=$query->row()->_id;
-		$this->_setData($level);
-		return true;
-	}
-	
-	/**
-	 * _getContentType function.
-	 * 
-	 * Returns the content type when we only know the urlid
-	 *
-	 * @access protected
-	 * @return void
-	 */
-	protected function _getContentType() {
-		$ci=&get_instance();
-		$ci->db->select("content_types.*");
-		$ci->db->from("content_types");
-		$ci->db->where("content.urlid",$this->urlid);
-		$ci->db->join("content","content.content_type_id=content_types.id");
-		$query=$ci->db->get();
-		$content_type=$query->row();
-		if (empty($content_type->id)) {
-			return false;
-		}
-		$this->content_type=$content_type;
-		$this->populateFields();
-	}
-	
-	/**
-	 * _setData function.
-	 * 
-	 * This is the meat of the data fetcher. It grabs what it needs from the DB
-	 *
-	 * @access public
-	 * @return void
-	 */
-	public function _setData($level=0) {
-		$ci=&get_instance();
-		$result=$ci->mongo_db->get_where("content", array("_id"=>$this->content_id));
-		foreach($result[0] as $row) {
-			$this->$key=$value;
-		}
-		/*$ci->db->join($this->content_type->table_name, "content.id={$this->content_type->table_name}.content_id");
-		$ci->db->where("content.id",$this->content_id);
-		$query=$ci->db->get("content");
-		foreach($query->row() as $key=>$value) {
-			$this->$key=$value;
-		}
-		$content_ids=array();
-		$typearr=array();
-		$drilldown=false;
-		foreach($this->fields as $field) {
-			if ($field->type!="drilldown") {
-				if ($field->link) {
-					$typearr[]="content_content.fieldname=".$ci->db->escape($field->name);
-				} else {
-					$typearr[$field->contenttype]="content_content.fieldname=".$ci->db->escape($field->name);
-				}
-			} else {
-				$drilldown=true;
-			}
-		}
-		//if (!$drilldown) {
-			$typearr[]="content_content.fieldname=''";
-		//}
-		$ci->db->where("content_id",$this->content_id);
-		$ci->db->where("(".implode(" OR ",$typearr).")");
-		$ci->db->limit(100);
-		$query=$ci->db->get("content_content");
-		if ($level>=1) {
-			return true;
-		}
-		foreach($query->result() as $row) {
-			$level++;
-			$tmp=new TLContent($row->content_link_id, false, $level);
-			if (!empty($row->fieldname)) {
-				foreach($this->fields as $key=>$field) {
-					if ($field->name==$row->fieldname) {
-						if ($this->fields[$key]->multiple) {
-							$this->fields[$key]->data[]=$tmp;
-							$this->$key=$tmp->content_id;
-						} else {
-							$this->fields[$key]->data=$tmp;
-							$this->$key=$tmp->content_id;
-						}
-					}
-				}
-			} else {
-				if (isset($tmp->content_type->urlid) && ($tmp->content_type->urlid!=$this->content_type->urlid)) {
-					foreach($this->fields as $key=>$field) {
-						if ($field->contenttype==$tmp->content_type->urlid) {
-							if ($this->fields[$key]->multiple) {
-								$this->fields[$key]->data[]=$tmp;
-								$this->$key=$tmp->content_id;
-							} else {
-								$this->fields[$key]->data=$tmp;
-								$this->$key=$tmp->content_id;
-							}
-						}
-					}
-				} else {
-					foreach($this->fields as $key=>$field) {
-						if ($field->link==true) {
-							$this->fields[$key]->data[]=$tmp;
-							$this->$key=$tmp->content_id;
-						}
-					}
-				}
-			}
-		}*/
-	}
+
 	
 	/**
 	 * setContentType function.
@@ -511,58 +379,6 @@ class TLContent {
 		foreach($this->fields as $key=>$field) {
 			$this->fields[$key]->value="";
 		}
-	}
-	
-	/**
-	 * dbClone function.
-	 * 
-	 * This'll clone our ORM, say for forking
-	 *
-	 * @access public
-	 * @return int content_id
-	 */
-	public function dbClone() {
-		$linktable=$this->content_type->table_name;
-		$urlid=$this->urlid;
-		$ci=&get_instance();
-		$ci->load->library("datatransformations");
-		$newurlid=$ci->datatransformations->safe_urlid($urlid, "content", "urlid");
-		$fields = $ci->db->list_fields("content");
-		for($x=0; $x<sizeof($fields); $x++) {
-			if (($fields[$x]=="id") || ($fields[$x]=="urlid")) {
-				unset($fields[$x]);
-			}
-		}
-		$query="INSERT INTO content (".implode(",",$fields).", urlid) SELECT ".implode(",",$fields).", ".$ci->db->escape($newurlid)." FROM content WHERE id=".$ci->db->escape($this->content_id);
-		$ci->db->query($query);
-		$query=$ci->db->get_where("content",array("urlid"=>$newurlid));
-		$content_id=$query->row()->id;
-		$fields = $ci->db->list_fields($linktable);
-		for($x=0; $x<sizeof($fields); $x++) {
-			if (($fields[$x]=="id") || ($fields[$x]=="content_id")) {
-				unset($fields[$x]);
-			}
-		}
-		$query="INSERT INTO $linktable (".implode(",",$fields).", content_id) SELECT ".implode(",",$fields).", ".$ci->db->escape($content_id)." FROM $linktable WHERE content_id=".$ci->db->escape($this->content_id);
-		$ci->db->query($query);
-		return $content_id;
-	}
-	
-	/**
-	 * linkToPlatform function.
-	 * 
-	 * This links our current content to a new platform (or a new publication)
-	 *
-	 * @access public
-	 * @param mixed $platform_id
-	 * @return bool
-	 */
-	public function linkToPlatform($platform_id) {
-		$ci=&get_instance();
-		$ci->db->where(array("content_id"=>$this->content_id, "platform_id"=>$platform_id));
-		$ci->db->delete("content_platforms");
-		$ci->db->insert("content_platforms", array("content_id"=>$this->content_id, "platform_id"=>$platform_id));
-		return true;
 	}
 	
 }
