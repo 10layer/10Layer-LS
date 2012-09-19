@@ -263,6 +263,51 @@
 				});
 			}
 		}
+
+		function uploadBefore(e) {
+			$('#upload_indicator').css("width", '0%' )
+			$('#progress_container').show();
+		}
+		
+		function uploadProgress(e) {
+			$('#upload_indicator').css("width", ( Math.round((e.loaded / e.total) * 100)) + '%' );
+		}
+
+		function hide_progress_bar(){
+			$('#progress_container').hide();
+		}
+
+		function uploadFailed(e){
+			hide_progress_bar();
+		}
+
+
+		function uploadComplete(data) {
+			setTimeout(hide_progress_bar, 5000);
+			//hide_progress_bar();
+			$(document.body).data("saving",false);
+			if (data.error) {
+				$("#msgdialog-header").html("Error");
+				var info = (data.info) ? data.info : '';
+				if (_.isArray(info)) {
+					var tmp='';
+					for(var x=0; x<info.length; x++) {
+						tmp+="<li>"+info[x]+"</li>";
+					}
+				}
+				info="<ul>"+tmp+"</li>";
+				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
+			    $("#msgdialog").modal();
+			} else {
+				$("#msgdialog-header").html("Saved");
+				$("#msgdialog-body").html("<p>Content has been successfully saved</p>");
+				$("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				$("#msgdialog").modal();
+			}
+		}
+
+
+
 		
 		$(document).on('change', 'input[type=file]', function() {
 			content_type=$(document.body).data('content_type');
@@ -438,7 +483,17 @@
 					<li><button class="btn btn-primary" id="dosubmit_right">Done</button></li>
 					<li class="divider-vertical"></li>
 					<li><button id="dosubmit_right" class="btn btn-success">Save</button><br /></li>
+					<li class="divider-vertical"></li>
+					<li style=" padding-top:10px; width:300px;">
+						<div id='progress_container' style='display:none;' class="progress progress-striped active">
+							<div id="upload_indicator" class="bar" style="width: 0%;"></div>
+						</div>
+					</li>
+
 					<!--<span id="workflows"></span>-->
+
+
+
 				</ul>
 			</div>
 		</div>

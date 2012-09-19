@@ -81,6 +81,7 @@
 		});
 		
 		function save() {
+
 			for ( instance in CKEDITOR.instances )
 				CKEDITOR.instances[instance].updateElement();
 			content_type=$(document.body).data('content_type');
@@ -112,14 +113,26 @@
 			}
 		}
 		
-		function uploadBefore(e) {}
+		function uploadBefore(e) {
+			$('#upload_indicator').css("width", '0%' )
+			$('#progress_container').show();
+		}
 		
 		function uploadProgress(e) {
-			console.log("Upload progress");
-			console.log(e);
+			$('#upload_indicator').css("width", ( Math.round((e.loaded / e.total) * 100)) + '%' );
+		}
+
+		function hide_progress_bar(){
+			$('#progress_container').hide();
+		}
+
+		function uploadFailed(e){
+			hide_progress_bar();
 		}
 		
 		function uploadComplete(data) {
+			setTimeout(hide_progress_bar, 5000);
+			//hide_progress_bar();
 			$(document.body).data("saving",false);
 			if (data.error) {
 				$("#msgdialog-header").html("Error");
@@ -132,7 +145,6 @@
 				}
 				info="<ul>"+tmp+"</li>";
 				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
-				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
 			    $("#msgdialog").modal();
 			} else {
 				$("#msgdialog-header").html("Saved");
@@ -185,6 +197,12 @@
 		<div class="container">
 			<ul class="nav">
 				<li><button class="btn btn-primary" id="dosubmit_right">Save</button></li>
+				<li class='divider-vertical'></li>
+				<li style=" padding-top:10px; width:300px;">
+					<div id='progress_container' style='display:none;' class="progress progress-striped active">
+						<div id="upload_indicator" class="bar" style="width: 0%;"></div>
+					</div>
+				</li>
 			</ul>
 		</div>
 	</div>
