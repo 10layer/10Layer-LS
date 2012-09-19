@@ -139,11 +139,6 @@
 				),
 			),
 			array(
-				"name"=>"live",
-				"tablename"=>"content",
-				"type"=>"checkbox",
-			),
-			array(
 				"name"=>"start_date",
 				"tablename"=>"content",
 				"type"=>"date",
