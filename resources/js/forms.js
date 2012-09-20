@@ -372,6 +372,24 @@ function init_form() {
 	
 	$( ".datepicker" ).datepicker();
 	
+	$(".autocomplete").each(function() {
+		console.log($(this));
+		var content_type = $(this).attr("contenttype");
+		var url="/api/content/listing/";
+		$(this).typeahead({
+			source: function( request, response ) {
+				console.log(request);
+			    $.getJSON(url,{ limit: 12, search: request, content_type: content_type }, function(data){
+			    	var result = [];
+			    	_.each(data.content, function(item) {
+						result.push( item.title );
+					});
+					response(result);
+			    });
+			}
+		});
+	});
+		
 	/*$(".autocomplete").each(function() {
 		var contenttype=$(this).attr("contenttype");
 		var contenttypes=false;
