@@ -77,17 +77,12 @@
 
 <script type='text/template' id='edit-field-boolean'>
 	<!-- edit-field-boolean -->
-		<div class='control-group'>
-			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-			<div class='controls'>
-				<input type='checkbox' name='<%= field.contenttype %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.value==1) ? "checked='checked'" : '' %> />
-			</div>
-		</div>
+	<%= _.template($('#edit-field-checkbox').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='create-field-boolean'>
 	<!-- create-field-boolean -->
-	<%= _.template($('#edit-field-boolean').html(), {field: field} ) %>
+	<%= _.template($('#edit-field-checkbox').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-cdn'>
@@ -124,7 +119,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datepicker <%= field.class %>' />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datepicker <%= field.class %>' data-date="<%= (field.value) ? field.value : '' %>" data-date-format="yyyy-mm-dd" />
 		</div>
 	</div>
 </script>
@@ -139,7 +134,10 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datetimepicker <%= field.class %>' />
+			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' /> :
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' />
 		</div>
 	</div>
 </script>
@@ -183,22 +181,6 @@
 <script type='text/template' id='create-field-deepsearch'>
 	<!-- create-field-deepsearch -->
 	<%= _.template($('#edit-field-deepsearch').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='edit-field-drilldown'>
-	<%= _.template($("#old-fields-template").html(), { field: field, urlid: urlid, content_type: content_type }) %>
-</script>
-
-<script type='text/template' id='create-field-drilldown'>
-	<%= _.template($("#old-fields-create-template").html(), { field: field, content_type: content_type }) %>
-</script>
-
-<script type='text/template' id='edit-field-embed'>
-	<%= _.template($("#old-fields-template").html(), { field: field, urlid: urlid, content_type: content_type }) %>
-</script>
-
-<script type='text/template' id='create-field-embed'>
-	<%= _.template($("#old-fields-create-template").html(), { field: field, content_type: content_type }) %>
 </script>
 
 <script type='text/template' id='edit-field-external'>
@@ -421,9 +403,13 @@
 </script>
 
 <script type='text/template' id='edit-field-readonly'>
-	<label class='<%= field.label_class %>'><%= field.label %></label>
-	<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' readonly='readonly' />
-	<br clear='both' />
+	<!-- edit-field-readonly -->
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' readonly='readonly' />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='create-field-readonly'>
@@ -534,14 +520,6 @@
 	
 	</div>
 	<br clear="both" />
-</script>
-
-<script type='text/template' id='edit-field-section'>
-	<%= _.template($("#old-fields-template").html(), { field: field, urlid: urlid, content_type: content_type }) %>
-</script>
-
-<script type='text/template' id='create-field-section'>
-	<%= _.template($("#old-fields-create-template").html(), { field: field, content_type: content_type }) %>
 </script>
 
 <script type='text/template' id='edit-field-select'>
