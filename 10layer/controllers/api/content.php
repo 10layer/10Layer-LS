@@ -25,7 +25,6 @@
 			$this->tlsecurity->ignore_security();
 			$this->secure=$this->_check_secure();
 			if (!$this->secure) {
-				$this->mongo_db->where(array("live"=>"1"));
 				$this->mongo_db->where_gte("major_version", "4");
 			}
 			$this->data=array(
