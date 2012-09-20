@@ -344,8 +344,9 @@
 				$this->data["msg"][]="Could not find content type to retrieve meta information";
 				return true;
 			}
-			//This is still old-skool system. Needs to change
+			$cache=$this->mongo_db->state_save();
 			$fields=$this->get_field_data($content_type);
+			$this->mongo_db->state_restore($cache);
 			if (empty($fields)) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Could not find model for content type $content_type to retrieve meta information";
