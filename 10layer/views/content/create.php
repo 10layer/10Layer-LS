@@ -137,7 +137,7 @@
 		
 		function uploadComplete(data) {
 			
-			setTimeout(hide_progress_bar, 5000);
+			setTimeout(hide_progress_bar, 2000);
 			$(document.body).data("saving",false);
 			if (data.error) {
 				$("#msgdialog-header").html("Error");
