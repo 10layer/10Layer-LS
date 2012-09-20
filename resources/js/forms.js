@@ -15,6 +15,13 @@ function update_content(data) {
 	$('#'+data.element).html(results_data);
 }
 
+function leadingZeros(s) {
+	if (s<10) {
+		return '0'+s;
+	}
+	return s;
+}
+
 $(function() {
 	
 	
@@ -200,6 +207,76 @@ $(function() {
 		popup_insert(form, content_type);
 		return false;
 	});
+	
+	$(document).on('keydown', '.datetime_hour', function(e) {
+		var key = e.keyCode;
+		if ((key > 33) && (key < 47)) {
+			return false;
+		}
+		if ((key > 58) && (key < 126)) {
+			return false;
+		}
+		var val=$(this).val();
+		if ((key > 47) && (key < 58)) {
+			if (val.length > 1) {
+				return false;
+			}
+			var newval = val + (key-48);
+			if (newval > 23) {
+				return false;
+			}
+		}
+	});
+	
+	$(document).on('blur', '.datetime_hour', function(e) {
+		var val = parseInt($(this).val());
+		$(this).val(leadingZeros(val));
+	});
+	
+	$(document).on('blur', '.datetime_minute', function(e) {
+		var val = parseInt($(this).val());
+		$(this).val(leadingZeros(val));
+	});
+	
+	$(document).on('keydown', '.datetime_minute', function(e) {
+		var key = e.keyCode;
+		if ((key > 33) && (key < 47)) {
+			return false;
+		}
+		if ((key > 58) && (key < 126)) {
+			return false;
+		}
+		var val=$(this).val();
+		if ((key > 47) && (key < 58)) {
+			if (val.length > 1) {
+				return false;
+			}
+			var newval = val + (key-48);
+			if (newval > 59) {
+				return false;
+			}
+		}
+		return true;
+	});
+	
+	$(document).on('keyup', '.datetime_change', function() {
+		updateDateTime(this);
+	});
+	
+	$(document).on('change', '.datetime_change', function() {
+		updateDateTime(this);
+	});
+	
+	function updateDateTime(sender) {
+		var parent = $(sender).parent();
+		var val = "";
+		val += parent.children('.datetime_date').val();
+		val += " ";
+		val += (parent.children('.datetime_hour').val()) ? parent.children('.datetime_hour').val() : "00";
+		val += ":";
+		val += (parent.children('.datetime_minute').val()) ? parent.children('.datetime_minute').val() : "00";
+		$(sender).siblings(':hidden').val(val);
+	}
 });
 
 function checkreqs() {
@@ -262,11 +339,7 @@ function init_form() {
 		});
 	});*/
 	
-	/*$( ".datepicker" ).datepicker({
-		changeMonth: true,
-		changeYear: true,
-		dateFormat: "yy-mm-dd",
-	});*/
+	$( ".datepicker" ).datepicker();
 	
 	/*$(".autocomplete").each(function() {
 		var contenttype=$(this).attr("contenttype");

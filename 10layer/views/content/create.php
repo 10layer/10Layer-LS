@@ -10,6 +10,9 @@
 <link rel="stylesheet" href="/resources/chosen/chosen.css">
 <script src="/resources/chosen/chosen.jquery.js"></script>
 
+<link rel="stylesheet" href="/resources/bootstrap-datepicker/css/datepicker.css">
+<script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+
 <script language="javascript">
 	$(function() {
 		//Set the API key
