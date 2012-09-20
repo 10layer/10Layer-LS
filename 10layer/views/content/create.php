@@ -65,7 +65,6 @@
 			action = $(this).attr('id');
 			$(document.body).data('action',action);
 			if (!$(document.body).data('saving')) {
-				//$(document.body).data('action',action);
 				save();
 			}
 			return false;
@@ -168,16 +167,6 @@
 
 				$(location).attr('href',url);
 				
-
-				// if($(document.body).data("action") == '_create'){
-				// 	url += 'create/'+$(document.body).data('content_type');
-				// }
-
-				//$('#review_options').html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
-				// $("#msgdialog-header").html("Saved");
-				// $("#msgdialog-body").html("<p>Content has been successfully saved</p>");
-				// $("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
-				// $("#msgdialog").modal();
 			}
 		}
 		

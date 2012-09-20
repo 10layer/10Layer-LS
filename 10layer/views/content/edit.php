@@ -219,17 +219,20 @@
 			
 		}
 		
-		$(document).on('click', '#dosubmit_right', function() {
-			$(document.body).data('done_submit', false);
+		$(document).on('click', '.the_action', function() {
+			action = $(this).attr('id');
+			$(document.body).data('action',action);
 			save();
 			return false;
 		});
 		
-		$(document).on('click', '#dodone_right', function() {
-			$(document.body).data('done_submit', true);
-			save();
-			return false;
-		});
+		// $(document).on('click', '#dodone_right', function() {
+		// 	action = $(this).attr('id');
+		// 	$(document.body).data('action',action);
+		// 	$(document.body).data('done_submit', true);
+		// 	save();
+		// 	return false;
+		// });
 		
 		
 		function save() {
@@ -299,10 +302,23 @@
 				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
 			    $("#msgdialog").modal();
 			} else {
-				$("#msgdialog-header").html("Saved");
-				$("#msgdialog-body").html("<p>Content has been successfully saved</p>");
-				$("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
-				$("#msgdialog").modal();
+
+				var url = '<?php echo base_url(); ?>';    
+				if($(document.body).data("action") == '_done'){
+					url += 'edit/'+$(document.body).data('content_type');
+				}
+
+
+				if($(document.body).data("action") == '_edit'){
+					url += 'edit/'+$(document.body).data('content_type')+"/"+data.id;
+				}
+
+				$(location).attr('href',url);
+
+				// $("#msgdialog-header").html("Saved");
+				// $("#msgdialog-body").html("<p>Content has been successfully saved</p>");
+				// $("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				// $("#msgdialog").modal();
 			}
 		}
 
@@ -480,9 +496,15 @@
 		<div class="navbar-inner">
 			<div class="container">
 				<ul class="nav">
-					<li><button class="btn btn-primary" id="dosubmit_right">Done</button></li>
-					<li class="divider-vertical"></li>
-					<li><button id="dosubmit_right" class="btn btn-success">Save</button><br /></li>
+
+					<li><button id="_done" class="the_action btn btn-mini btn-primary" id="dosubmit_right">Save and List</button></li>
+					<li class='divider-vertical'></li>
+					<li><button id="_edit" class="the_action btn btn-mini btn-warning" id="dosubmit_right">Save and Edit</button></li>
+					<li class='divider-vertical'></li>
+					<li><button id="_publish" class="the_action btn btn-mini btn-danger" id="dosubmit_right">Save and Publish</button></li>
+
+
+
 					<li class="divider-vertical"></li>
 					<li style=" padding-top:10px; width:300px;">
 						<div id='progress_container' style='display:none;' class="progress progress-striped active">
