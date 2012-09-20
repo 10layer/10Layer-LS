@@ -90,9 +90,9 @@ class TLContent {
 	 */
 	public function setContentType($id) {
 		$ci=&get_instance();
-		$ci->mongo_db->state_save();
+		$cache=$ci->mongo_db->state_save();
 		$query=$ci->mongo_db->get_where("content_types", array("_id"=>$id));
-		$ci->mongo_db->state_restore();
+		$ci->mongo_db->state_restore($cache);
 		if (empty($query)) {
 			show_error("Could not find content type $id");
 		}		
