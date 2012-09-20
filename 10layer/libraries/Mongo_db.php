@@ -894,6 +894,7 @@ class Mongo_db {
 			"sorts"=>$this->sorts
 		);
 		$this->_clear();
+		return $this->cache;
 	}
 	
 	/**
@@ -905,7 +906,10 @@ class Mongo_db {
 	 * @access public
 	 * @return void
 	 */
-	public function state_restore() {
+	public function state_restore($cache = false) {
+		if (!empty($cache)) {
+			$this->cache = $cache;
+		}
 		if (!is_array($this->cache)) {
 			return true;
 		}
