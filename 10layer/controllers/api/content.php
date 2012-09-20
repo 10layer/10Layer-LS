@@ -368,14 +368,14 @@
 				if (empty($id)) {
 					return false;
 				}
-				$this->mongo_db->state_save();
+				$cache=$this->mongo_db->state_save();
 				$result=$this->mongo_db->get_where("content", array("_id"=>$id));
 				if (empty($result)) {
 					$this->data["error"]=true;
 					$this->data["msg"][]="Could not find content ID $id";
 					return false;
 				}
-				$this->mongo_db->state_restore();
+				$this->mongo_db->state_restore($cache);
 				$content_type=$result[0]->content_type;
 			}
 			return $content_type;
