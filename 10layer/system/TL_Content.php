@@ -195,7 +195,7 @@ class TLContent {
 		$ci=&get_instance();
 		foreach($this->fields as $key=>$field) {
 			if (($field->type=="select") && empty($this->fields[$key]->options)) {
-				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->sort("title DESC")->get("content");
+				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->get("content");
 				if(!empty($result)) {
 					foreach($result() as $item) {
 						$this->fields[$key]->options[$item->_id]=$item->title;
