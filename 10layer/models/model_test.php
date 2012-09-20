@@ -13,7 +13,7 @@ class Model_Test extends Model_Content {
 	    array(
 	    	"name"=>"autocomplete",
 	    	"type"=>"autocomplete",
-	    	"contenttype"=>"tags",
+	    	"contenttype"=>"tag",
 	    ),
 	    array(
 	    	"name"=>"boolean",
