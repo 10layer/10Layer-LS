@@ -131,13 +131,25 @@
 
 <script type='text/template' id='edit-field-datetime'>
 	<!-- edit-field-datetime -->
+	<%
+		var val_date = val_hour = val_minute = "";
+		if (field.value) {
+			parts = field.value.split(" ");
+			val_date = parts[0];
+			if (parts[1]) {
+				times = parts[1].split(":");
+				val_hour = times[0];
+				(times[1]) ? val_minute = times[1] : val_minute = "00";
+			}
+		}
+	%>
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' />
-			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" />
-			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' /> :
-			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' value="<%= val_hour %>" /> :
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' value="<%= val_minute %>" />
 		</div>
 	</div>
 </script>

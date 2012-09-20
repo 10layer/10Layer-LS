@@ -216,7 +216,7 @@ $(function() {
 		if ((key > 58) && (key < 126)) {
 			return false;
 		}
-		var val=$(this).val();
+		/*var val=$(this).val();
 		if ((key > 47) && (key < 58)) {
 			if (val.length > 1) {
 				return false;
@@ -225,17 +225,48 @@ $(function() {
 			if (newval > 23) {
 				return false;
 			}
-		}
+		}*/
 	});
 	
 	$(document).on('blur', '.datetime_hour', function(e) {
-		var val = parseInt($(this).val());
-		$(this).val(leadingZeros(val));
+		var val = 0;
+		if (($(this).val())) {
+			var val = Number($(this).val());
+			$(this).val(leadingZeros(val));
+			if ($(this).val().length > 2) {
+				var s = $(this).val();
+				$(this).val(s.substring(s.length - 2, s.length));
+				val = parseInt($(this).val());
+			}
+			if (val > 23) {
+				$(this).val("23");
+			}
+		} else {
+			$(this).val("00");
+		}
+		if (!isFinite($(this).val())) {
+			$(this).val("00");
+		}
 	});
 	
 	$(document).on('blur', '.datetime_minute', function(e) {
-		var val = parseInt($(this).val());
-		$(this).val(leadingZeros(val));
+		if ($(this).val()) {
+			var val = Number($(this).val());
+			$(this).val(leadingZeros(val));
+			if ($(this).val().length > 2) {
+				var s = $(this).val();
+				$(this).val(s.substring(s.length - 2, s.length));
+				val = parseInt($(this).val());
+			}
+			if (val > 59) {
+				$(this).val("59");
+			}
+		} else {
+			$(this).val("00");
+		}
+		if (!isFinite($(this).val())) {
+			$(this).val("00");
+		}
 	});
 	
 	$(document).on('keydown', '.datetime_minute', function(e) {
@@ -246,7 +277,7 @@ $(function() {
 		if ((key > 58) && (key < 126)) {
 			return false;
 		}
-		var val=$(this).val();
+		/*var val=$(this).val();
 		if ((key > 47) && (key < 58)) {
 			if (val.length > 1) {
 				return false;
@@ -256,7 +287,7 @@ $(function() {
 				return false;
 			}
 		}
-		return true;
+		return true;*/
 	});
 	
 	$(document).on('keyup', '.datetime_change', function() {
