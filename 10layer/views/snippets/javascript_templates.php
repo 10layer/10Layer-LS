@@ -90,7 +90,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' readonly='readonly' />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' readonly='readonly' />
 		</div>
 	</div>
 </script>
@@ -215,8 +215,8 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= field.value %>" />
+			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= field.value %>" />
 		</div>
 	</div>
 </script>
@@ -247,8 +247,8 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-url='/edit/fileupload/<%= content_type %>/<%= urlid %>/<%= field.contenttype %>_<%= field.name %>' />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= field.value %>" data-url='/edit/fileupload/<%= content_type %>/<%= urlid %>/<%= field.contenttype %>_<%= field.name %>' />
+			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= field.value %>" />
 		<% if (urlid) { %>
 			<div class="preview-image">
 				<img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/500/300?<%= Math.random() * 1000 %>" />
@@ -370,7 +370,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' />
+			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' />
 		</div>
 	</div>
 </script>
