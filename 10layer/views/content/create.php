@@ -61,8 +61,11 @@
 			});
 		}
 		
-		$(document).on('click', '#dosubmit_right', function() {
+		$(document).on('click', '.the_action', function() {
+			action = $(this).attr('id');
+			$(document.body).data('action',action);
 			if (!$(document.body).data('saving')) {
+				//$(document.body).data('action',action);
 				save();
 			}
 			return false;
@@ -131,8 +134,8 @@
 		}
 		
 		function uploadComplete(data) {
+			
 			setTimeout(hide_progress_bar, 5000);
-			//hide_progress_bar();
 			$(document.body).data("saving",false);
 			if (data.error) {
 				$("#msgdialog-header").html("Error");
@@ -145,12 +148,36 @@
 				}
 				info="<ul>"+tmp+"</li>";
 				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
+				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
 			    $("#msgdialog").modal();
 			} else {
-				$("#msgdialog-header").html("Saved");
-				$("#msgdialog-body").html("<p>Content has been successfully saved</p>");
-				$("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
-				$("#msgdialog").modal();
+
+
+				var url = '<?php echo base_url(); ?>';    
+				if($(document.body).data("action") == '_create'){
+					url += 'create/'+$(document.body).data('content_type');
+				}
+
+				if($(document.body).data("action") == '_reuse'){
+					return false;
+				}
+
+				if($(document.body).data("action") == '_edit'){
+					url += 'edit/'+$(document.body).data('content_type')+"/"+data.id;
+				}
+
+				$(location).attr('href',url);
+				
+
+				// if($(document.body).data("action") == '_create'){
+				// 	url += 'create/'+$(document.body).data('content_type');
+				// }
+
+				//$('#review_options').html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				// $("#msgdialog-header").html("Saved");
+				// $("#msgdialog-body").html("<p>Content has been successfully saved</p>");
+				// $("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				// $("#msgdialog").modal();
 			}
 		}
 		
@@ -196,9 +223,17 @@
 	<div class="navbar-inner">
 		<div class="container">
 			<ul class="nav">
-				<li><button class="btn btn-primary" id="dosubmit_right">Save</button></li>
+				<li><button id="_create" class="the_action btn btn-mini btn-primary" id="dosubmit_right">Save and Create another</button></li>
 				<li class='divider-vertical'></li>
-				<li style=" padding-top:10px; width:300px;">
+				<li><button id="_reuse" class="the_action btn btn-mini btn-info" id="dosubmit_right">Save and Reuse Info</button></li>
+				<li class='divider-vertical'></li>
+				<li><button id="_edit" class="the_action btn btn-mini btn-warning" id="dosubmit_right">Save and Edit</button></li>
+				<li class='divider-vertical'></li>
+				<li><button id="_publish" class="the_action btn btn-mini btn-danger" id="dosubmit_right">Save and Publish</button></li>
+
+
+				<li class='divider-vertical'></li>
+				<li style=" padding-top:5px; width:300px;">
 					<div id='progress_container' style='display:none;' class="progress progress-striped active">
 						<div id="upload_indicator" class="bar" style="width: 0%;"></div>
 					</div>
