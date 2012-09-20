@@ -10,6 +10,9 @@
 <link rel="stylesheet" href="/resources/chosen/chosen.css">
 <script src="/resources/chosen/chosen.jquery.js"></script>
 
+<link rel="stylesheet" href="/resources/bootstrap-datepicker/css/datepicker.css">
+<script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+
 <script>
 	var currentpage=false;
 	
@@ -286,7 +289,7 @@
 
 
 		function uploadComplete(data) {
-			setTimeout(hide_progress_bar, 2000);
+			setTimeout(hide_progress_bar, 5000);
 			//hide_progress_bar();
 			$(document.body).data("saving",false);
 			if (data.error) {
@@ -310,11 +313,15 @@
 
 
 				if($(document.body).data("action") == '_edit'){
-					return false;
+					url += 'edit/'+$(document.body).data('content_type')+"/"+data.id;
 				}
 
 				$(location).attr('href',url);
 
+				// $("#msgdialog-header").html("Saved");
+				// $("#msgdialog-body").html("<p>Content has been successfully saved</p>");
+				// $("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
+				// $("#msgdialog").modal();
 			}
 		}
 
