@@ -55,15 +55,6 @@ class Model_Site_Sections extends Model_Content {
 			"contenttype"=>"zones",
 			"tablename"=>"section_zones",
 	    ),
-	    array(
-	    	"name"=>"articles",
-	    	"tablename"=>"article",
-	    	"contenttype"=>"article",
-	    	"type"=>"drilldown",
-	    	"readonly"=>true,
-	    	"multiple"=>true,
-	    ),
-	    
 	);
 
 	public function __construct() {

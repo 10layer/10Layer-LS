@@ -24,7 +24,12 @@ class Model_Tag extends Model_Content {
 			"transformations"=>array(
 			"copy"=>"title",
 			"urlid"=>array("content.urlid",false)
-		)
+		),
+		array(
+			"name"=>"tag_type",
+			"contenttype"=>"tag_type",
+			"type"=>"select",
+		),
 	),
 );
 

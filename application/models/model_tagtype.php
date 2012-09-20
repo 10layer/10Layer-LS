@@ -21,14 +21,6 @@ class Model_Tagtype extends Model_Content {
 	    		"urlid"=>array("content.urlid",false)
 	    	)
 	    ),
-	    array(
-	    	"name"=>"tag",
-	    	"tablename"=>"tag",
-	    	"label"=>"Tags",
-	    	"type"=>"drilldown",
-	    	"contenttype"=>"tag",
-	    	"multiple"=>true,
-	    ),
 	);
 
 	public function __construct() {

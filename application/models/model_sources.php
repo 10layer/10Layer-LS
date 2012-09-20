@@ -45,15 +45,6 @@ class Model_Sources extends Model_Content {
 			"name"=>"show",
 			"type"=>"boolean",
 		),
-	    array(
-	    	"name"=>"articles",
-	    	"tablename"=>"article",
-	    	"contenttype"=>"article",
-	    	"type"=>"drilldown",
-	    	"readonly"=>true,
-	    	"multiple"=>true,
-	    ),
-	    
 	);
 
 	public function __construct() {
