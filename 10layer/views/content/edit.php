@@ -286,7 +286,7 @@
 
 
 		function uploadComplete(data) {
-			setTimeout(hide_progress_bar, 5000);
+			setTimeout(hide_progress_bar, 2000);
 			//hide_progress_bar();
 			$(document.body).data("saving",false);
 			if (data.error) {
@@ -310,15 +310,11 @@
 
 
 				if($(document.body).data("action") == '_edit'){
-					url += 'edit/'+$(document.body).data('content_type')+"/"+data.id;
+					return false;
 				}
 
 				$(location).attr('href',url);
 
-				// $("#msgdialog-header").html("Saved");
-				// $("#msgdialog-body").html("<p>Content has been successfully saved</p>");
-				// $("#msgdialog-buttons").html("<a data-dismiss='modal' class='btn' href='<?= base_url() ?>create/"+$(document.body).data('content_type')+"'>Create another</a> <button class='btn' data-dismiss='modal' aria-hidden='true'>Reuse info</button> <a class='btn' href='<?= base_url() ?>edit/"+$(document.body).data('content_type')+"/"+data.id+"'>Edit</a>");
-				// $("#msgdialog").modal();
 			}
 		}
 
