@@ -308,6 +308,43 @@ $(function() {
 		val += (parent.children('.datetime_minute').val()) ? parent.children('.datetime_minute').val() : "00";
 		$(sender).siblings(':hidden').val(val);
 	}
+	
+	$(document).on('click', '.deepsearch-search', function() {
+		var searchel=$(this).prev();
+		var origel = this;
+		var search=$(this).prev().val();
+		var content_type=$(this).prev().attr("contenttype");
+		var optionel=$(this).parent().siblings('.deepsearch-options');
+		var resultel=$(this).parent().siblings('.deepsearch-results');
+		console.log(resultel);
+		//resultel.html('Searching...');
+		$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+			var pos = $.extend({}, searchel.offset(), {
+        		height: origel.offsetHeight
+			});
+			console.log(pos);
+			optionel.css({
+				top: pos.top + pos.height
+				, left: pos.left
+			});
+			
+			optionel.show();
+			
+			optionel.html('');
+			_.each(data.content, function(item) {
+				var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+					optionel.hide();
+					var newel= _.template($('#field-autocomplete-item').html(), { urlid: item._id, field: { contenttype: content_type, name: "", value: "" } });
+					resultel.append(newel);
+					searchel.val("");
+				});
+				optionel.append(el);
+			});
+		});
+	});
+	
 });
 
 function checkreqs() {

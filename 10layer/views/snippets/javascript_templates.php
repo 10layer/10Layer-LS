@@ -164,27 +164,24 @@
 		<div class='control-group deepsearch'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls'>
-				<input id="deepsearch_view_<%= field.contenttype %>_<%= field.name %>" type="text" contenttype="<%= field.contenttype %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" class="deepsearch_input <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value="" <% (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
-				<br clear="both" />
-				<div class="deepsearch_results well span2" style="height:300px; overflow:auto; float:left;"></div>
-				<div class="selected_results well span2" style="height:300px; overflow:auto; ">
+				<div class="input-append">
+					<input id="deepsearch_view_<%= field.contenttype %>_<%= field.name %>" type="text" contenttype="<%= field.contenttype %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" class="span2 deepsearch_input <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value="" <% (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+					<button class="btn deepsearch-search" type="button">Search</button>
+				</div>
+				<ul class="deepsearch-options dropdown-menu"></ul>
+				<div class="deepsearch-results">
 				<%
-					if (field.data) {
-						var x=0;
-						_.each(field.data, function(data) {
-							var value=data.content_id;
-							var title=data.fields.title.value;
-							var start_date=data.fields.start_date.value;
+					if (field.value) {
+						if (!_.isArray(field.value)) {
+							field.value=[field.value];
+						}
+						_.each(field.value, function(urlid) {
 				%>
-					<div class='deepsearch_selected_item'>
-					<input id="deepsearch_<%= field.contenttype %>_<%= field.name %>_<%= value %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple==1) ? '[]' : '' %>" value="<%= value %>"  />
-					<span><%= title %> (<%= start_date %>)</span>
-					</div>
-				
-<%				
+							<%= _.template($('#field-autocomplete-item').html(), { urlid: urlid, field: field }) %>
+				<%
 						});
 					}
-%>				
+				%>
 				</div>
 			</div>
 		</div>
