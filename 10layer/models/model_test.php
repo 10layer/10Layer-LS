@@ -38,7 +38,7 @@ class Model_Test extends Model_Content {
 		array(
 			"name"=>"deepsearch",
 			"type"=>"deepsearch",
-			"contenttype"=>"articles",
+			"contenttype"=>"article",
 		),
 		
 		array(
@@ -86,7 +86,7 @@ class Model_Test extends Model_Content {
 		array(
 			"name"=>"select",
 			"type"=>"select",
-			"contenttype"=>"tag_types"
+			"contenttype"=>"tag_type"
 		),
 		array(
 			"name"=>"text",
