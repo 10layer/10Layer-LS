@@ -227,6 +227,7 @@
 			$content_type=$this->input->get_post("content_type");
 			if (!empty($content_type)) {
 				$this->mongo_db->where(array("content_type"=>$content_type));
+				$this->data["criteria"]["content_type"]=$content_type;
 			}
 		}
 		
