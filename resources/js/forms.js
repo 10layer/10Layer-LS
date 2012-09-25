@@ -1,5 +1,8 @@
+
+var xhr_reqs = [];
+
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
-	var newel = _.template($('#field-autocomplete-item').html(), { title: item.title, field: { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id }});
+	var newel = _.template($('#field-autocomplete-item').html(), { title:item.title, field: { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id }});
 	return newel;
 }
 
@@ -316,41 +319,52 @@ $(function() {
 		$(sender).siblings(':hidden').val(val);
 	}
 	
+	
 	$(document).on('click', '.deepsearch-search', function() {
 		var searchel=$(this).prev();
 		var origel = this;
-		var multiple_status = $(this).attr('multiple');
-		var field_name = $(this).attr('fieldname');
 		var search=$(this).prev().val();
 		var content_type=$(this).prev().attr("contenttype");
 		var optionel=$(this).parent().siblings('.deepsearch-options');
 		var resultel=$(this).parent().siblings('.deepsearch-results');
-		console.log(resultel);
+		var indicator = $(this);
 		//resultel.html('Searching...');
-		$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
-			var pos = $.extend({}, searchel.offset(), {
-        		height: origel.offsetHeight
-			});
-			console.log(pos);
-			optionel.css({
-				top: pos.top + pos.height
-				, left: pos.left
-			});
-			
-			optionel.show();
-			
-			optionel.html('');
-			_.each(data.content, function(item) {
-				var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
-					e.stopPropagation();
-					e.preventDefault();
-					optionel.hide();
-					resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
-					searchel.val("");
+
+		while(xhr_reqs.length>0) {
+			jqXHR=xhr_reqs.pop();
+			jqXHR.abort();
+		}
+		indicator.html("<span class='label label-success'>Searching...</span>");
+		xhr_reqs.push(
+			$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+				var pos = $.extend({}, searchel.offset(), {
+	        		height: origel.offsetHeight
 				});
-				optionel.append(el);
+				console.log(pos);
+				optionel.css({
+					top: pos.top + pos.height
+					, left: pos.left
+				});
+				
+				optionel.show();
+				
+				optionel.html('');
+				_.each(data.content, function(item) {
+					var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						optionel.hide();
+						var newel= _.template($('#field-autocomplete-item').html(), { urlid: item._id, field: { contenttype: content_type, name: "", value: "" } });
+						resultel.append(newel);
+						searchel.val("");
+					});
+					indicator.html('Search');
+					optionel.append(el);
+				});
 			});
-		});
+		);
+
+		
 	});
 	
 });
@@ -429,31 +443,46 @@ function init_form() {
 			var optionel=$(this).parent().siblings('.options');
 			var resultel=$(this).parent().siblings('.result_container');
 			var content_type = $(this).attr("contenttype");
+			var url="/api/content/listing/";
 			var search = $(this).val();
-			$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
-				var pos = $.extend({}, searchel.offset(), {
-	        		height: origel.offsetHeight
-				});
-		
-				optionel.css({
-					top: pos.top + pos.height
-					, left: pos.left
-				});
-				
-				optionel.show();
-				
-				optionel.html('');
-				_.each(data.content, function(item) {
-					var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
-						e.stopPropagation();
-						e.preventDefault();
-						optionel.hide();
-						resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
-						searchel.val("");
+			var indicator = $(this).parent().siblings('.indicator');
+
+	        while(xhr_reqs.length>0) {
+				jqXHR=xhr_reqs.pop();
+				jqXHR.abort();
+			}
+			indicator.show();
+			xhr_reqs.push(
+				$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+					var pos = $.extend({}, searchel.offset(), {
+		        		height: origel.offsetHeight
 					});
-					optionel.append(el);
-				});
-			});
+			
+					optionel.css({
+						top: pos.top + pos.height
+						, left: pos.left
+					});
+					
+					optionel.show();
+					
+					optionel.html('');
+					_.each(data.content, function(item) {
+						var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
+							e.stopPropagation();
+							e.preventDefault();
+							optionel.hide();
+							resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
+							searchel.val("");
+						});
+						optionel.append(el);
+						indicator.hide();
+					});
+
+
+
+				})
+			);
+			
 		});
 
 	});
