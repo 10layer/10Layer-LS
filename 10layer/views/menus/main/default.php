@@ -5,7 +5,7 @@
 	if (empty($usermenus)) {
 		$usermenus=array();
 		foreach($content_types as $ct) {
-			$usermenus[]=$ct->urlid;
+			$usermenus[]=$ct->_id;
 		}
 	}
 ?>
@@ -17,13 +17,13 @@
 		foreach($usermenus as $usermenu) {
 			$content_type=false;
 			foreach($content_types as $ct) {
-				if ($ct->urlid==$usermenu) {
+				if ($ct->_id==$usermenu) {
 					$content_type=$ct;
 				}
 			}
-			if (isset($content_type->urlid)) {
+			if (isset($content_type->_id)) {
 	?>
-		<li class="menuitem" id='create_menuitem_<?= $content_type->urlid ?>'><?= anchor("create/".$content_type->urlid,$content_type->name) ?></li>
+		<li class="menuitem" id='create_menuitem_<?= $content_type->_id ?>'><?= anchor("create/".$content_type->_id,$content_type->name) ?></li>
 	<?php
 			}
 		}
@@ -37,13 +37,13 @@
 	foreach($usermenus as $usermenu) {
 		$content_type=false;
 		foreach($content_types as $ct) {
-			if ($ct->urlid==$usermenu) {
+			if ($ct->_id==$usermenu) {
 				$content_type=$ct;
 			}
 		}
-		if (isset($content_type->urlid)) {
+		if (isset($content_type->_id)) {
 	?>
-	<li class="menuitem" id='menuitem_<?= $content_type->urlid ?>'><?= anchor("edit/".$content_type->urlid,$content_type->name) ?></li>
+	<li class="menuitem" id='menuitem_<?= $content_type->urlid ?>'><?= anchor("edit/".$content_type->_id,$content_type->name) ?></li>
 	<?php
 		}
 	}
