@@ -775,8 +775,6 @@ if(strlen($s) > 2) {
 			
 		  }
 
-		
-		
 		/**
 		 * get_content_types function.
 		 * 
@@ -787,12 +785,11 @@ if(strlen($s) > 2) {
 		 * @return object
 		 */
 		public function get_content_types($public=true) {
-		//Moved from model_content_deprecated
 			if ($public) {
-				$this->db->where("public",true);
+				//$this->mongo_db->where(array("public"=>true));
 			}
-			$result=$this->db->get("content_types");
-			return $result->result();
+			$result=$this->mongo_db->get("content_types");
+			return $result;
 		}
 		
 		/**
