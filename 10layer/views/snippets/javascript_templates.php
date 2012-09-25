@@ -23,15 +23,26 @@
 
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls' style="position:relative;">
-				<div class="input-append">
+				<div class="input-append" style="position:relative;">
 					<% var multiple = (field.multiple==true) ? 'multiple' : ''; %>
-					<input multiple='<%= multiple %>' id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' type='text' contenttype='<%= field.contenttype %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+					<input multiple='<%= multiple %>' 
+						id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' 
+						type='text' 
+						contenttype='<%= field.contenttype %>' 
+						fieldname='<%= field.name %>' 
+						class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" 
+						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+						
 					<% if ((field.external==1) && (field.hidenew==false)) { %>
 					<%= _.template($('#button-new-template').html(), { field: field }) %>
 					<%
 						}
 					%>
-				</div>	
+
+				</div>
+
+
+				<span style='position:absolute; top:-12px !important; z-index:10; left:120px; display:none;' class='indicator label label-success'>loading...</span>
 				<ul class="options dropdown-menu"></ul>
 				<div class="result_container" style="margin-top:5px;">
 					<%
@@ -72,7 +83,7 @@
 <script type='text/template' id='field-autocomplete-item'>
 	<div style="float:left; padding:4px; margin-right:5px; border:1px solid #ccc; border-radius:5px; -moz-border-radius:5px;">
 		<a style="margin-top:-4px;" class="close">&times;</a>
-		<span style="float:left;margin-right:3px;" class="label label-info"> <%= title %> </span>
+		<span style="float:left;margin-right:3px;" class="label label-info">  </span>
 		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= urlid %>"  />
 	</div>
 </script>
@@ -171,7 +182,7 @@
 					<button class="btn deepsearch-search" type="button">Search</button>
 				</div>
 				<ul class="deepsearch-options dropdown-menu"></ul>
-				<div class="deepsearch-results result_container " style="margin-top:5px;">
+				<div class="deepsearch-results result_container" style="margin-top:5px;">
 				<%
 					if (field.value) {
 						if (!_.isArray(field.value)) {
