@@ -1,3 +1,8 @@
+function create_autocomplete_item(item, content_type, multiple_status, field_name){
+	var newel = _.template($('#field-autocomplete-item').html(), { title: item.title, field: { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id }});
+	return newel;
+}
+
 
 function update_rich(sender) {
 	var content_type = $(sender).attr('contenttype');
@@ -23,7 +28,9 @@ function leadingZeros(s) {
 }
 
 $(function() {
-	
+	$(".result_container div a.close").live('click', function(){
+		$(this).parent().remove();
+	});
 	
 	$("input, textarea").keyup(function() {
 		var reqs=checkreqs();
@@ -312,6 +319,8 @@ $(function() {
 	$(document).on('click', '.deepsearch-search', function() {
 		var searchel=$(this).prev();
 		var origel = this;
+		var multiple_status = $(this).attr('multiple');
+		var field_name = $(this).attr('fieldname');
 		var search=$(this).prev().val();
 		var content_type=$(this).prev().attr("contenttype");
 		var optionel=$(this).parent().siblings('.deepsearch-options');
@@ -336,8 +345,7 @@ $(function() {
 					e.stopPropagation();
 					e.preventDefault();
 					optionel.hide();
-					var newel= _.template($('#field-autocomplete-item').html(), { urlid: item._id, field: { contenttype: content_type, name: "", value: "" } });
-					resultel.append(newel);
+					resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
 					searchel.val("");
 				});
 				optionel.append(el);
@@ -409,23 +417,47 @@ function init_form() {
 	
 	$( ".datepicker" ).datepicker();
 	
-	$(".autocomplete").each(function() {
-		console.log($(this));
-		var content_type = $(this).attr("contenttype");
-		var url="/api/content/listing/";
-		$(this).typeahead({
-			source: function( request, response ) {
-				console.log(request);
-			    $.getJSON(url,{ limit: 12, search: request, content_type: content_type }, function(data){
-			    	var result = [];
-			    	_.each(data.content, function(item) {
-						result.push( item.title );
+	$(".autocomplete").each(function(){
+
+		$(this).keyup(function(){
+			var searchel=$(this).prev();
+			var origel = this;
+			var multiple_status = $(this).attr('multiple');
+			var field_name = $(this).attr('fieldname');
+			var search=$(this).prev().val();
+			var content_type=$(this).prev().attr("contenttype");
+			var optionel=$(this).parent().siblings('.options');
+			var resultel=$(this).parent().siblings('.result_container');
+			var content_type = $(this).attr("contenttype");
+			var search = $(this).val();
+			$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+				var pos = $.extend({}, searchel.offset(), {
+	        		height: origel.offsetHeight
+				});
+		
+				optionel.css({
+					top: pos.top + pos.height
+					, left: pos.left
+				});
+				
+				optionel.show();
+				
+				optionel.html('');
+				_.each(data.content, function(item) {
+					var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						optionel.hide();
+						resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
+						searchel.val("");
 					});
-					response(result);
-			    });
-			}
+					optionel.append(el);
+				});
+			});
 		});
+
 	});
+
 		
 	/*$(".autocomplete").each(function() {
 		var contenttype=$(this).attr("contenttype");
