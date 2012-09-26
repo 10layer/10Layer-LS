@@ -361,7 +361,7 @@ $(function() {
 					indicator.html('Search');
 					optionel.append(el);
 				});
-			});
+			})
 		);
 
 		
