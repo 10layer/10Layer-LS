@@ -120,7 +120,6 @@
 		 * @return void
 		 */
 		public function save() {
-
 			if(empty($_POST) || empty($_GET)){
 				$this->data["error"]=true;
 				$this->data["msg"][]="We did not receive data";
@@ -174,7 +173,11 @@
 			$data->last_modified=date("Y-m-d H:i:s");
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
 			$data->last_editor=$user->name;
-			
+			for($x=0; $x < sizeof($data); $x++) {
+				if (empty($data[$x])) {
+					unset($data[$x]);
+				}
+			}
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
 				//Update
