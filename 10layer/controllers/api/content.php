@@ -182,8 +182,6 @@
 				}
 			}
 
-			print_r($data);
-
 
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
