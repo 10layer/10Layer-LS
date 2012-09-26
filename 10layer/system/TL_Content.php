@@ -195,14 +195,19 @@ class TLContent {
 		$ci=&get_instance();
 		foreach($this->fields as $key=>$field) {
 			if (($field->type=="select") && empty($this->fields[$key]->options)) {
-				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->get("content");
+				$ci->mongo_db->state_save();
+				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->limit(500)->order_by(array("title", "desc"))->select(array("title", "_id"))->get("content");
+				$ci->mongo_db->state_restore();
 				if(!empty($result)) {
-					foreach($result() as $item) {
+					foreach($result as $item) {
 						$this->fields[$key]->options[$item->_id]=$item->title;
 					}
 				}
+
 			}
 		}
+
+
 	}
 	
 	/**
