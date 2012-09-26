@@ -173,11 +173,18 @@
 			$data->last_modified=date("Y-m-d H:i:s");
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
 			$data->last_editor=$user->name;
-			for($x=0; $x < sizeof($data); $x++) {
-				if (empty($data[$x])) {
-					unset($data[$x]);
+			$this->load->helper('data');
+			foreach($data as $key => $value){
+				if(is_array($data->$key)){
+					if(array_empty($value)){
+						$data->$key = false;
+					}
 				}
 			}
+
+			print_r($data);
+
+
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
 				//Update
