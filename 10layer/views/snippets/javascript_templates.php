@@ -42,7 +42,7 @@
 				</div>
 
 
-				<span style='position:absolute; top:-12px !important; z-index:10; left:120px; display:none;' class='indicator label label-success'>loading...</span>
+				<span style='position:absolute; top:5px !important; z-index:10; left:390px; display:none;' class='indicator label label-success'>loading...</span>
 				<ul class="options dropdown-menu"></ul>
 				<div class="result_container" style="margin-top:5px;">
 					<%
@@ -52,7 +52,7 @@
 							}
 							_.each(field.value, function(urlid) {
 					%>
-								<%= _.template($('#field-autocomplete-item').html(), { urlid: urlid, field: field }) %>
+								<%= _.template($('#field-autocomplete-item').html(), { title: urlid, field: field }) %>
 					<%
 							});
 						}
@@ -83,8 +83,8 @@
 <script type='text/template' id='field-autocomplete-item'>
 	<div style="float:left; padding:4px; margin-right:5px; border:1px solid #ccc; border-radius:5px; -moz-border-radius:5px;">
 		<a style="margin-top:-4px;" class="close">&times;</a>
-		<span style="float:left;margin-right:3px;" class="label label-info">  </span>
-		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= urlid %>"  />
+		<span style="float:left;margin-right:3px;" class="label label-info"> <%= title %>  </span>
+		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= field.value %>"  />
 	</div>
 </script>
 

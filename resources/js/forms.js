@@ -2,6 +2,8 @@
 var xhr_reqs = [];
 
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
+	console.log(item);
+
 	var newel = _.template($('#field-autocomplete-item').html(), { title:item.title, field: { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id }});
 	return newel;
 }
@@ -431,57 +433,77 @@ function init_form() {
 	
 	$( ".datepicker" ).datepicker();
 	
+	var autocomplete_timer = false;
 	$(".autocomplete").each(function(){
+		var self = $(this);
+		var self_val = '';
+		var origel = this;
+		self.keyup(function(){
 
-		$(this).keyup(function(){
-			var searchel=$(this).prev();
-			var origel = this;
-			var multiple_status = $(this).attr('multiple');
-			var field_name = $(this).attr('fieldname');
-			var search=$(this).prev().val();
-			var content_type=$(this).prev().attr("contenttype");
-			var optionel=$(this).parent().siblings('.options');
-			var resultel=$(this).parent().siblings('.result_container');
-			var content_type = $(this).attr("contenttype");
-			var url="/api/content/listing/";
-			var search = $(this).val();
-			var indicator = $(this).parent().siblings('.indicator');
+			if ($.trim(self_val) != $.trim(self.val())) {
+				self_val = self.val();
+				
+				clearTimeout(autocomplete_timer);
+				autocomplete_timer = setTimeout(function(){
 
-	        while(xhr_reqs.length>0) {
-				jqXHR=xhr_reqs.pop();
-				jqXHR.abort();
-			}
-			indicator.show();
-			xhr_reqs.push(
-				$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
-					var pos = $.extend({}, searchel.offset(), {
-		        		height: origel.offsetHeight
-					});
-			
-					optionel.css({
-						top: pos.top + pos.height
-						, left: pos.left
-					});
-					
-					optionel.show();
-					
-					optionel.html('');
-					_.each(data.content, function(item) {
-						var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
-							e.stopPropagation();
-							e.preventDefault();
-							optionel.hide();
-							resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
-							searchel.val("");
+				var searchel=self.prev();
+				
+				var multiple_status = self.attr('multiple');
+				var field_name = self.attr('fieldname');
+				var search=self.prev().val();
+				var content_type=self.prev().attr("contenttype");
+				var optionel=self.parent().siblings('.options');
+				var resultel=self.parent().siblings('.result_container');
+				var content_type = self.attr("contenttype");
+				var url="/api/content/listing/";
+				var search = self.val();
+				var indicator = self.parent().siblings('.indicator');
+
+		        while(xhr_reqs.length>0) {
+					jqXHR=xhr_reqs.pop();
+					jqXHR.abort();
+				}
+				indicator.show();
+				xhr_reqs.push(
+					$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+						var pos = $.extend({}, searchel.offset(), {
+			        		height: origel.offsetHeight
 						});
-						optionel.append(el);
-						indicator.hide();
-					});
+				
+						optionel.css({
+							top: pos.top + pos.height
+							, left: pos.left
+						});
+						
+						if(data.lenth > 0){
+							optionel.show();
+						}else{
+							optionel.hide();
+							indicator.hide();
+						}
+						
+						
+						optionel.html('');
+						_.each(data.content, function(item) {
+							var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
+								e.stopPropagation();
+								e.preventDefault();
+								optionel.hide();
+								resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
+								searchel.val("");
+							});
+							optionel.append(el);
+							indicator.hide();
+						});
 
 
 
-				})
-			);
+					})
+				)
+
+				}, 500);
+			
+			}
 			
 		});
 
