@@ -32,7 +32,21 @@ function leadingZeros(s) {
 	return s;
 }
 
+
+function load_over_lay(content){
+	$("#over_lay").html(content).animate({
+		    width: "70%",
+		    opacity: 0.4,
+		    marginLeft: "0.6in",
+		    fontSize: "3em",
+		    borderWidth: "10px"
+		  }, 1500 );
+	
+}
+
 $(function() {
+
+
 	$(".result_container div a.close").live('click', function(){
 		$(this).parent().remove();
 	});
@@ -75,9 +89,13 @@ $(function() {
 	});
 		
 	
+
+	$(".btn_new").live("click",function() {
+
+		load_over_lay('testing');
+	});
 			
 	$(".remover").live("click", function() {
-		//$(this).next().remove();
 		$(this).parent().remove();
 		return false;
 	});
