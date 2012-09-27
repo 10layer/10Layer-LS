@@ -84,7 +84,7 @@
 	<div style="float:left; padding:4px; margin-right:5px; border:1px solid #ccc; border-radius:5px; -moz-border-radius:5px;">
 		<a style="margin-top:-4px;" class="close">&times;</a>
 		<span style="float:left;margin-right:3px;" class="label label-info"> <%= title %>  </span>
-		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= field.value %>"  />
+		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= (field.value) ? field.value : '' %>"  />
 	</div>
 </script>
 
@@ -103,7 +103,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' readonly='readonly' />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' readonly='readonly' />
 		</div>
 	</div>
 </script>
@@ -237,8 +237,8 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= field.value %>" />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= field.value %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
 		</div>
 	</div>
 </script>
@@ -269,8 +269,8 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= field.value %>" data-url='/edit/fileupload/<%= content_type %>/<%= urlid %>/<%= field.contenttype %>_<%= field.name %>' />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= field.value %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
 		<% if (urlid) { %>
 			<div class="preview-image">
 				<img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/500/300?<%= Math.random() * 1000 %>" />
@@ -278,7 +278,7 @@
 		<% } %>
 		<% if (field.linkformat && urlid) { %>
 			<label>Download link</label>
-			<div class='download_url'><input type='text' class='span8 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', field.value) %>' /></div>
+			<div class='download_url'><input type='text' class='span8 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', (field.value) ? field.value : '') %>' /></div>
 		<% } %>
 		</div>
 	</div>
@@ -392,7 +392,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= field.value %>' class='<%= field.class %>' />
+			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' />
 		</div>
 	</div>
 </script>
