@@ -86,7 +86,7 @@ class Model_Test extends Model_Content {
 		array(
 			"name"=>"select",
 			"type"=>"select",
-			"contenttype"=>"tag_type"
+			"contenttype"=>"section"
 		),
 		array(
 			"name"=>"text",
