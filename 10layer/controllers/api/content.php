@@ -171,6 +171,7 @@
 			unset($data->urlid);
 			unset($data->content_id);
 			$data->last_modified=date("Y-m-d H:i:s");
+			$content_title = $data->title;
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
 			$data->last_editor=$user->name;
 			$this->load->helper('data');
@@ -202,6 +203,7 @@
 				$this->returndata();
 				return false;
 			}
+			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
 			$this->returndata();
 		}
