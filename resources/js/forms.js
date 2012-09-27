@@ -111,20 +111,12 @@ $(function() {
 	$(".btn_new").live("click",function() {
 
 		var content_type = $(this).attr('contenttype');
+		var element_id = $(this).attr('id');
 		
 
 		$.getJSON("/api/content/blank?jsoncallback=?", { api_key: $(document.body).data('api_key'), content_type: content_type, meta: true }, function(data) {
-				console.log(data);
-
-				//var the_form = ;
-
-				load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type }));
-
-				//$('#dyncontent').html(_.template($("#create-template").html(), { data:data, content_type: content_type }));
-				//init_form();
-
-				//$('#dyncontent').html(_.template($("#create-template").html(), { data:data, content_type: content_type }));
-				//init_form();
+	
+				load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
 		});
 
 
@@ -723,8 +715,7 @@ function _insert_inpage(form, content_type) {
 
 
 function inpage_uploadComplete(data) {
-
-	console.log(data);
+	
 
     $(document.body).data("saving",false);
     if (data.error) {
@@ -733,19 +724,23 @@ function inpage_uploadComplete(data) {
 		$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
 		$("#msgdialog").modal();
     } else {
+    	var vq = $('#element_pointer').attr('pointer');
+		var pointer = $('#'+vq);
+
+		var resultel=pointer.parent().siblings('.result_container');
+		var content_type=pointer.prev().attr("contenttype");
+		var field_name = pointer.attr('fieldname');
+		var multiple_status = pointer.attr('multiple');
+		var item = {title:data.title, _id:data.id};
+		resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
+
     	$("#msgdialog-header").html("Saved");
 		$("#msgdialog-body").html("<p>Content has been saved</p>");
 		$("#msgdialog").modal();
-        if ($(document.body).data('done_submit')) {
-        	content_type=$(document.body).data('content_type');
-        	urlid=$(document.body).data('urlid');
-        	$.ajax({ type: "GET", url: "<?= base_url() ?>/workflow/change/advance/"+content_type+"/"+urlid, async:false});
-        	location.href="/edit/"+content_type;
-        	//location.href="/workers/content/unlock/"+content_type+"/"+urlid;
-        } else {
-        	$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-        }
+        $("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
     }
+
+    return data;
 }
 
 
