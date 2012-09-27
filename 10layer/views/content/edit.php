@@ -475,9 +475,9 @@
 
 
 <script type='text/template' id='edit-template'>
-<div class="row">
+<div class="row" style="position:relative;">
 	<% console.log(data); %>
-	<div id="edit-content" class="span9">
+	<div id="edit-content" class="span9" >
 		<h2>Edit</h2>
 		<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
 		<input type='hidden' name='action' value='submit' />
@@ -490,7 +490,12 @@
 			<% } %>
 		<% }); %>
 		</form>
+
+		
 	</div>
+
+	<div id="over_lay" style='border:2px solid; height:200px; width:50px; right:1px; position:absolute; top:1px; display:none;'> </div>
+
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container">
@@ -589,6 +594,7 @@
 <div id="dyncontent">
 </div>
 <div id="createdialog"></div>
+
 <?php
 	$this->load->view("templates/footer");
 ?>
