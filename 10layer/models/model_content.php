@@ -150,6 +150,15 @@
 				"type"=>"date",
 				"value"=>"2100-01-01",
 			),
+			array(
+				"name"=>"workflow_status",
+				"type"=>"select",
+				"options"=>array(
+					"New",
+					"Edited",
+					"Published"
+				),
+			),
 		);
 		
 		
