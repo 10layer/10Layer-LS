@@ -649,6 +649,7 @@
 	
 	<div id="create-content" style="width:840px; padding:10px;" class="boxed wide">
 		<h2>Create - <%= content_type %></h2>
+		<span id='element_pointer' pointer='<%= element_pointer %>'></span>
 		<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
 		<input type='hidden' name='action' value='submit' />
 		<% _.each(data.meta, function(field) { %>
