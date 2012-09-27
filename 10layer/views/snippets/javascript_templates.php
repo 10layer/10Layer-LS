@@ -639,3 +639,26 @@
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>
 	<div class='popup' id='new_dialog_<%= field.contenttype %>_<%= field.name %>'></div>
 </script>
+
+
+
+
+
+
+<script type='text/template' id='create_auto_complete_new'>
+	
+	<div id="create-content" style="width:840px; padding:10px;" class="boxed wide">
+		<h2>Create - <%= content_type %></h2>
+		<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+		<input type='hidden' name='action' value='submit' />
+		<% _.each(data.meta, function(field) { %>
+			<% if (!field.hidden) { %>
+				<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
+			<% } %>
+		<% }); %>
+		
+		<a class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
+		
+		</form>
+	</div>
+</script>
