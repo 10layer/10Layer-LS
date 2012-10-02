@@ -374,7 +374,7 @@ $(function() {
 						e.stopPropagation();
 						e.preventDefault();
 						optionel.hide();
-						var newel= _.template($('#field-autocomplete-item').html(), { urlid: item._id, field: { contenttype: content_type, name: "", value: "" } });
+						var newel= _.template($('#field-autocomplete-item').html(), { title: item._id, field: { contenttype: content_type, name: "", value: "" } });
 						resultel.append(newel);
 						searchel.val("");
 					});
