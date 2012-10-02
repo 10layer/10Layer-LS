@@ -36,15 +36,33 @@ function leadingZeros(s) {
 function load_over_lay(content){
 	$("#over_lay").html(content).animate({
 		    width: "70%",
-		    opacity: 0.4,
 		    marginLeft: "0.6in",
 		    fontSize: "3em",
-		    borderWidth: "10px"
+		    borderWidth: "1px"
 		  }, 1500 );
 	
 }
 
 $(function() {
+
+	$('.inpage_create').live('click', function(){
+		var content_type = $(this).attr('contenttype');
+		var form = $(this).parent();
+		_insert_inpage(form, content_type);
+		console.log('yeah');
+		return false;
+	});
+
+
+
+	// $(document).on('click', '.dosubmit_popup', function() {
+	// 	var content_type = $(this).attr('contenttype');
+	// 	// var fieldname = $(this).attr('fieldname');
+	// 	// var form = $(this).parent(); //    $('#form_create_'+content_type);
+	// 	// _insert(form, content_type);
+	// 	conosole.log('yeah');
+	// 	return false;
+	// });
 
 
 	$(".result_container div a.close").live('click', function(){
@@ -92,7 +110,21 @@ $(function() {
 
 	$(".btn_new").live("click",function() {
 
-		load_over_lay('testing');
+		var content_type = $(this).attr('contenttype');
+		var element_id = $(this).attr('id');
+		
+
+		$.getJSON("/api/content/blank?jsoncallback=?", { api_key: $(document.body).data('api_key'), content_type: content_type, meta: true }, function(data) {
+	
+				load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
+		});
+
+
+		// $.getJSON(url, function(data){
+		// 	console.log(data);
+		// });
+
+		// load_over_lay(content_type);
 	});
 			
 	$(".remover").live("click", function() {
@@ -230,13 +262,13 @@ $(function() {
 		return false;
 	});
 	
-	$(document).on('click', '.dosubmit_popup', function() {
-		var content_type = $(this).attr('contenttype');
-		var fieldname = $(this).attr('fieldname');
-		var form = $('#form_create_'+content_type);
-		popup_insert(form, content_type);
-		return false;
-	});
+	// $(document).on('click', '.dosubmit_popup', function() {
+	// 	var content_type = $(this).attr('contenttype');
+	// 	var fieldname = $(this).attr('fieldname');
+	// 	var form = $('#form_create_'+content_type);
+	// 	popup_insert(form, content_type);
+	// 	return false;
+	// });
 	
 	$(document).on('keydown', '.datetime_hour', function(e) {
 		var key = e.keyCode;
@@ -674,6 +706,56 @@ function rich_overlay() {
 	});*/
 }
 
+
+//======================== manage inpage submits ====================
+
+function _insert_inpage(form, content_type) {
+	_insert(form, content_type, inpage_uploadComplete);
+}
+
+
+function inpage_uploadComplete(data) {
+	
+
+    $(document.body).data("saving",false);
+    if (data.error) {
+    	$("#msgdialog-header").html("Error");
+		$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+data.info+"</p>");
+		$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+		$("#msgdialog").modal();
+    } else {
+    	var vq = $('#element_pointer').attr('pointer');
+		var pointer = $('#'+vq);
+
+		var resultel=pointer.parent().siblings('.result_container');
+		var content_type=pointer.prev().attr("contenttype");
+		var field_name = pointer.attr('fieldname');
+		var multiple_status = pointer.attr('multiple');
+		var item = {title:data.title, _id:data.id};
+		resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
+
+    	$("#msgdialog-header").html("Saved");
+		$("#msgdialog-body").html("<p>Content has been saved</p>");
+		$("#msgdialog").modal();
+        $("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+    }
+
+    return data;
+}
+
+
+//===================================================================
+
+
+
+
+
+
+
+
+
+
+
 function insert(form, content_type) {
 	_insert(form, content_type, uploadComplete);
 }
@@ -689,8 +771,9 @@ function _insert(form, content_type, success) {
 		$(document.body).data('saving', true);
 		var formData = new FormData(form[0]);
 		$.ajax({
-			url: "/workers/api/insert/"+content_type+"/"+$(document.body).data('api_key'),  //server script to process data
+			url: "/api/content/save/?content_type="+content_type+"&api_key="+$(document.body).data('api_key'),  //server script to process data
 			type: 'POST',
+			data:formData,
 			xhr: function() {  // custom xhr
 				myXhr = $.ajaxSettings.xhr();
 				if(myXhr.upload){ // check if upload property exists
