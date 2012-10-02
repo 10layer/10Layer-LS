@@ -494,7 +494,7 @@
 		
 	</div>
 
-	<div id="over_lay" style='border:2px solid; height:200px; width:50px; right:1px; position:absolute; top:1px; display:none;'> </div>
+	<div id="over_lay" style='border:2px solid; width:50px; right:1px; position:absolute; background-color:#fff; overflow:hidden; top:1px;'> </div>
 
 	<div class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
