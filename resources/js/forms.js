@@ -1,6 +1,7 @@
 
 var xhr_reqs = [];
 
+
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
 	console.log(item);
 
@@ -34,13 +35,41 @@ function leadingZeros(s) {
 
 
 function load_over_lay(content){
-	$("#over_lay").html(content).animate({
-		    width: "70%",
+
+	var pointer = $('#over_lay');
+	var main = pointer.prev();
+	$('#bottom_bar').fadeOut();
+
+	main.addClass('sliding_style');
+	main.animate({
+		    width: "7%",
+		    border: "1px solid #ccc"
+		  }, 1500 );
+
+	pointer.html(content).animate({
+		    width: "60%",
 		    marginLeft: "0.6in",
 		    fontSize: "3em",
 		    borderWidth: "1px"
 		  }, 1500 );
-	
+}
+
+function close_over_lay(){
+	var pointer = $('#over_lay');
+	var main = pointer.prev();
+
+	main.animate({
+		    width: "80%"
+		  }, 1500 );
+
+	pointer.animate({
+		    width: "0%",
+		  }, 1500,function(){ 
+		  	$(this).html('');
+		  	main.removeClass('sliding_style');
+		  	$('#bottom_bar').fadeIn();
+
+		  });
 }
 
 $(function() {
@@ -49,7 +78,11 @@ $(function() {
 		var content_type = $(this).attr('contenttype');
 		var form = $(this).parent();
 		_insert_inpage(form, content_type);
-		console.log('yeah');
+		return false;
+	});
+
+	$('.inpage_cancel').live('click', function(){
+		close_over_lay();
 		return false;
 	});
 
@@ -112,11 +145,10 @@ $(function() {
 
 		var content_type = $(this).attr('contenttype');
 		var element_id = $(this).attr('id');
-		
+
 
 		$.getJSON("/api/content/blank?jsoncallback=?", { api_key: $(document.body).data('api_key'), content_type: content_type, meta: true }, function(data) {
-	
-				load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
+			load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
 		});
 
 
@@ -525,12 +557,15 @@ function init_form() {
 							, left: pos.left
 						});
 						
-						if(data.lenth > 0){
+					
+						if(data.content.length > 0){
 							optionel.show();
 						}else{
 							optionel.hide();
 							indicator.hide();
 						}
+
+						
 						
 						
 						optionel.html('');
@@ -545,6 +580,7 @@ function init_form() {
 							optionel.append(el);
 							indicator.hide();
 						});
+						console.log(optionel.html());
 
 
 
@@ -738,6 +774,7 @@ function inpage_uploadComplete(data) {
 		$("#msgdialog-body").html("<p>Content has been saved</p>");
 		$("#msgdialog").modal();
         $("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+
     }
 
     return data;

@@ -659,6 +659,7 @@
 		<% }); %>
 		
 		<a class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
+		<a class="btn btn-success btn-mini inpage_cancel" contenttype="<%= content_type %>" fieldname="<%= name %>" >Cancel / Done </a>
 		
 		</form>
 	</div>

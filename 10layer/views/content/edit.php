@@ -475,7 +475,7 @@
 
 
 <script type='text/template' id='edit-template'>
-<div class="row" style="position:relative;">
+<div class="row" >
 	<% console.log(data); %>
 	<div id="edit-content" class="span9" >
 		<h2>Edit</h2>
@@ -494,9 +494,19 @@
 		
 	</div>
 
-	<div id="over_lay" style='border:2px solid; width:50px; right:1px; position:absolute; background-color:#fff; overflow:hidden; top:1px;'> </div>
+	<div id="over_lay" style='
+		border:1px solid #ccc; 
+		width:50px; right:1px; 
+		position:absolute; 
+		background-color:#fff; 
+		-moz-border-radius:5px; 
+		border-radius:5px;
+	 	overflow:hidden; 
+	 	top:100px; 
+	 	right:300px;'>
+	 </div>
 
-	<div class="navbar navbar-fixed-bottom">
+	<div id='bottom_bar' class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
 			<div class="container">
 				<ul class="nav">

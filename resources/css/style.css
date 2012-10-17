@@ -1,1 +1,6 @@
 a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20px}
+
+.sliding_style{
+	border-right:1px solid #ccc; 
+	overflow:hidden;
+}
