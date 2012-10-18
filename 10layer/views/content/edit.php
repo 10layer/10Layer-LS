@@ -502,7 +502,8 @@
 		-moz-border-radius:5px; 
 		border-radius:5px;
 	 	overflow:hidden; 
-	 	top:100px; 
+	 	top:100px;
+	 	display:none; 
 	 	right:300px;'>
 	 </div>
 

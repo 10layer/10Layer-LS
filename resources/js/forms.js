@@ -46,12 +46,13 @@ function load_over_lay(content){
 		    border: "1px solid #ccc"
 		  }, 1500 );
 
-	pointer.html(content).animate({
+	pointer.html(content).show().animate({
 		    width: "60%",
 		    marginLeft: "0.6in",
 		    fontSize: "3em",
 		    borderWidth: "1px"
 		  }, 1500 );
+
 }
 
 function close_over_lay(){
@@ -68,6 +69,7 @@ function close_over_lay(){
 		  	$(this).html('');
 		  	main.removeClass('sliding_style');
 		  	$('#bottom_bar').fadeIn();
+		  	$(this).hide();
 
 		  });
 }
@@ -769,7 +771,7 @@ function inpage_uploadComplete(data) {
 		var multiple_status = pointer.attr('multiple');
 		var item = {title:data.title, _id:data.id};
 		resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
-
+		close_over_lay();
     	$("#msgdialog-header").html("Saved");
 		$("#msgdialog-body").html("<p>Content has been saved</p>");
 		$("#msgdialog").modal();

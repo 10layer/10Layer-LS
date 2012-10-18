@@ -68,14 +68,43 @@
 	<!-- create-field-autocomplete -->
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-			<div class='controls'>
-				<input id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' type='text' contenttype='<%= field.contenttype %>' contenttype='<%= field.contenttype %>' fieldname='<%= field.name %>' class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
-				<div class="items_container offset1 span8"></div>
-				<% if ((field.external==1) && (field.hidenew==false)) { %>
-				<%= _.template($('#button-new-template').html(), { field: field }) %>
-				<%
-					}
-				%>
+			<div class='controls' style="position:relative;">
+				<div class="input-append" style="position:relative;">
+					<% var multiple = (field.multiple==true) ? 'multiple' : ''; %>
+					<input multiple='<%= multiple %>' 
+						id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' 
+						type='text' 
+						contenttype='<%= field.contenttype %>' 
+						fieldname='<%= field.name %>' 
+						class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" 
+						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+						
+					<% if ((field.external==1) && (field.hidenew==false)) { %>
+					<%= _.template($('#button-new-template').html(), { field: field }) %>
+					<%
+						}
+					%>
+
+				</div>
+
+
+				<span style='position:absolute; top:5px !important; z-index:10; left:390px; display:none;' class='indicator label label-success'>loading...</span>
+				<ul class="options dropdown-menu"></ul>
+				<div class="result_container" style="margin-top:5px;">
+					<%
+						if (field.value) {
+							if (!_.isArray(field.value)) {
+								field.value=[field.value];
+							}
+							_.each(field.value, function(urlid) {
+					%>
+								<%= _.template($('#field-autocomplete-item').html(), { title: urlid, field: field }) %>
+					<%
+							});
+						}
+					%>
+				</div>
+				
 			</div>
 		</div>
 </script>
@@ -84,6 +113,7 @@
 	<div style="float:left; padding:4px; margin-right:5px; border:1px solid #ccc; border-radius:5px; -moz-border-radius:5px;">
 		<a style="margin-top:-4px;" class="close">&times;</a>
 		<span style="float:left;margin-right:3px;" class="label label-info"> <%= (title) ? title : '' %>  </span>
+		<% var urlid = (urlid) ? urlid : ''; %>
 		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= (field.value) ? field.value : '' %>"  />
 	</div>
 </script>
