@@ -296,13 +296,7 @@ $(function() {
 		return false;
 	});
 	
-	// $(document).on('click', '.dosubmit_popup', function() {
-	// 	var content_type = $(this).attr('contenttype');
-	// 	var fieldname = $(this).attr('fieldname');
-	// 	var form = $('#form_create_'+content_type);
-	// 	popup_insert(form, content_type);
-	// 	return false;
-	// });
+
 	
 	$(document).on('keydown', '.datetime_hour', function(e) {
 		var key = e.keyCode;
@@ -772,11 +766,7 @@ function inpage_uploadComplete(data) {
 		var item = {title:data.title, _id:data.id};
 		resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
 		close_over_lay();
-    	$("#msgdialog-header").html("Saved");
-		$("#msgdialog-body").html("<p>Content has been saved</p>");
-		$("#msgdialog").modal();
-        $("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-
+  
     }
 
     return data;
