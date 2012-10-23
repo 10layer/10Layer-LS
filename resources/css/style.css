@@ -1,6 +1,16 @@
 a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20px}
 
 .sliding_style{
-	border-right:1px solid #ccc; 
 	overflow:hidden;
+	margin-bottom: 10px;
+
+}
+
+.slider{
+	margin-bottom: 10px;
+	border-top:1px solid #ccc; 
+	-moz-border-radius:5px; 
+	border-radius:5px;
+ 	display:none; 
+ 	margin: 0 auto;
 }
