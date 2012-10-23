@@ -500,9 +500,12 @@
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls'>
-				<button id="contentselectButton_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_rich_select btn">Select <%= field.label %></button>
-				<% $(document.body).data('onsave', update_rich) %>
-				<%= _.template($('#button-new-template').html(), { field: field }) %>
+				<div>
+					<button id="contentselectButton_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_rich_select btn">Select <%= field.label %></button>
+					<% $(document.body).data('onsave', update_rich) %>
+					<%= _.template($('#button-new-template').html(), { field: field }) %>
+				</div>
+				
 				<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
 					<% if(field.value) {  %>
 						<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.value, contenttype: field.contenttype }) %>
@@ -676,21 +679,30 @@
 
 
 <script type='text/template' id='create_auto_complete_new'>
-	
-	<div id="create-content" style="width:840px; padding:10px;" class="boxed wide">
-		<h2>Create - <%= content_type %></h2>
-		<span id='element_pointer' pointer='<%= element_pointer %>'></span>
-		<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
-		<input type='hidden' name='action' value='submit' />
-		<% _.each(data.meta, function(field) { %>
-			<% if (!field.hidden) { %>
-				<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
-			<% } %>
-		<% }); %>
-		
-		<a class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
-		<a class="btn btn-success btn-mini inpage_cancel" contenttype="<%= content_type %>" fieldname="<%= name %>" >Cancel / Done </a>
-		
-		</form>
+	<div style='margin-left:0;' class='main_form_container span10'>
+		<div>
+			<div id="edit-content" class="span10" >
+				<h3>Create - <%= content_type %></h3>
+				<span id='element_pointer' pointer='<%= element_pointer %>'></span>
+				<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+				<input type='hidden' name='action' value='submit' />
+				<% _.each(data.meta, function(field) { %>
+					<% if (!field.hidden) { %>
+						<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
+					<% } %>
+				<% }); %>
+				
+				<a class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
+				<a class="btn btn-success btn-mini inpage_cancel" contenttype="<%= content_type %>" fieldname="<%= name %>" >Cancel / Done </a>
+				
+				</form>
+
+			</div>
+			<br clear='both'>
+		</div>
+
+		<div class="over_lay slider span10"></div>
+
 	</div>
+
 </script>

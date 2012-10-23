@@ -1,6 +1,11 @@
 
 var xhr_reqs = [];
 
+//I use this to determine the element I working with on nested sliders
+var nest;
+//where I want the results
+var dest = [];
+
 
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
 	console.log(item);
@@ -34,44 +39,35 @@ function leadingZeros(s) {
 }
 
 
-function load_over_lay(content){
+function load_over_lay(pointer, content){
 
-	var pointer = $('#over_lay');
+	//var pointer = $('#over_lay');
 	var main = pointer.prev();
-	$('#bottom_bar').fadeOut();
-
 	main.addClass('sliding_style');
-	main.animate({
-		    width: "7%",
-		    border: "1px solid #ccc"
-		  }, 1500 );
-
-	pointer.html(content).show().animate({
-		    width: "60%",
-		    marginLeft: "0.6in",
-		    fontSize: "3em",
-		    borderWidth: "1px"
-		  }, 1500 );
+	$('#bottom_bar').fadeOut();
+	main.animate({height: "50px",}, 1500,function(){
+		pointer.html(content).fadeIn();
+	} );
 
 }
 
-function close_over_lay(){
-	var pointer = $('#over_lay');
+function close_over_lay(pointer){
+	
+	
 	var main = pointer.prev();
+	console.log(main.attr('class'));
 
-	main.animate({
-		    width: "80%"
-		  }, 1500 );
+	pointer.fadeOut(function(){
+		$(this).html('');
+		main.removeClass('sliding_style');
+		main.animate({ height: "100%"}, 1500);
+		if(main.hasClass('root')){
+			$('#bottom_bar').fadeIn();
+		}
+		
+	});
 
-	pointer.animate({
-		    width: "0%",
-		  }, 1500,function(){ 
-		  	$(this).html('');
-		  	main.removeClass('sliding_style');
-		  	$('#bottom_bar').fadeIn();
-		  	$(this).hide();
-
-		  });
+	
 }
 
 $(function() {
@@ -79,12 +75,17 @@ $(function() {
 	$('.inpage_create').live('click', function(){
 		var content_type = $(this).attr('contenttype');
 		var form = $(this).parent();
+
+		var pointer = $(this).parent().parent().parent().parent().parent(); //$('#over_lay');
+		//close_over_lay(pointer);
+		nest = pointer;
 		_insert_inpage(form, content_type);
 		return false;
 	});
 
 	$('.inpage_cancel').live('click', function(){
-		close_over_lay();
+		var pointer = $(this).parent().parent().parent().parent().parent(); //$('#over_lay');
+		close_over_lay(pointer);
 		return false;
 	});
 
@@ -144,21 +145,17 @@ $(function() {
 	
 
 	$(".btn_new").live("click",function() {
-
+		var tracker = $(this);
+		dest.push(tracker);
 		var content_type = $(this).attr('contenttype');
 		var element_id = $(this).attr('id');
-
+		var pointer = $(this).parent().parent().parent().parent().parent().parent().next(); //6
+		//console.log(pointer.attr('class'));
 
 		$.getJSON("/api/content/blank?jsoncallback=?", { api_key: $(document.body).data('api_key'), content_type: content_type, meta: true }, function(data) {
-			load_over_lay(_.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
+			load_over_lay(pointer, _.template($("#create_auto_complete_new").html(), { data:data, content_type: content_type, element_pointer:element_id }));
 		});
 
-
-		// $.getJSON(url, function(data){
-		// 	console.log(data);
-		// });
-
-		// load_over_lay(content_type);
 	});
 			
 	$(".remover").live("click", function() {
@@ -756,8 +753,13 @@ function inpage_uploadComplete(data) {
 		$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
 		$("#msgdialog").modal();
     } else {
-    	var vq = $('#element_pointer').attr('pointer');
-		var pointer = $('#'+vq);
+
+		var index = dest.length - 1;
+		var pointer = dest[index];
+		dest.splice(index,1);
+
+		console.log(nest.attr('class'));
+		console.log(pointer.attr('class'));
 
 		var resultel=pointer.parent().siblings('.result_container');
 		var content_type=pointer.prev().attr("contenttype");
@@ -765,7 +767,7 @@ function inpage_uploadComplete(data) {
 		var multiple_status = pointer.attr('multiple');
 		var item = {title:data.title, _id:data.id};
 		resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
-		close_over_lay();
+		close_over_lay(nest);
   
     }
 

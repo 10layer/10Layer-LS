@@ -187,38 +187,31 @@
 </script>
 
 <script type='text/template' id='create-template'>
-	<%	
-		if (typeof popup == 'undefined') {
-			popup = false;
-		}
-	%>
-	<div id="create-content" class="boxed wide">
-		<h2>Create - <%= content_type %></h2>
-		<form id='contentform' class='form-horizontal span12 <%= (popup) ? "popupform" : "contentform" %>' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
-		<input type='hidden' name='action' value='submit' />
-		<% _.each(data.meta, function(field) { %>
-			<% if (!field.hidden) { %>
-				<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
-			<% } %>
-		<% }); %>
-		<% if (popup) { %>
-		<button contenttype="<%= content_type %>" fieldname="<%= name %>" class='dosubmit_popup'>Save</button>
-		<% } %>
-		</form>
-	</div>
 
-	<div id="over_lay" style='
-		border:1px solid #ccc; 
-		width:50px; right:1px; 
-		position:absolute; 
-		background-color:#fff; 
-		-moz-border-radius:5px; 
-		border-radius:5px;
-	 	overflow:hidden; 
-	 	top:100px;
-	 	display:none; 
-	 	right:300px;'>
-	 </div>
+<div class="row" >
+
+	<div style='margin-left:0;' class='main_form_container span10'>
+		<div class='root'>
+			
+			<div id="edit-content" class="span10" >
+				<h2>Create - <%= content_type %></h2>
+				<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+				<input type='hidden' name='action' value='submit' />
+				<% _.each(data.meta, function(field) { %>
+					<% if (!field.hidden) { %>
+						<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
+					<% } %>
+				<% }); %>
+				</form>
+
+			</div>
+			<br clear='both'>
+		</div>
+
+		<div class="over_lay slider span10"></div>
+    </div>
+
+</div>
 
 </script>
 
