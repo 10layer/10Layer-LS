@@ -6,6 +6,8 @@ var nest;
 //where I want the results
 var dest = [];
 
+var imbeded_progress_bar;
+
 
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
 	console.log(item);
@@ -57,6 +59,11 @@ function close_over_lay(pointer){
 	var main = pointer.prev();
 	console.log(main.attr('class'));
 
+	var index = dest.length - 1;
+	var button = dest[index];
+	dest.splice(index,1);
+	button.next().hide();
+
 	pointer.fadeOut(function(){
 		$(this).html('');
 		main.removeClass('sliding_style');
@@ -75,9 +82,9 @@ $(function() {
 	$('.inpage_create').live('click', function(){
 		var content_type = $(this).attr('contenttype');
 		var form = $(this).parent();
-
 		var pointer = $(this).parent().parent().parent().parent().parent(); //$('#over_lay');
-		//close_over_lay(pointer);
+
+		imbeded_progress_bar = $(this).next().next();
 		nest = pointer;
 		_insert_inpage(form, content_type);
 		return false;
@@ -146,6 +153,7 @@ $(function() {
 
 	$(".btn_new").live("click",function() {
 		var tracker = $(this);
+		tracker.next().show();
 		dest.push(tracker);
 		var content_type = $(this).attr('contenttype');
 		var element_id = $(this).attr('id');
@@ -739,27 +747,29 @@ function rich_overlay() {
 //======================== manage inpage submits ====================
 
 function _insert_inpage(form, content_type) {
-	_insert(form, content_type, inpage_uploadComplete);
+	_process_insert_inpage(form, content_type, inpage_uploadComplete);
 }
 
 
 function inpage_uploadComplete(data) {
 	
-
     $(document.body).data("saving",false);
     if (data.error) {
     	$("#msgdialog-header").html("Error");
 		$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+data.info+"</p>");
 		$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
 		$("#msgdialog").modal();
+		
+		indicator = imbeded_progress_bar.children(':first');
+		indicator.css("width",'0%' );
+		imbeded_progress_bar.hide();
+
     } else {
 
 		var index = dest.length - 1;
 		var pointer = dest[index];
 		dest.splice(index,1);
-
-		console.log(nest.attr('class'));
-		console.log(pointer.attr('class'));
+		pointer.next().hide();
 
 		var resultel=pointer.parent().siblings('.result_container');
 		var content_type=pointer.prev().attr("contenttype");
@@ -825,6 +835,50 @@ function _insert(form, content_type, success) {
 		});
 	}
 }
+
+
+
+//does the same thing as above, just looks for a different progress indicator
+function _process_insert_inpage(form, content_type, success) {
+	for ( instance in CKEDITOR.instances )
+		CKEDITOR.instances[instance].updateElement();
+	if (!$(document.body).data('saving')) {
+		$(document.body).data('saving', true);
+		var formData = new FormData(form[0]);
+		$.ajax({
+			url: "/api/content/save/?content_type="+content_type+"&api_key="+$(document.body).data('api_key'),  //server script to process data
+			type: 'POST',
+			data:formData,
+			xhr: function() {  // custom xhr
+				myXhr = $.ajaxSettings.xhr();
+				if(myXhr.upload){ // check if upload property exists
+					myXhr.upload.addEventListener('progress',inbeded_upload_Progress, false); // for handling the progress of the upload
+				}
+				return myXhr;
+			},
+			//Ajax events
+			beforeSend: uploadBefore,
+			success: success,
+			error: uploadFailed,
+			// Form data
+			data: formData,
+			//Options to tell JQuery not to process data or worry about content-type
+			cache: false,
+			contentType: false,
+			processData: false
+		});
+	}
+}
+
+
+
+
+function inbeded_upload_Progress(e) {
+	imbeded_progress_bar.show();
+	indicator = imbeded_progress_bar.children(':first');
+	indicator.css("width", ( Math.round((e.loaded / e.total) * 100)) + '%' );
+}
+
 
 function uploadProgress(e) {}
 

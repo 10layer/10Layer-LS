@@ -670,6 +670,7 @@
 
 <script type='text/template' id='button-new-template'>
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>
+	<span style='display:none;margin-left:10px;' class='label label-success'>Loading...</span>
 	<div class='popup' id='new_dialog_<%= field.contenttype %>_<%= field.name %>'></div>
 </script>
 
@@ -692,9 +693,15 @@
 					<% } %>
 				<% }); %>
 				
-				<a class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
-				<a class="btn btn-success btn-mini inpage_cancel" contenttype="<%= content_type %>" fieldname="<%= name %>" >Cancel / Done </a>
 				
+				<a style='float:left; margin-right:10px;' class="btn btn-primary btn-mini inpage_create" contenttype="<%= content_type %>" fieldname="<%= name %>" >Save <%= content_type %> </a>
+				<a style='float:left; margin-right:10px;' class="btn btn-success btn-mini inpage_cancel" contenttype="<%= content_type %>" fieldname="<%= name %>" >Cancel / Done </a>
+				
+				
+				<div style='display:none; width:400px; border:1px solid #ccc; float:left' class="progress progress-striped active">
+						<div class="bar" style="width: 0%;"></div>
+				</div>
+
 				</form>
 
 			</div>
