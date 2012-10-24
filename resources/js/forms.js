@@ -55,14 +55,14 @@ function load_over_lay(pointer, content){
 
 function close_over_lay(pointer){
 	
-	
 	var main = pointer.prev();
-	console.log(main.attr('class'));
-
 	var index = dest.length - 1;
-	var button = dest[index];
-	dest.splice(index,1);
-	button.next().hide();
+	if(index != -1){
+		var button = dest[index];
+		dest.splice(index,1);
+		button.next().hide();
+	}
+	
 
 	pointer.fadeOut(function(){
 		$(this).html('');
