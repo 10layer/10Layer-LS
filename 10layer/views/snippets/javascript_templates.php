@@ -50,9 +50,10 @@
 							if (!_.isArray(field.value)) {
 								field.value=[field.value];
 							}
-							_.each(field.value, function(urlid) {
+
+							_.each(field.value, function(item) {
 					%>
-								<%= _.template($('#field-autocomplete-item').html(), { title: urlid, field: field }) %>
+								<%= _.template($('#field-autocomplete-item').html(), { title: item.title, field: field , item:item}) %>
 					<%
 							});
 						}
@@ -96,9 +97,9 @@
 							if (!_.isArray(field.value)) {
 								field.value=[field.value];
 							}
-							_.each(field.value, function(urlid) {
+							_.each(field.value, function(item) {
 					%>
-								<%= _.template($('#field-autocomplete-item').html(), { title: urlid, field: field }) %>
+								<%= _.template($('#field-autocomplete-item').html(), { title: item.title, field: field , item:item}) %>
 					<%
 							});
 						}
@@ -113,8 +114,8 @@
 	<div style="float:left; padding:4px; margin-right:5px; border:1px solid #ccc; border-radius:5px; -moz-border-radius:5px;">
 		<a style="margin-top:-4px;" class="close">&times;</a>
 		<span style="float:left;margin-right:3px;" class="label label-info"> <%= (title) ? title : '' %>  </span>
-		<% var urlid = (urlid) ? urlid : ''; %>
-		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= (field.value) ? field.value : '' %>"  />
+		<%  var urlid = (item._id) ? item._id : ''; %>
+		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= (item._id) ? item._id : '' %>"  />
 	</div>
 </script>
 
@@ -218,13 +219,13 @@
 						if (!_.isArray(field.value)) {
 							field.value=[field.value];
 						}
-						_.each(field.value, function(urlid) {
-				%>
-							<%= _.template($('#field-autocomplete-item').html(), { title: urlid, field: field }) %>
-				<%
-						});
-					}
-				%>
+						_.each(field.value, function(item) {
+					%>
+								<%= _.template($('#field-autocomplete-item').html(), { title: item.title, field: field , item:item}) %>
+					<%
+							});
+						}
+					%>
 				</div>
 			</div>
 		</div>

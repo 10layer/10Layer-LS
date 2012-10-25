@@ -10,9 +10,10 @@ var imbeded_progress_bar;
 
 
 function create_autocomplete_item(item, content_type, multiple_status, field_name){
-	console.log(item);
 
-	var newel = _.template($('#field-autocomplete-item').html(), { title:item.title, field: { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id }});
+	var field = { multiple:multiple_status, contenttype: content_type, name: field_name, value: item._id };
+
+	var newel = _.template($('#field-autocomplete-item').html(), { title:item.title, field: field, item:item});
 	return newel;
 }
 
