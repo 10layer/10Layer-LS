@@ -553,6 +553,17 @@ class Mongo_db {
 		
 		//return(iterator_to_array($documents));
 	}
+
+	public function get_light($urlid){
+		//echo $urlid;
+		$query = array('db.content.find({_id:"'.$urlid.'"})');
+		$item ='';
+		$cursor = $this->db->content->find(array("_id" => $urlid)); //$this->command($query); // $this->db->content->find(array("_id" => $urlid));
+		foreach ($cursor as $x) {
+			$item = (object)$x;
+		}
+		return $item;
+	}
 	
 	/**
 	*	--------------------------------------------------------------------------------
