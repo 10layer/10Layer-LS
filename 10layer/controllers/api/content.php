@@ -109,6 +109,27 @@
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
 			$content=$this->mongo_db->get("content");
+			$meta = $this->data['meta'];
+
+			//print_r($content[0]);
+			//print_r($meta); die();
+
+			foreach ($meta as $item) {
+				if($item->type == 'autocomplete'){
+					$field_name = $item->name;
+					if(isset($content[0]->$field_name) AND is_array($content[0]->$field_name)){
+						
+						$set_items = $content[0]->$field_name;
+						$values = array();
+						foreach($set_items as $pointer){
+							array_push($values, $this->mongo_db->get_light($pointer));
+						}
+						$content[0]->$field_name = $values;
+					}
+					
+				}
+			}
+
 			$this->data["content"]=$content[0];
 			$this->returndata();
 		}
