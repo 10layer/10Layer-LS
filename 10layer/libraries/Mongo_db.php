@@ -534,7 +534,7 @@ class Mongo_db {
 	*/
 	
 	public function get($collection = "") {
-		MongoCursor::$timeout = -1;
+		MongoCursor::$timeout = 10000; //10secs
 		if(empty($collection))
 			show_error("In order to retreive documents from MongoDB, a collection name must be passed", 500);
 		$results = array();
