@@ -333,26 +333,6 @@
 		}
 		
 		/**
-		 * getContentType function.
-		 * 
-		 * Gets the content_type
-		 *
-		 * @access public
-		 * @param mixed $id
-		 * @return object
-		 */
-		public function getContentType($id) {
-			if (empty($id)) {
-				$query=$this->db->get_where("content_types",array("id"=>$this->getField("content_type_id")->value));
-			} elseif (is_numeric($id)) {
-				$query=$this->db->get_where("content_types",array("id"=>$id));
-			} else {
-				$query=$this->db->get_where("content_types",array("urlid"=>$id));
-			}
-			return $query->row();
-		}
-		
-		/**
 		 * count function.
 		 * 
 		 * Returns number of results we can expect from a list
@@ -811,12 +791,8 @@ if(strlen($s) > 2) {
 		 * @return object
 		 */
 		public function get_content_type($id) {
-			if (is_numeric($id)) {
-				$this->db->where("id",$id);
-			} else {
-				$this->db->where("urlid",$id);
-			}
-			return $this->db->get("content_types")->row();
+			$result=$this->mongo_db->get_where("content_types", array("_id"=>$id));
+			return $result[0];
 		}
 		
 		/**
