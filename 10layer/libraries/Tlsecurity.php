@@ -30,6 +30,10 @@
 		}
 		
 		public function securityHook() {
+			//Check that we actually have a system. Else let's bail to the Setup
+			if ($this->checkSetup()) {
+				return true;
+			}
 			//Check if the controller specifically tells us to ignore security checks
 			if ($this->_ignore_security) {
 				return true;
@@ -42,6 +46,20 @@
 			$this->checkLogin();
 			$this->checkStatus();
 			$this->checkUrl();
+		}
+		
+		public function checkSetup() {
+			$uri=$this->ci->uri->segment(1);
+			if ($uri == "setup") {
+				return true;
+			}
+			$collections=$this->ci->mongo_db->collections();
+			if (empty($collections)) {
+				$this->ci->load->view("setup/first");
+				print $this->ci->output->get_output();
+				die();
+			}
+			return false;
 		}
 		
 		/**
@@ -188,6 +206,36 @@
 		
 		public function user_id() {
 			return $this->ci->session->userdata("id");
+		}
+		
+		public function random_pass($length=6, $strength=0) {
+		//Props http://www.webtoolkit.info/php-random-password-generator.html
+			$vowels = 'aeuy';
+			$consonants = 'bdghjmnpqrstvz';
+			if ($strength & 1) {
+				$consonants .= 'BDGHJLMNPQRSTVWXZ';
+			}
+			if ($strength & 2) {
+				$vowels .= "AEUY";
+			}
+			if ($strength & 4) {
+				$consonants .= '23456789';
+			}
+			if ($strength & 8) {
+				$consonants .= '@#$%';
+			}
+			$password = '';
+			$alt = time() % 2;
+			for ($i = 0; $i < $length; $i++) {
+				if ($alt == 1) {
+					$password .= $consonants[(rand() % strlen($consonants))];
+					$alt = 0;
+				} else {
+					$password .= $vowels[(rand() % strlen($vowels))];
+					$alt = 1;
+				}
+			}
+			return $password;
 		}
 		
 	}
