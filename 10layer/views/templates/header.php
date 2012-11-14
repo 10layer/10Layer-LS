@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="/resources/jquery/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="/resources/js/underscore-min.js"></script>
 	<script type="text/javascript" src="/resources/bootstrap/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/resources/js/10layer.js"></script>
 	
 	<script language="javascript">
 		<?php
