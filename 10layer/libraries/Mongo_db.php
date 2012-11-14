@@ -148,6 +148,19 @@ class Mongo_db {
 	}
 	
 	/**
+	 * collections function.
+	 * 
+	 * Returns a list of collections for a specific database
+	 *
+	 * @access public
+	 * @param string $db. (default: "")
+	 * @return void
+	 */
+	public function collections($db = "") {
+		return $this->db->listCollections();
+	}
+	
+	/**
 	*	--------------------------------------------------------------------------------
 	*	SELECT FIELDS
 	*	--------------------------------------------------------------------------------
