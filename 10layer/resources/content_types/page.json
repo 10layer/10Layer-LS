@@ -1,0 +1,67 @@
+{ "_id" : "page", "fields" : [
+	{
+		"name" : "urlid",
+		"hidden" : true,
+		"transformations" : {
+			"copy" : "title",
+			"urlid" : [
+				"content.urlid",
+				false
+			]
+		}
+	},
+	{
+		"name" : "title",
+		"class" : "bigger",
+		"label_class" : "bigger",
+		"rules" : [
+			"required"
+		],
+		"transformations" : [
+			"safetext"
+		],
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		},
+		"type" : "textarea"
+	},
+	{
+		"name" : "last_modified",
+		"hidden" : true,
+		"transformations" : [
+			"date('c')"
+		]
+	},
+	{
+		"name" : "start_date",
+		"type" : "date",
+		"value" : "Today"
+	},
+	{
+		"name" : "workflow_status",
+		"type" : "select",
+		"options" : [
+			"New",
+			"Edited",
+			"Published"
+		]
+	},
+	{
+		"name" : "end_date",
+		"tablename" : "content",
+		"hidden" : true
+	},
+	{
+		"name" : "body",
+		"type" : "textarea",
+		"rules" : [
+			"required"
+		],
+		"class" : "richedit",
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		}
+	}
+], "name" : "Page", "collection" : "0", "order_by" : [ "timestamp DESC", "start_date" ] }

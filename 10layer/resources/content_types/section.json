@@ -1,0 +1,71 @@
+{ "_id" : "section", "fields" : [
+	{
+		"name" : "urlid",
+		"hidden" : true,
+		"transformations" : {
+			"copy" : "title",
+			"urlid" : [
+				"content.urlid",
+				false
+			]
+		}
+	},
+	{
+		"name" : "title",
+		"class" : "bigger",
+		"label_class" : "bigger",
+		"rules" : [
+			"required"
+		],
+		"transformations" : [
+			"safetext"
+		],
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		},
+		"type" : "textarea"
+	},
+	{
+		"name" : "last_modified",
+		"hidden" : true,
+		"transformations" : [
+			"date('c')"
+		]
+	},
+	{
+		"name" : "start_date",
+		"type" : "hidden",
+		"value" : "Today"
+	},
+	{
+		"name" : "workflow_status",
+		"type" : "select",
+		"options" : [
+			"New",
+			"Edited",
+			"Published"
+		]
+	},
+	{
+		"name" : "live",
+		"type" : "hidden"
+	},
+	{
+		"name" : "auto",
+		"type" : "boolean"
+	},
+	{
+		"name" : "child_sections",
+		"type" : "autocomplete",
+		"link" : "true",
+		"contenttype" : "section",
+		"multiple" : true
+	},
+	{
+		"name" : "zone",
+		"type" : "autocomplete",
+		"multiple" : true,
+		"contenttype" : "zone"
+	}
+], "name" : "Section", "collection" : "1", "order_by" : [ "title ASC", "start_date" ] }

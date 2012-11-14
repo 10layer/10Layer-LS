@@ -1,0 +1,113 @@
+{ "_id" : "article", "fields" : [
+	{
+		"name" : "urlid",
+		"hidden" : true,
+		"transformations" : {
+			"copy" : "title",
+			"urlid" : "content.urlid"
+		}
+	},
+	{
+		"name" : "title",
+		"class" : "bigger",
+		"label_class" : "bigger",
+		"rules" : [
+			"required"
+		],
+		"transformations" : [
+			"safetext"
+		],
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		},
+		"type" : "textarea"
+	},
+	{
+		"name" : "last_modified",
+		"hidden" : true,
+		"transformations" : [
+			"date('c')"
+		]
+	},
+	{
+		"name" : "start_date",
+		"type" : "date",
+		"value" : "Today"
+	},
+	{
+		"name" : "workflow_status",
+		"type" : "select",
+		"options" : [
+			"New",
+			"Edited",
+			"Published"
+		]
+	},
+	{
+		"name" : "blurb",
+		"type" : "textarea",
+		"rules" : {
+			"0" : "required",
+			"maxlen" : 150
+		},
+		"transformations" : [
+			"safetext"
+		],
+		"showcount" : 150
+	},
+	{
+		"name" : "body",
+		"type" : "textarea",
+		"rules" : [
+			"required"
+		],
+		"class" : "richedit"
+	},
+	{
+		"name" : "mainpic",
+		"label" : "Main photo",
+		"type" : "rich",
+		"contenttype" : "picture",
+		"multiple" : false
+	},
+	{
+		"name" : "caption",
+		"label" : "Main photo caption",
+		"type" : "textarea"
+	},
+	{
+		"name" : "related_articles",
+		"label" : "Related Articles",
+		"type" : "deepsearch",
+		"link" : true,
+		"contenttype" : "article",
+		"multiple" : true
+	},
+	{
+		"name" : "author",
+		"label" : "Authors",
+		"type" : "autocomplete",
+		"rules" : [
+			"required",
+			"min_count=1",
+			"max_count=5"
+		],
+		"contenttype" : "author",
+		"multiple" : true
+	},
+	{
+		"name" : "tags",
+		"type" : "autocomplete",
+		"contenttype" : "tag",
+		"multiple" : true
+	},
+	{
+		"name" : "section",
+		"type" : "nesteditems",
+		"contenttype" : "section",
+		"rules" : [
+			"required"
+		]
+	}
+], "name" : "Article", "collection" : "0", "order_by" : [ "last_modified desc" ] }

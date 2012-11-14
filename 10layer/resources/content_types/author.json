@@ -1,0 +1,94 @@
+{ "_id" : "author", "fields" : [
+	{
+		"name" : "urlid",
+		"hidden" : true,
+		"transformations" : {
+			"copy" : "title",
+			"urlid" : [
+				"content.urlid",
+				false
+			]
+		}
+	},
+	{
+		"name" : "title",
+		"class" : "bigger",
+		"label_class" : "bigger",
+		"rules" : [
+			"required"
+		],
+		"transformations" : [
+			"safetext"
+		],
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		},
+		"type" : "textarea"
+	},
+	{
+		"name" : "last_modified",
+		"hidden" : true,
+		"transformations" : [
+			"date('c')"
+		]
+	},
+	{
+		"name" : "start_date",
+		"type" : "hidden",
+		"value" : "Today"
+	},
+	{
+		"name" : "workflow_status",
+		"type" : "select",
+		"options" : [
+			"New",
+			"Edited",
+			"Published"
+		]
+	},
+	{
+		"name" : "email",
+		"type" : "text",
+		"rules" : [
+			"valid_email"
+		]
+	},
+	{
+		"name" : "twitter",
+		"label" : "Twitter account",
+		"type" : "text"
+	},
+	{
+		"name" : "facebook",
+		"label" : "Facebook account",
+		"type" : "text"
+	},
+	{
+		"name" : "googleplus",
+		"label" : "Google Plus account number",
+		"type" : "text"
+	},
+	{
+		"name" : "telephone",
+		"type" : "text"
+	},
+	{
+		"name" : "bio",
+		"label" : "Biography",
+		"type" : "textarea",
+		"class" : "richedit"
+	},
+	{
+		"name" : "pic",
+		"type" : "image",
+		"label" : "Author Portrait",
+		"filetypes" : [
+			"gif",
+			"jpg",
+			"jpeg",
+			"png"
+		],
+		"directory" : "/content/authors/{date('Y')}/{date('m')}/{date('d')}/"
+	}
+], "name" : "Author", "collection" : "0", "order_by" : [ "timestamp DESC", "start_date" ] }

@@ -1,0 +1,50 @@
+{ "_id" : "tag", "fields" : [
+	{
+		"name" : "urlid",
+		"hidden" : true,
+		"transformations" : {
+			"copy" : "title",
+			"urlid" : [
+				"content.urlid",
+				false
+			]
+		}
+	},
+	{
+		"name" : "title",
+		"class" : "bigger",
+		"label_class" : "bigger",
+		"rules" : [
+			"required"
+		],
+		"transformations" : [
+			"safetext"
+		],
+		"libraries" : {
+			"semantic" : true,
+			"search" : "like"
+		},
+		"type" : "textarea"
+	},
+	{
+		"name" : "last_modified",
+		"hidden" : true,
+		"transformations" : [
+			"date('c')"
+		]
+	},
+	{
+		"name" : "start_date",
+		"type" : "hidden",
+		"value" : "Today"
+	},
+	{
+		"name" : "workflow_status",
+		"type" : "select",
+		"options" : [
+			"New",
+			"Edited",
+			"Published"
+		]
+	}
+], "name" : "Tag", "collection" : "0", "order_by" : [ "title ASC", "start_date" ] }
