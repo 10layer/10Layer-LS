@@ -19,6 +19,7 @@ class Home extends CI_Controller {
 		$this->load->view('home/custom',$data);
 		$this->load->view("templates/footer");
 	}
+	
 }
 
 /* End of file home.php */
