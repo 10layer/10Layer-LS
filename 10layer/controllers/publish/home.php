@@ -8,7 +8,7 @@
  */
 class Home extends CI_Controller {
 
-	function __construct() {
+	public function __construct() {
 		parent::__construct();
 	}
 	
@@ -29,6 +29,12 @@ class Home extends CI_Controller {
 		/*$data["menu1_active"]="publish";
 		$this->load->view('templates/header',$data);
 		$this->load->view("templates/footer");*/
+	}
+	
+	public function _remap() {
+		$collection_type=$this->uri->segment(2);
+		print $collection_type;
+		die();
 	}
 }
 
