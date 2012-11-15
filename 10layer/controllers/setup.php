@@ -55,7 +55,7 @@
 				foreach($templates as $filename) {
 					try {
 						$jsondata=json_decode(file_get_contents($filename));
-						$this->json_check();
+						$this->json_check($filename);
 						$content_types[]=$jsondata;
 					} catch(Exception $e) {
 						show_error("Error parsing template $filename");
@@ -82,27 +82,27 @@
 			$this->load->view("setup/users");
 		}
 		
-		protected function json_check() {
+		protected function json_check($filename="") {
 			switch (json_last_error()) {
 				case JSON_ERROR_NONE:
 					break;
 				case JSON_ERROR_DEPTH:
-					show_error('JSON error - Maximum stack depth exceeded');
+					show_error($filename.' JSON error - Maximum stack depth exceeded');
 					break;
 				case JSON_ERROR_STATE_MISMATCH:
-					show_error('JSON error - Underflow or the modes mismatch');
+					show_error($filename.' JSON error - Underflow or the modes mismatch');
 					break;
 				case JSON_ERROR_CTRL_CHAR:
-	            	show_error('JSON error - Unexpected control character found');
+	            	show_error($filename.' JSON error - Unexpected control character found');
 					break;
 				case JSON_ERROR_SYNTAX:
-					show_error('JSON error - Syntax error, malformed JSON');
+					show_error($filename.' JSON error - Syntax error, malformed JSON');
 					break;
 				case JSON_ERROR_UTF8:
-					show_error('JSON error - Malformed UTF-8 characters, possibly incorrectly encoded');
+					show_error($filename.' JSON error - Malformed UTF-8 characters, possibly incorrectly encoded');
 					break;
 				default:
-					show_error('JSON error - Unknown error');
+					show_error($filename.' JSON error - Unknown error');
 				break;
 			}
 		}
