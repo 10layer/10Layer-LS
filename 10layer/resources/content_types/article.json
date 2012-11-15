@@ -2,20 +2,30 @@
 	{
 		"name" : "urlid",
 		"hidden" : true,
-		"transformations" : {
-			"copy" : "title",
-			"urlid" : "content.urlid"
-		}
+		"transformations" : [
+			{ 
+				"fn": "copy",
+				"vars": [ "title" ]
+			},
+			{
+				"fn": "urlid",
+				"vars": [ "true" ]
+			}
+		]
 	},
 	{
 		"name" : "title",
 		"class" : "bigger",
 		"label_class" : "bigger",
 		"rules" : [
-			"required"
+			{
+				"fn": "required"
+			}
 		],
 		"transformations" : [
-			"safetext"
+			{ 
+				"fn": "safetext" 
+			}
 		],
 		"libraries" : {
 			"semantic" : true,
@@ -27,7 +37,10 @@
 		"name" : "last_modified",
 		"hidden" : true,
 		"transformations" : [
-			"date('c')"
+			{ 
+				"fn": "date('c')",
+				"hint": "Today's date"
+			}
 		]
 	},
 	{
@@ -47,12 +60,19 @@
 	{
 		"name" : "blurb",
 		"type" : "textarea",
-		"rules" : {
-			"0" : "required",
-			"maxlen" : 150
-		},
+		"rules" : [
+			{
+				"fn": "required"
+			},
+			{
+				"fn": "maxlen",
+				"vars" : [ 150 ]
+			}
+		],
 		"transformations" : [
-			"safetext"
+			{
+				"fn": "safetext"
+			}
 		],
 		"showcount" : 150
 	},
@@ -60,7 +80,9 @@
 		"name" : "body",
 		"type" : "textarea",
 		"rules" : [
-			"required"
+			{
+				"fn": "required"
+			}
 		],
 		"class" : "richedit"
 	},
@@ -89,9 +111,17 @@
 		"label" : "Authors",
 		"type" : "autocomplete",
 		"rules" : [
-			"required",
-			"min_count=1",
-			"max_count=5"
+			{
+				"fn": "required"
+			},
+			{
+				"fn": "min_count",
+				"var": 1
+			},
+			{
+				"fn": "max_count",
+				"var": 5
+			}
 		],
 		"contenttype" : "author",
 		"multiple" : true
@@ -107,7 +137,9 @@
 		"type" : "nesteditems",
 		"contenttype" : "section",
 		"rules" : [
-			"required"
+			{
+				"fn": "required"
+			}
 		]
 	}
 ], "name" : "Article", "collection" : "0", "order_by" : [ "last_modified desc" ] }
