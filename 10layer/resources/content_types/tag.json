@@ -2,23 +2,30 @@
 	{
 		"name" : "urlid",
 		"hidden" : true,
-		"transformations" : {
-			"copy" : "title",
-			"urlid" : [
-				"content.urlid",
-				false
-			]
-		}
+		"transformations" : [
+			{
+				"fn": "copy",
+				"vars": [ "title" ]
+			},
+			{
+				"fn": "urlid",
+				"vars": [ false ]
+			}
+		]
 	},
 	{
 		"name" : "title",
 		"class" : "bigger",
 		"label_class" : "bigger",
 		"rules" : [
-			"required"
+			{
+				"fn": "required"
+			}
 		],
 		"transformations" : [
-			"safetext"
+			{
+				"fn": "safetext"
+			}
 		],
 		"libraries" : {
 			"semantic" : true,
@@ -30,7 +37,9 @@
 		"name" : "last_modified",
 		"hidden" : true,
 		"transformations" : [
-			"date('c')"
+			{
+				"fn": "date('c')"
+			}
 		]
 	},
 	{
