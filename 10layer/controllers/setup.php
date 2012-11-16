@@ -57,6 +57,7 @@
 						$jsondata=json_decode(file_get_contents($filename));
 						$this->json_check($filename);
 						$content_types[]=$jsondata;
+						$this->mongo_db->insert("content_types", $jsondata);
 					} catch(Exception $e) {
 						show_error("Error parsing template $filename");
 					}
@@ -67,7 +68,6 @@
 				foreach($content_types as $content_type) {
 					if ($content_type->_id == $content_type_urlid) {
 						$data["content_type_id"]=$x;
-						print $x;
 					}
 					$x++;
 				}
