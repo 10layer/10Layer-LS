@@ -5,65 +5,160 @@
 	$this->load->view("/templates/header",$headerdata);
 ?>
 <script src="/resources/js/backbone-min.js"></script>
+<script src="/resources/backbone/backbone.localStorage-min.js"></script>
+<script src="/resources/knockout/knockout-2.2.0.js"></script>
 <script>
-	var content_types = <?= json_encode($content_types) ?>;
+
+	var Transformation = function(data) {
+		var self = this;
+		self.fn = ko.observable(data.fn);
+		self.hint = ko.observable(data.hint);
+		self.vars = ko.observable(data.vars);
+		self.params = ko.observable(data.var);
+		self.var_check = ko.observable(data.var_check);
+		
+		
+	}
+
+	var Rule = function(data) {
+		var self = this;
+		self.fn = ko.observable(data.fn);
+		self.hint = ko.observable(data.hint);
+		self.vars = ko.observable(data.var);
+		self.var_check = ko.observable(data.var_check);
+	}
 	
-	var ModelContentType = Backbone.Model.extend({});
-	
-	var CollectionContentTypes = Backbone.Collection.extend({
-		model: ModelContentType,
-		initialize: function() {
-			this.content_type_id = 0;
+	var Field = function(data) {
+		var self = this;
+		self.name = ko.observable(data.name);
+		self.isRemovable = (!_.contains(req_types, data.name));
+		self.label = ko.observable(data.label);
+		self.type = ko.observable(data.type);
+		self.defaultValue = ko.observable(data.default);
+		self.options = ko.observable(data.options);
+		self.external = ko.observable(data.external);
+		self.filetypes = ko.observable(data.filetypes);
+		self.directory = ko.observable(data.directory);
+		self.readonly = ko.observable(data.readonly);
+		self.multiple = ko.observable(data.multiple);
+		self.showcount = ko.observable(data.showcount);
+		self.hidenew = ko.observable(data.hidenew);
+		self.rules = ko.observableArray(_.map(data.rules, function(item) { return new Rule(item) }));
+		self.transformations = ko.observableArray(_.map(data.transformations, function(item) { return new Transformation(item) }));
+		
+		self.clickTransformationsUpArrow = function(data) {
+			var pos = self.transformations.indexOf(data);
+			if (pos <= 0) {
+				return;
+			}
+			var tmp = self.transformations();
+			self.transformations.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
 		}
-	});
-	
-	var collection_content_types=new CollectionContentTypes(content_types);
-	
-	var ContentTypesView = Backbone.View.extend({
-		el: "#content_type_app",
-		initialize: function() {
-			this.render();
-		},
-		render: function() {
-			$(this.el).html(_.template($("#content_types").html(), this.model));
+		
+		self.clickTransformationsDownArrow = function(data) {
+			var pos = self.transformations.indexOf(data);
+			if (pos >= self.transformations().length - 1) {
+				return;
+			}
+			var tmp = self.transformations();
+			self.transformations.splice(pos, 2, tmp[pos + 1], tmp[pos]);
 		}
-	});
-	
-	var ContentTypeView = Backbone.View.extend({
-		el: "#core",
-		initialize: function() {
-			this.render();
-		},
-		render: function() {
-			$(this.el).html(_template($("#content_types-core").html(), this.model));
+		
+		self.clickTransformationsRemove = function(data) {
+			self.transformations.remove(data);
 		}
-	});
-	
-	var ViewRules = Backbone.View.extend({
-		render: function() {
-			$(this.el).html(_.template($("#content_type-rule").html(), this.model));
+		
+		self.clickTransformationsAdd = function(data) {
+			self.transformations.push(new Transformation(data));
 		}
-	});
+		
+		self.clickRulesUpArrow = function(data) {
+			var pos = self.rules.indexOf(data);
+			if (pos <= 0) {
+				return;
+			}
+			var tmp = self.rules();
+			self.rules.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
+		}
+		
+		self.clickRulesDownArrow = function(data) {
+			var pos = self.rules.indexOf(data);
+			if (pos >= self.rules().length - 1) {
+				return;
+			}
+			var tmp = self.rules();
+			self.rules.splice(pos, 2, tmp[pos + 1], tmp[pos]);
+		}
+		
+		self.clickRulesRemove = function(data) {
+			self.rules.remove(data);
+		}
+		
+		self.clickRulesAdd = function(data) {
+			self.rules.push(new Transformation(data));
+		}
+	}
 	
-	var types = new Backbone.Model({ 
-		autocomplete: "Autocomplete",
-		checkbox: "Checkbox",
-		date: "Date",
-		datetime: "Date Time",
-		file: "File",
-		hidden: "Hidden",
-		image: "Image",
-		nesteditems: "Tree",
-		password: "Password",
-		radio: "Radio",
-		search: "Search",
-		wysiwyg: "WYSIWYG editor",
-		select: "Select",
-		text: "Text",
-		textarea: "Text Area"
-	});
+	var ContentType = function(data, key) {
+		var self = this;
+		
+		//Clean up our MongoDB mess
+		if (data.collection == "0") {
+			data.collection = false;
+		}
+		
+		self.fields = ko.observableArray([]);
+		self.fields(
+			_.map(
+				data.fields, function(item) { 
+					return new Field(item)
+				}
+			)
+		);
+		self._id = ko.observable(data._id);
+		self.name = ko.observable(data.name);
+		self.collection = ko.observable(data.collection);
+		self.order_by = ko.observable(data.order_by);
+		self.isActive = (key == content_type_id);
+	};
+		
+	var ContentTypesModel = function() {
+		var self = this;
+		
+		self.contentTypes = ko.observableArray([]);
+		self.contentType = ko.observableArray([]);
+		
+		self.types = ko.observableArray(types);
+		self.rules = ko.observableArray(rule_template);
+		self.transformations = ko.observableArray(transformation_template);
+		
+		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
+			content_types=data.content;
+			var mappedContentTypes = _.map(content_types, function(item, key) { return new ContentType(item, key);  });
+			self.contentTypes(mappedContentTypes);
+			self.contentType(mappedContentTypes[content_type_id]);
+		});
+	};
 	
-	var transformation_template = new Backbone.Model([
+	var types = ([
+		{ _id: "autocomplete", name: "Autocomplete" },
+		{ _id: "checkbox", name: "Checkbox" },
+		{ _id: "date", name: "Date" },
+		{ _id: "datetime", name: "Date Time" },
+		{ _id: "file", name: "File" },
+		{ _id: "hidden", name: "Hidden" },
+		{ _id: "image", name: "Image" },
+		{ _id: "nesteditems", name: "Tree" },
+		{ _id: "password", name: "Password" },
+		{ _id: "radio", name: "Radio" },
+		{ _id: "search", name: "Search" },
+		{ _id: "wysiwyg", name: "WYSIWYG editor" },
+		{ _id: "select", name: "Select" },
+		{ _id: "text", name: "Text" },
+		{ _id: "textarea", name: "Text Area" }
+	]);
+	
+	var transformation_template = ([
 		{
 			fn: "urlid",
 			hint: "Unique URL identifier. Set to false to exclude date",
@@ -103,7 +198,7 @@
 		}
 	]);
 	
-	var rule_template = new Backbone.Model([
+	var rule_template = ([
 		{
 			fn: "required",
 			hint: "Required"
@@ -206,96 +301,18 @@
 	var content_type_id=<?= $content_type_id ?>;
 	
 	$(function() {
-		var content_types_app = new ContentTypesView();
+		ko.applyBindings(new ContentTypesModel());
 		
-		function show_content_type(id) {
-			$("#core").html(_.template($("#content_type-core").html(), { content_type: content_types[id] }));
-			$("#fields").html("");
-			_.each(content_types[id].fields, function(field, key) {
-				_.defaults(field, { type: "text" });
-				$("#fields").append(_.template($("#content_type-field").html(), { id: key, field: field } ));
-			});
-		}
 		
-		show_content_type(content_type_id);
-		
-		$(".field-edit").on("click", function() {
+		//Events
+		$(document).on('click', '.field-edit', function(e) {
+			e.preventDefault();
 			$(this).parent().next().toggle();
-			return false;
 		});
 		
-		$(document).on('click', '.rule_add', function(e) {
-			e.preventDefault();
-			var rule = { fn: false };
-			rule.fn = $(this).attr("data-fn");
-			var field_id = $(this).attr("data-field_id");
-			var rules = content_types[content_type_id].fields[field_id].rules;
-			if (! rules) {
-				rules = new Array();
-			}
-			if (!_.isArray(rules)) {
-				rules = [ rules ];
-			}
-			rules.push(rule);
-			console.log(rules);
-			var self=this;
-			_.each(rules, function(rule_template) {
-				if (rule_template.fn == rule.fn) {
-					$(self).parent().parent().parent().next().append(_.template($("#content_type-rule").html(), {rule: rule}) );
-				}
-			});
-		});
-		
-		$(document).on('click', '.transformation_add', function(e) {
-			e.preventDefault();
-			var transformation_id=$(this).attr("data-fn");
-			var self=this;
-			_.each(transformation_template.toJSON(), function(transformation) {
-				if (transformation.fn == transformation_id) {
-					$(self).parent().parent().parent().next().append(_.template($("#content_type-transformation").html(), {transformation: transformation}) );
-				}
-			});
-		});
-		
-		$(document).on('click', '.icon-arrow-up', function(e) {
-			e.preventDefault();
-			var self=this;
-			var prev=$(self).parent().parent().prev();
-			if (prev.is("div")) {
-				el=$(self).parent().parent().detach();
-				prev.before(el);
-			}
-		});
-		
-		$(document).on('click', '.icon-arrow-down', function(e) {
-			e.preventDefault();
-			var self=this;
-			var prev=$(self).parent().parent().next();
-			if (prev.is("div")) {
-				el=$(self).parent().parent().detach();
-				prev.after(el);
-			}
-		});
-		
-		$(document).on('click', '.icon-remove', function(e) {
-			e.preventDefault();
-			$(this).parent().parent().remove();
-		});
 	});
 </script>
-<script type='text/template' id='content_type-core'>
-	<fieldset>
-	    <legend>Core</legend>
-	    <label>Name</label>
-	    <input type="text" name="name" value="<%= nullStr(content_type.name) %>">
-	    <label>Url</label>
-	    <input type="text" name="urlid" value="<%= nullStr(content_type._id) %>">
-	    <label>Order By</label>
-	    <input type="text" name="order_by" value="<%= nullStr(content_type.order_by) %>">
-	    <label class="checkbox"><input name="collection" type="checkbox" <%= (content_type.collection==true) ? 'checked="checked"' : '' %>> Collection</label>
-	</fieldset>
-	<legend>Fields</legend>
-</script>
+
 <script type='text/template' id='content_type-rule'>
 	<div><dt><i class="icon-arrow-up"></i><i class="icon-arrow-down"></i><i class="icon-remove"></i> <%= rule.fn %> <%= (rule.vars) ? rule.vars.join(", ") : ''  %></dt>
 	<dd><%= nullStr(rule.hint) %></dd></div>
@@ -305,109 +322,6 @@
 	<dd><%= nullStr(transformation.hint) %></dd></div>
 </script>
 
-<script type='text/template' id='content_type-field'>
-	<div class="span3">
-	<fieldset>
-		<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
-		<% if (!_.contains(req_types, field.name)) { %><button class='field-delete btn btn-small btn-warning'><i class='icon-trash icon-white'></i></button><% } %> <%= field.name %> </legend>
-		<div class='field-details' style='display: none'>
-		<label>Name</label>
-		<input type="text" name="name" value="<%= nullStr(field.name) %>">
-		<label>Label</label>
-		<input type="text" name="label" value="<%= nullStr(field.label) %>">
-		<label>Type</label>
-		<select name="content_type">
-			<% _.each(types.toJSON(), function(val, key) { console.log(val) %>
-			<option value='<%= key %>' <%= (field.type == key) ? 'selected="selected"' : '' %>><%= val %></option>
-			<% }); %>
-		</select>
-		<label>Default value</label>
-		<input type="text" name="value" value="<%= nullStr(field.value) %>">
-		
-		<label>Rules</label>
-		<div class="btn-group">
-			<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
-				Add a rule
-				<span class="caret"></span>
-			</a>
-			<ul class="dropdown-menu">
-			<% _.each(rule_template.toJSON(), function(rule) { %>
-				<li><a class="rule_add" data-fn="<%= rule.fn %>" data-field_id="<%= id %>" href='#'><%= rule.fn %></a></li>
-			<% }); %>
-			</ul>
-		</div>
-		<dl>
-		<% 
-		if (field.rules) {
-			_.each(field.rules, function(rule) { %>
-				<%= _.template($("#content_type-rule").html(), {rule: rule}) %>
-			<% });
-		}
-		%>
-		</dl>
-		<label>Transformations</label>
-		<div class="btn-group">
-			<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
-				Add a transformation
-				<span class="caret"></span>
-			</a>
-			<ul class="dropdown-menu">
-			<% _.each(transformation_template.toJSON(), function(transformation) { %>
-				<li><a class="transformation_add" data-fn="<%= transformation.fn %>" href='#'><%= transformation.fn %></a></li>
-			<% }); %>
-			</ul>
-		</div>
-		<dl>
-		<% 
-		if (field.transformations) {
-			_.each(field.transformations, function(transformation) { %>
-				<%= _.template($("#content_type-transformation").html(), { transformation: transformation }) %>
-			<% });
-		}
-		%>
-		</dl>
-		<label>Import from another Content Type</label>
-		<select name="content_type" multiple="multiple">
-			<option value="">None</option>
-			<% _.each(content_types, function(content_type) { %>
-				<option value="<%= content_type._id %>" <%= (content_type._id == field.contenttype) ? 'selected="selected"' : '' %>><%= content_type.name %></option>
-			<% }); %>
-		</select>
-		<label>OR</label>
-		<label>Set pre-defined Options</label>
-		<input type="text" name="options" value="<%= nullStr(field.options) %>">
-		<label>OR</label>
-		<label>Import from a file or network</label>
-		<input type="text" name="external" value="<%= nullStr(field.external) %>">
-		<label>Permitted File Types</label>
-		<input type="text" name="filetypes" value="<%= nullStr(field.filetypes) %>">
-		<label>Directory for Files</label>
-		<input type="text" name="directory" value="<%= nullStr(field.directory) %>">
-		<label class="checkbox"><input name="readonly" type="checkbox" <%= (field.readonly==true) ? 'checked="checked"' : '' %>> Read Only</label>
-		<label class="checkbox"><input name="multiple" type="checkbox" <%= (field.multiple==true) ? 'checked="checked"' : '' %>> Allow Multiple Selections</label>
-		<label class="checkbox"><input name="showcount" type="checkbox" <%= (field.showcount==true) ? 'checked="checked"' : '' %>> Show Count</label>
-		<label class="checkbox"><input name="hidenew" type="checkbox" <%= (field.hidenew==true) ? 'checked="checked"' : '' %>> Hide New Button</label>
-		</div>
-	</fieldset>
-	</div>
-</script>
-
-<script type='text/template' id='content_types'>
-	<ul class="nav nav-tabs">
-	<%
-		var x=0;
-		_.each(content_types, function(content_type) { 
-	%>
-		<li <%= (x==content_type_id) ? 'class="active"' : '' %>><a href="/setup/content_types/<%= content_type._id %>"><%= content_type.name %></a></li>
-	<%
-			x++;
-		});
-	%>
-		<li><a href="#"><i class="icon-plus"></i></a></li>
-	</ul>
-	<div id="core"></div>
-	<div id="fields" class="row"></div>	
-</script>
 <div class="page-header">
 	<h1>Setup</h1>
 </div>
@@ -432,7 +346,115 @@
 				<button class="btn btn-large btn-primary"><i class="icon-fire icon-white"></i> Onward!</button>
 			</div>
 		</div>
-		<div id="content_type_app"></div>
+		<div id="content_type_app">
+			<script> var x=0; </script>
+			<ul class="nav nav-tabs">
+				<!-- ko foreach: contentTypes -->
+				<li data-bind="attr: { class: (isActive) ? 'active' : '' }"><a data-bind="text: name, attr: { href: _id }"></a></li>
+				<!-- /ko -->
+				<li><a href="#"><i class="icon-plus"></i></a></li>
+			</ul>
+			<fieldset>
+	   			<legend>Core</legend>
+				<label>Name</label>
+				<input type="text" name="name" value="" data-bind="value: contentType().name ">
+		 		<label>ID</label>
+				<input type="text" name="_id" value="" data-bind="value: contentType()._id ">
+				<label>Order By</label>
+				<input type="text" name="order_by" value="" data-bind="value: contentType().order_by ">
+				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: contentType().collection"> Collection</label>
+			</fieldset>
+			<legend>Fields</legend>
+			<div data-bind="foreach: contentType().fields">
+				<div class="span3">
+				<fieldset>
+					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
+						<!-- ko if: isRemovable -->
+						<button class='field-delete btn btn-small btn-warning'><i class='icon-trash icon-white'></i></button>
+						<!-- /ko --> 
+						<span data-bind="text: name"></span> 
+					</legend>
+					<div class='field-details' style='display: none'>
+						<label>Name</label>
+						<input type="text" name="name" value="" data-bind="value: name">
+					
+						<label>Label</label>
+						<input type="text" name="label" value="" data-bind="value: label">
+					
+						<label>Type</label>
+						<select name="content_type" data-bind="foreach: $parent.types">
+							<option value='' data-bind="text: name, value: _id"></option>					
+						</select>
+					
+						<label>Default value</label>
+						<input type="text" name="value" value="" data-bind="value: defaultValue">
+			
+						<label>Rules</label>
+						<div class="btn-group">
+							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
+								Add a rule <span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" data-bind="foreach: $parent.rules">
+								<li><a class="rule_add" data-bind='text: fn, click: $parent.clickRulesAdd' href='#'></a></li>
+							</ul>
+						</div>
+						<dl data-bind="foreach: rules">
+							<div>
+							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickRulesUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickRulesDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickRulesRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span></dt>
+							<dd data-bind="text: hint"></dd>
+							</div>
+						</dl>
+						
+						<label>Transformations</label>
+						<div class="btn-group">
+							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
+								Add a transformation <span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" data-bind="foreach: $parent.transformations">
+								<li><a data-bind='text: fn, click: $parent.clickTransformationsAdd' href='#'></a></li>
+							</ul>
+						</div>
+						<dl data-bind="foreach: transformations">
+							<div>
+							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span></dt>
+							<dd data-bind="text: hint"></dd>
+							</div>
+						</dl>
+						
+						<label>Import from another Content Type</label>
+						<select name="content_type" multiple="multiple">
+							<option value="">None</option>
+							<!-- ko foreach: $parent.contentTypes -->
+								<option data-bind="value: _id, text: name" value=""></option>
+							<!-- /ko -->
+						</select>
+						
+						<div><strong>OR</strong></div>
+						
+						<label>Set pre-defined Options</label>
+						<input type="text" name="options" value="" data-bind="value: options" />
+						
+						<div><strong>OR</strong></div>
+						
+						<label>Import from a file or network</label>
+						<input type="text" name="external" value="" data-bind="value: external" />
+						
+						<label>Permitted File Types</label>
+						<input type="text" name="filetypes" value="" data-bind="value: filetypes">
+						
+						<label>Directory for Files</label>
+						<input type="text" name="directory" value="" data-bind="value: directory">
+						
+						<label class="checkbox"><input name="readonly" type="checkbox" data-bind="checked: readonly"> Read Only</label>
+						<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
+						<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
+						<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
+					</div>
+				</fieldset>
+				</div>
+			</div>
+			<!-- <div id="fields"></div> -->
+		</div>
 	</div>
 	
 </div>
