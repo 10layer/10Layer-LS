@@ -4,8 +4,6 @@
 	$headerdata["menu2_active"]="login";
 	$this->load->view("/templates/header",$headerdata);
 ?>
-<script src="/resources/js/backbone-min.js"></script>
-<script src="/resources/backbone/backbone.localStorage-min.js"></script>
 <script src="/resources/knockout/knockout-2.2.0.js"></script>
 <script>
 
@@ -311,15 +309,6 @@
 		});
 		
 	});
-</script>
-
-<script type='text/template' id='content_type-rule'>
-	<div><dt><i class="icon-arrow-up"></i><i class="icon-arrow-down"></i><i class="icon-remove"></i> <%= rule.fn %> <%= (rule.vars) ? rule.vars.join(", ") : ''  %></dt>
-	<dd><%= nullStr(rule.hint) %></dd></div>
-</script>
-<script type='text/template' id='content_type-transformation'>
-	<div><dt><i class="icon-arrow-up"></i><i class="icon-arrow-down"></i><i class="icon-edit"></i><i class="icon-remove"></i> <%= transformation.fn %> <%= (transformation.vars) ? transformation.vars.join(", ") : ''  %></dt>
-	<dd><%= nullStr(transformation.hint) %></dd></div>
 </script>
 
 <div class="page-header">
