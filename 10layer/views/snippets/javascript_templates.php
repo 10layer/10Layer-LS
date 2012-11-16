@@ -1,22 +1,3 @@
-
-<script>
-	function leadingZeros(s) {
-		if (s<10) {
-			return '0'+s;
-		}
-		return s;
-	}
-	
-	function sqlCurrentDate() {
-		var d = new Date();
-		return leadingZeros(d.getFullYear())+'-'+leadingZeros(d.getMonth()+1)+'-'+leadingZeros(d.getDate());
-	}
-	
-	function sqlCurrentTime() {
-		var d = new Date();
-		return leadingZeros(sqlCurrentDate())+' '+leadingZeros(d.getHours())+':'+leadingZeros(d.getMinutes());
-	}
-</script>
 <script type='text/template' id='edit-field-autocomplete'>
 	<!-- edit-field-autocomplete -->
 		<div class='control-group'>
@@ -119,47 +100,6 @@
 	</div>
 </script>
 
-<script type='text/template' id='edit-field-boolean'>
-	<!-- edit-field-boolean -->
-	<%= _.template($('#edit-field-checkbox').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='create-field-boolean'>
-	<!-- create-field-boolean -->
-	<%= _.template($('#edit-field-checkbox').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='proto-field-boolean'>
-	<!-- proto-field-boolean -->
-	<%= _.template($('#proto-field-checkbox').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='edit-field-cdn'>
-	<!-- edit-field-cdn -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='<%= field.class %>' readonly='readonly' />
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='create-field-cdn'>
-	<!-- create-field-cdn -->
-</script>
-
-<script type='text/template' id='proto-field-cdn'>
-	<!-- proto-field-cdn -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>CDN</label>
-		    <div class="controls">
-		    	<input type='text' name='proto_field_checkbox' value='' class='' readonly='readonly' />
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-checkbox'>
 	<!-- edit-field-checkbox -->
 	<div class='control-group'>
@@ -258,9 +198,9 @@
 	</div>
 </script>
 
-<script type='text/template' id='edit-field-deepsearch'>
-	<!-- edit-field-deepsearch -->
-		<div class='control-group deepsearch'>
+<script type='text/template' id='edit-field-search'>
+	<!-- edit-field-search -->
+		<div class='control-group search'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls'>
 				<div class="input-append">
@@ -286,63 +226,19 @@
 		</div>
 </script>
 
-<script type='text/template' id='create-field-deepsearch'>
-	<!-- create-field-deepsearch -->
-	<%= _.template($('#edit-field-deepsearch').html(), {field: field} ) %>
+<script type='text/template' id='create-field-search'>
+	<!-- create-field-search -->
+	<%= _.template($('#edit-field-search').html(), {field: field} ) %>
 </script>
 
-<script type='text/template' id='proto-field-deepsearch'>
-	<!-- proto-field-deepsearch -->
+<script type='text/template' id='proto-field-search'>
+	<!-- proto-field-search -->
 	<div class="proto well">
 		<div class='control-group'>
 		    <label class='control-label '>Deep Search</label>
 		    <div class="controls">
 		    	<input id="proto_deepsearch_view" type="text" class="span2 deepsearch_input" value="" />
 				<button class="btn deepsearch-search" type="button">Search</button>
-		    </div>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='edit-field-external'>
-	<!-- edit-field-external -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<select class='chzn-select' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %>' id='<%= field.name %>-hook'>
-				<option value="0"></option>
-			<% 
-			$.get(field.options, function(data) {
-				var parts=data.split("\n");
-				_.each(parts, function(value) {
-					$('#'+field.name+'-hook').append('<option value="'+value+'" '+((value==field.value) ? 'selected="selected"' : '')+'>'+value+'</option>');
-						
-				});
-				$("#"+field.name+"-hook").trigger("liszt:updated");
-			}); 
-			%>
-			</select>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='create-field-external'>
-	<!-- create-field-external -->
-	<%= _.template($('#edit-field-external').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='proto-field-external'>
-	<!-- proto-field-external -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>External</label>
-		    <div class="controls">
-		    	<select class='chzn-select' data-placeholder="Choose External" name='proto_external' id='external-hook'>
-					<option value="0">Option 1</option>
-					<option value="1">Option 2</option>
-					<option value="2">Option 3</option>
-				</select>
-				<% $("#external-hook").trigger("liszt:updated"); %>
 		    </div>
 		</div>
 	</div>
@@ -371,34 +267,6 @@
 		    <label class='control-label '>File</label>
 		    <div class="controls">
 		    	<input type="file" name="proto_file" class="file_upload" value="" />
-		    </div>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='edit-field-hidden'>
-	<!-- edit-field-hidden -->
-	<% if (field.multiple) { 
-			_.each(field.value, function(value) { %>
-				<input type='hidden' name='<%= field.contenttype %>_<%= field.name %>[]' value='<%= (value) ? value : '' %>' />
-	<% 		});
-		} else { %>
-			<input type='hidden' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' />
-	<% } %>
-</script>
-
-<script type='text/template' id='create-field-hidden'>
-	<!-- create-field-hidden -->
-	<%= _.template($('#edit-field-hidden').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='proto-field-hidden'>
-	<!-- proto-field-hidden -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Hidden</label>
-		    <div class="controls">
-		    	<em>Hidden field</em>
 		    </div>
 		</div>
 	</div>
@@ -446,8 +314,8 @@
 	</div>
 </script>
 
-<script type='text/template' id='edit-field-nesteditems'>
-	<!-- edit-field-nesteditems -->
+<script type='text/template' id='edit-field-tree'>
+	<!-- edit-field-tree -->
 		<% compfield = field.contenttype; %>
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
@@ -486,12 +354,12 @@
 		</div>
 </script>
 
-<script type='text/template' id='edit-field-nesteditems-item'>
+<script type='text/template' id='edit-field-tree-item'>
 	<% _.each(tree, function(item) { %>
 		<% if (item.children) { %>
 		<optgroup label='<%= item.title %>'>
 			<option value='<%= item.urlid %>'  ><%= item.title %></option>
-			<%= (item.children) ? _.template($('#edit-field-nesteditems-list').html(), {tree: item.children}) : '' %>
+			<%= (item.children) ? _.template($('#edit-field-tree-list').html(), {tree: item.children}) : '' %>
 		</optgroup>
 		<% } else { %>
 			<option value='<%= item.urlid %>'><%= item.title %></option>
@@ -499,8 +367,8 @@
 	<% }); %>
 </script>
 
-<script type='text/template' id='create-field-nesteditems'>
-	<!-- create-field-nesteditems -->
+<script type='text/template' id='create-field-tree'>
+	<!-- create-field-tree -->
 		<% compfield = field.contenttype; %>
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
@@ -539,18 +407,18 @@
 		</div>
 </script>
 
-<script type='text/template' id='proto-field-nesteditems'>
+<script type='text/template' id='proto-field-tree'>
 	<!-- proto-field-nested -->
 	<div class="proto well">
 		<div class='control-group'>
 		    <label class='control-label '>Nested Items</label>
 		    <div class="controls">
-		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_nesteditems" id="proto_nesteditems-hook">
+		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_tree" id="proto_tree-hook">
 					<optgroup label="Nested Group 1"><option value="">Item 1</option></optgroup>
 					<optgroup label="Nested Group 2"><option value="">Item 2</option><option value="">Item 3</option></optgroup>
 					<optgroup label="Nested Group 3"><option value="">Item 4</option></optgroup>
 				</select>
-				<% $("#proto_nesteditems-hook").trigger("liszt:updated"); %>
+				<% $("#proto_tree-hook").trigger("liszt:updated"); %>
 		    </div>
 		</div>
 	</div>
@@ -689,107 +557,12 @@
 		<div class='control-group'>
 		    <label class='control-label '>Reverse</label>
 		    <div class="controls">
-		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_nesteditems" id="proto_nesteditems-hook">
+		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_tree" id="proto_tree-hook">
 					<option value="">Item 1</option>					
 					<option value="">Item 2</option><option value="">Item 3</option>
 					<option value="">Item 4</option>
 				</select>
-				<% $("#proto_nesteditems-hook").trigger("liszt:updated"); %>
-		    </div>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='edit-field-rich'>
-	<!-- edit-field-rich -->
-		<div class='control-group'>
-			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-			<div class='controls'>
-				<div>
-					<button id="contentselectButton_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_rich_select btn">Select <%= field.label %></button>
-					<% $(document.body).data('onsave', update_rich) %>
-					<%= _.template($('#button-new-template').html(), { field: field }) %>
-				</div>
-				
-				<div id='link_results_<%= field.contenttype %>_<%= field.name %>'>
-					<% if(field.value) {  %>
-						<%= _.template($('#field-rich-item').html(), { contenttype: field.contenttype, fieldname: field.name, urlid: field.value, contenttype: field.contenttype }) %>
-					<% } %>
-				</div>
-				<div id="contentselect_<%= field.contenttype %>_<%= field.name %>" class="<%= field.contenttype %>_<%= field.name %>-select popup wide"></div>
-			</div>
-		</div>
-</script>
-
-<script type='text/template' id='create-field-rich'>
-	<!-- create-field-rich -->
-	<%= _.template($("#edit-field-rich").html(), { field: field, content_type: content_type }) %>
-</script>
-
-<script type='text/template' id='field-rich-item'>
-		<a href="/edit/picture/<%= urlid %>" class="btn" target="_top">Edit</a>
-		<div class="link_results">
-			<div class="rich_overlay">
-				<button class="close">&times;</button>
-				
-			</div>
-			<div class="selectitem">
-				<div class="thumbnail"><img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/460/200" /></div>
-			</div>
-			<input type='hidden' name='<%= contenttype %>_<%= fieldname %>' value='<%= urlid %>' />
-		</div>
-</script>
-
-<script type='text/template' id='field-rich-list'>
-	<div id="contentlist" class="<%= contenttype %>-list boxed wide">
-		<div class="popupSearchContainer">
-			<input type="text" class="popup_search" value="<%= (search=='') ? 'Search…' : search %>" fieldname='<%= fieldname %>' contenttype='<%= contenttype %>' contenttype='<%= contenttype %>' />
-			<span class="popupResultsCount"></span>
-		</div>
-		
-		<table>
-			<tr> 
-				<th></th>
-				<th></th>
-				<th>Title</th>
-				<th>Edit</th>
-			</tr>
-		<%
-			var odd="odd";
-			_.each(content, function(item) {
-		%>
-		<tr class="<%= odd %> <%= contenttype %>-item content-item">
-			<td>
-				<input type="radio" value="<%= item.content_id %>" class="item-select singleselect" fieldname='<%= fieldname %>' contenttype='<%= contenttype %>' contenttype='<%= contenttype %>' urlid='<%= item.urlid %>' />
-			</td>
-			<td>
-				<img src="/workers/picture/display/<%= item.urlid %>/cropThumbnailImage/40/30" />
-			</td>
-			<td><%= item.title %></td>
-			<td><a href="/edit/<%= contenttype %>/<%= item.urlid %>">Edit</a></td>
-		</tr>
-		<%
-			if (odd=="") {
-				odd="odd";
-			} else {
-				odd="";
-			}
-		});
-		%>
-	</table>
-	
-	</div>
-	<br clear="both" />
-</script>
-
-<script type='text/template' id='proto-field-rich'>
-	<!-- proto-field-rich -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Rich</label>
-		    <div class="controls">
-		    	<button id="proto_rich_select" contenttype="" class="btn_rich_select btn">Select Rich</button>
-		    	<button id="proto_rich_new" contenttype="" class="btn_rich_select btn">New Rich</button>
+				<% $("#proto_tree-hook").trigger("liszt:updated"); %>
 		    </div>
 		</div>
 	</div>
@@ -899,44 +672,11 @@
 	</div>
 </script>
 
-<script type='text/template' id='old-fields-template'>
-	<!-- old-fields-template -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-		<% 
-		var url='/edit/field/'+field.name+'/'+content_type+'/'+urlid;
-		$.get(url, function(data) {
-			$('#'+field.name+'-hook').html(data);
-		}); 
-		%>
-		<div id='<%= field.name %>-hook'></div>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='old-fields-create-template'>
-	<label class='<%= field.label_class %>'><%= field.label %></label>
-	<% 
-		var url='/create/field/'+field.name+'/'+content_type;
-		$.get(url, function(data) {
-			$('#'+field.name+'-hook').html(data);
-		}); 
-	%>
-	<div id='<%= field.name %>-hook'></div>
-	<br clear='both' />
-</script>
-
 <script type='text/template' id='button-new-template'>
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>
 	<span style='display:none;margin-left:10px;' class='label label-success'>Loading...</span>
 	<div class='popup' id='new_dialog_<%= field.contenttype %>_<%= field.name %>'></div>
 </script>
-
-
-
-
-
 
 <script type='text/template' id='create_auto_complete_new'>
 	<div style='margin-left:0;' class='main_form_container span10'>

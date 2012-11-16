@@ -22,16 +22,11 @@ class Datatransformations {
 	 * @param bool $usedate. (default: true)
 	 * @return string
 	 */
-	public function urlid(&$sender, $value, $tableinfo, $usedate=true) {
+	public function urlid(&$sender, $value, $usedate=true) {
 		$ci=&get_instance();
 		$ci->load->helper("smarturl");
 		$urlid=smarturl($value, false, !$usedate);
-		$table=explode(".",$tableinfo);
-		if (sizeof($table)!=2) {
-			show_error("Format for urlid transformation: 'urlid'=>'tablename.fieldname'");
-		}
-		$urlid=$this->safe_urlid($urlid, $table[0], $table[1]);
-		
+		$urlid=$this->safe_urlid($urlid);
 		return $urlid;
 	}
 	
@@ -124,7 +119,7 @@ class Datatransformations {
 	 * @param string $field
 	 * @return string
 	 */
-	public function safe_urlid($urlid, $tablename, $field) {
+	public function safe_urlid($urlid) {
 		$ci=&get_instance();
 		$query=$ci->mongo_db->get_where("content", array("_id"=>$urlid), 1);
 		$addnum=0;
