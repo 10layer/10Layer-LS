@@ -17,7 +17,7 @@ class Autoloader {
 	    	$vname=implode("/",$segments);
 	    	if ($ci->exists->javascript($vname)) {
 	    		$found=true;
-	    		$vname="/tlresources/file/js/autoload/$vname.js";
+	    		$vname="/resources/js/$vname.js";
 	    		return $this->_format_javascript($vname);
 	    	}
 	    	array_pop($segments);
