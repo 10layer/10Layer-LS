@@ -9,6 +9,7 @@
 	
 	<link rel="stylesheet" href="/resources/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, projection" charset="utf-8" />
 	<link rel="stylesheet" href="/resources/css/style.css" type="text/css" media="screen, projection" charset="utf-8" />
+	<link rel="stylesheet" href="/resources/jquery/jqueryui191/css/ui-lightness/jqueryui191.css" type="text/css" media="screen, projection" charset="utf-8" />
 	
 	<?php
 		if (isset($stylesheets) && is_array($stylesheets)) {
@@ -20,7 +21,8 @@
 		}
 	?>
 	
-	<script type="text/javascript" src="/resources/jquery/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="/resources/jquery/jqueryui191/js/jquery182.js"></script>
+	<script type="text/javascript" src="/resources/jquery/jqueryui191/js/jqueryui191.js"></script>
 	<script type="text/javascript" src="/resources/js/underscore-min.js"></script>
 	<script type="text/javascript" src="/resources/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/resources/js/10layer.js"></script>

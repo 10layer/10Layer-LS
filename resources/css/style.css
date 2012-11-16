@@ -14,3 +14,160 @@ a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20
  	display:none; 
  	margin: 0 auto;
 }
+
+.show-grid [class*="span"] {
+	background-color: #EEE;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.collection_selector{
+	
+}
+
+.options_menu{
+	list-style: none;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+.options_menu li{
+	padding: 5px; 
+	margin-top:3px;
+	border:1px solid #ccc;
+	background-color: #fff;
+	border-radius: 3px;
+	-moz-border-radius:3px;
+}
+
+.options_menu li:hover{
+	background: rgba(255, 255, 255, 0.1);
+	cursor: pointer;
+	color: #f00;
+}
+
+#date_slider{
+	width:250px;
+}
+
+#date_slider_container{
+	float: left;
+	margin-right: 10px;
+
+}
+
+#search_criterion{
+	padding:10px;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #ccc;
+	font-size: 12px
+}
+
+#search_criterion #publishSearch{
+	float:left;
+	border: 1px solid #757474;
+	height:20px; 
+	margin: 5px 10px;
+	font-size: 12px;
+}
+
+#reset_search{
+	float: left;
+}
+
+#config_container{
+	float:left;
+	margin-left: 20px;
+	margin-top:5px;
+	height:20px;
+}
+
+#zone_details .small_text{
+	font-size: 10px;
+}
+
+#zone_details div{
+	text-align: center;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	-moz-border-radius:2px;
+	background-color: #fff;
+	padding: 2px;
+}
+#search_results{
+	margin-left:10px;
+}
+
+#publish_pane{
+	margin-right:10px;
+}
+
+#search_results, #publish_pane{
+	padding:5px;
+	overflow: auto;
+	height:500px;
+	border:1px solid #ccc;
+	border-radius: 5px;
+	-moz-border-radius:5px;
+	background-color: #fff;
+}
+
+.publishable_item{
+	border:1px solid #ccc;
+	border-radius: 3px;
+	-moz-border-radius:3px;
+	width:220px;
+	padding:5px;
+	float: left;
+	height:75px;
+	margin: 5px;
+	font-size: 12px;
+	overflow: hidden;
+}
+
+.publishable_item .settings{
+	height:20px;
+	float:right;
+	border-bottom: 1px solid #bbb;
+	
+}
+
+#collection_selector_container{
+	float:left;
+	margin-top:2px;
+	margin-right: 10px;
+}
+#collection_selector{
+	display: none;
+}
+
+#collection_selector div{
+	width:200px;
+}
+
+.content_type_label{
+	float:left;
+}
+
+
+.wrapper {
+font-size: 25px;
+width: 8em;
+height: 8em;
+position: relative;
+margin: 100px auto;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.1);
+border: 1em dashed rgba(138, 189, 195, 0.5);
+box-shadow: inset 0 0 2em rgba(255, 255, 255, 0.3), 0 0 0 0.7em rgba(255, 255, 255, 0.3);
+line-height: 6em;
+text-align: center;
+font-family: 'Racing Sans One', "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue","Helvetica","Arial","Lucida Grande",sans-serif;
+color: #444;
+text-shadow: 0 .04em rgba(255, 255, 255, 0.9);
+-webkit-animation: steam 3.5s linear infinite;
+-moz-animation: steam 3.5s linear infinite;
+-ms-animation: steam 3.5s linear infinite;
+-o-animation: steam 3.5s linear infinite;
+animation: steam 3.5s linear infinite;
+}
