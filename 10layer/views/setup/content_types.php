@@ -14,8 +14,6 @@
 		self.vars = ko.observable(data.vars);
 		self.params = ko.observable(data.var);
 		self.var_check = ko.observable(data.var_check);
-		
-		
 	}
 
 	var Rule = function(data) {
@@ -113,11 +111,21 @@
 				}
 			)
 		);
-		self._id = ko.observable(data._id);
+		self.urlid = ko.observable(data._id);
+		self.id = data._id; // We keep an immutable copy of this so we know which one to edit
 		self.name = ko.observable(data.name);
 		self.collection = ko.observable(data.collection);
 		self.order_by = ko.observable(data.order_by);
-		self.isActive = (key == content_type_id);
+		self.isActive = (data._id == content_type_urlid);
+		
+		//Save at this level to not wipe all the content types
+		self.save = function() {
+        	$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
+				data: ko.toJSON({ content_type: self }),
+				type: "post", contentType: "application/json",
+				success: function(result) { alert(result) }
+			});
+		}; 
 	};
 		
 	var ContentTypesModel = function() {
@@ -132,9 +140,14 @@
 		
 		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
 			content_types=data.content;
-			var mappedContentTypes = _.map(content_types, function(item, key) { return new ContentType(item, key);  });
+			var mappedContentTypes = _.map(content_types, function(item, key) { return new ContentType(item, item._id);  });
 			self.contentTypes(mappedContentTypes);
-			self.contentType(mappedContentTypes[content_type_id]);
+			_.each(mappedContentTypes, function(item) {
+				if (item.urlid() == content_type_urlid) {
+					self.contentType(item);
+				}
+			});
+			//self.contentType(mappedContentTypes[content_type_urlid]);
 		});
 	};
 	
@@ -296,11 +309,10 @@
 	
 	var req_types = new Array("urlid", "title", "last_modified", "start_date", "workflow_status");
 	
-	var content_type_id=<?= $content_type_id ?>;
+	var content_type_urlid="<?= $content_type_urlid ?>";
 	
 	$(function() {
 		ko.applyBindings(new ContentTypesModel());
-		
 		
 		//Events
 		$(document).on('click', '.field-edit', function(e) {
@@ -339,16 +351,17 @@
 			<script> var x=0; </script>
 			<ul class="nav nav-tabs">
 				<!-- ko foreach: contentTypes -->
-				<li data-bind="attr: { class: (isActive) ? 'active' : '' }"><a data-bind="text: name, attr: { href: _id }"></a></li>
+				<li data-bind="attr: { class: (isActive) ? 'active' : '' }"><a data-bind="text: name, attr: { href: urlid }"></a></li>
 				<!-- /ko -->
 				<li><a href="#"><i class="icon-plus"></i></a></li>
 			</ul>
 			<fieldset>
+				<button data-bind="click: contentType().save">Save</button>
 	   			<legend>Core</legend>
 				<label>Name</label>
 				<input type="text" name="name" value="" data-bind="value: contentType().name ">
 		 		<label>ID</label>
-				<input type="text" name="_id" value="" data-bind="value: contentType()._id ">
+				<input type="text" name="urlid" value="" data-bind="value: contentType().urlid ">
 				<label>Order By</label>
 				<input type="text" name="order_by" value="" data-bind="value: contentType().order_by ">
 				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: contentType().collection"> Collection</label>
@@ -414,7 +427,7 @@
 						<select name="content_type" multiple="multiple">
 							<option value="">None</option>
 							<!-- ko foreach: $parent.contentTypes -->
-								<option data-bind="value: _id, text: name" value=""></option>
+								<option data-bind="value: urlid, text: name" value=""></option>
 							<!-- /ko -->
 						</select>
 						
