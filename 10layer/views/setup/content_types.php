@@ -195,7 +195,7 @@
 			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
 				data: ko.toJSON({ content_types: self.contentTypes() }),
 				type: "post", contentType: "application/json",
-				success: function(result) { alert(result) }
+				success: function(result) { console.log("Saved") }
 			});
 		}
 	};
