@@ -48,7 +48,6 @@
 		
 		public function content_types($content_type_urlid=false) {
 			$this->load->model("model_content");
-			$data["content_type_id"]=0;
 			$content_types=$this->model_content->get_content_types();
 			if (empty($content_types)) {
 				$templates=glob(TLPATH."resources/content_types/*.json");
@@ -63,11 +62,12 @@
 					}
 				}
 			}
+			$data["content_type_urlid"]=$content_types[0]->_id;
 			if (!empty($content_type_urlid)) {
 				$x=0;
 				foreach($content_types as $content_type) {
 					if ($content_type->_id == $content_type_urlid) {
-						$data["content_type_id"]=$x;
+						$data["content_type_urlid"]=$content_type_urlid;
 					}
 					$x++;
 				}
