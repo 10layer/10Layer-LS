@@ -5,11 +5,11 @@
 		"transformations" : [
 			{
 				"fn": "copy",
-				"vars": [ "title" ]
+				"params": [ "title" ]
 			},
 			{
 				"fn": "urlid",
-				"vars": [ false ]
+				"params": [ false ]
 			}
 		]
 	},
@@ -56,4 +56,4 @@
 			"Published"
 		]
 	}
-], "name" : "Tag", "collection" : "0", "order_by" : [ "title ASC", "start_date" ] }
+], "name" : "Tag", "collection" : false, "order_by" : [ "title ASC", "start_date" ] }

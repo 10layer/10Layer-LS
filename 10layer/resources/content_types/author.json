@@ -5,11 +5,11 @@
 		"transformations" : [
 			{
 				"fn": "copy",
-				"vars": [ "title" ]
+				"params": [ "title" ]
 			},
 			{
 				"fn": "urlid",
-				"vars": [ false ]
+				"params": [ false ]
 			}
 		]
 	},
@@ -102,4 +102,4 @@
 		],
 		"directory" : "/content/authors/{date('Y')}/{date('m')}/{date('d')}/"
 	}
-], "name" : "Author", "collection" : "0", "order_by" : [ "timestamp DESC", "start_date" ] }
+], "name" : "Author", "collection" : false, "order_by" : [ "timestamp DESC", "start_date" ] }
