@@ -39,6 +39,7 @@
 		self.multiple = ko.observable(data.multiple);
 		self.showcount = ko.observable(data.showcount);
 		self.hidenew = ko.observable(data.hidenew);
+		self.hide = ko.observable(data.hide);
 		self.rules = ko.observableArray(_.map(data.rules, function(item) { return new Rule(item) }));
 		self.transformations = ko.observableArray(_.map(data.transformations, function(item) { return new Transformation(item) }));
 		
@@ -119,17 +120,7 @@
 		self.name = ko.observable(data.name);
 		self.collection = ko.observable(data.collection);
 		self.order_by = ko.observable(data.order_by);
-		self.isActive = ko.observable(data.isActive);
-		
-		//Save at this level to not wipe all the content types
-		self.save = function() {
-        	$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
-				data: ko.toJSON({ content_type: self }),
-				type: "post", contentType: "application/json",
-				success: function(result) { alert(result) }
-			});
-		};
-		
+		self.isActive = ko.observable(data.isActive);		
 		self.clickRemove = function(data) {
 			var pos = self.fields.indexOf(data);
 			self.fields.splice(pos, 1);
@@ -176,16 +167,31 @@
 		
 		//Events
 		self.clickAddContentType = function() {
-			self.contentTypes.push(new ContentType( { collection: false, _id: "newtype", name: "New Content Type" } ));
+			//Make sure we don't already have a new content type
+			var found = false;
+			_.each(self.contentTypes(), function(item) {
+				if (item.urlid() == "new_content_type") {
+					found = true;
+				}
+			});
+			if (found) {
+				return false;
+			}
+			var emptyType = empty_type_template;
+			emptyType._id = "content_type_"+self.contentTypes().length;
+			self.contentTypes.push(new ContentType( empty_type_template ));
+			self.content_type_urlid(emptyType._id);
 		};
 		
 		self.clickShowContentType = function(data) {
-			console.log(data.id);
 			self.content_type_urlid(data.id);
 		};
 		
+		self.clickRemoveContentType = function(data) {
+			self.contentTypes.remove(data);
+		}
+		
 		self.save = function() {
-			console.log("Save");
 			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
 				data: ko.toJSON({ content_types: self.contentTypes() }),
 				type: "post", contentType: "application/json",
@@ -194,7 +200,7 @@
 		}
 	};
 	
-	var types = ([
+	var types = [
 		{ _id: "autocomplete", name: "Autocomplete" },
 		{ _id: "checkbox", name: "Checkbox" },
 		{ _id: "date", name: "Date" },
@@ -210,7 +216,76 @@
 		{ _id: "select", name: "Select" },
 		{ _id: "text", name: "Text" },
 		{ _id: "textarea", name: "Text Area" }
-	]);
+	];
+	
+	var empty_type_template = { 
+		"_id" : "new_content_type", 
+		"fields" : [
+		{
+			"name" : "urlid",
+			"hidden" : true,
+			"type" : "text",
+			"transformations" : [
+				{ 
+					"fn": "copy",
+					"params": [ "title" ]
+				},
+				{
+					"fn": "urlid",
+					"params": [ "true" ]
+				}
+			]
+		},
+		{
+			"name" : "title",
+			"class" : "bigger",
+			"label_class" : "bigger",
+			"rules" : [
+				{
+					"fn": "required"
+				}
+			],
+			"transformations" : [
+				{ 
+					"fn": "safetext" 
+				}
+			],
+			"libraries" : {
+				"semantic" : true,
+				"search" : "like"
+			},
+			"type" : "textarea"
+		},
+		{
+			"name" : "last_modified",
+			"hidden" : true,
+			"type" : "datetime",
+			"hidden" : true,
+			"transformations" : [
+				{ 
+					"fn": "date('c')",
+					"hint": "Today's date"
+				}
+			]
+		},
+		{
+			"name" : "start_date",
+			"type" : "date",
+			"value" : "Today"
+		},
+		{
+			"name" : "workflow_status",
+			"type" : "select",
+			"options" : [
+				"New",
+				"Edited",
+				"Published"
+			]
+		}], 
+		"name" : "New Content Type", 
+		"collection" : false, 
+		"order_by" : [ "last_modified desc" ] 
+	};
 	
 	var transformation_template = ([
 		{
@@ -252,7 +327,7 @@
 		}
 	]);
 	
-	var rule_template = ([
+	var rule_template = [
 		{
 			fn: "required",
 			hint: "Required"
@@ -348,7 +423,7 @@
 			hint: "Must match",
 			var_check: function(x) { return _.isString(x); }
 		}
-	]);
+	];
 	
 	var req_types = new Array("urlid", "title", "last_modified", "start_date", "workflow_status");
 	
@@ -392,15 +467,13 @@
 			<script> var x=0; </script>
 			<ul class="nav nav-tabs">
 				<!-- ko foreach: contentTypes -->
-				<li data-bind="css: { active: isActive }, click: $parent.clickShowContentType"><a href="#" data-bind="text: name"></a></li>
+				<li data-bind="css: { active: isActive }"><a href="#" data-bind=""><span data-bind="text:name, click: $parent.clickShowContentType"></span> <i data-bind="click: $parent.clickRemoveContentType" class="icon-remove"></i></a> </li>
 				<!-- /ko -->
 				<li><a href="#" data-bind="click: clickAddContentType"><i class="icon-plus"></i></a></li>
 			</ul>
 			<!-- ko foreach: contentTypes -->
 				<!-- ko if: isActive -->
-			<fieldset>
-				<button data-bind="click: save">Save</button>
-	   			<legend>Core</legend>
+			<fieldset class="form-inline">
 				<label>Name</label>
 				<input type="text" name="name" value="" data-bind="value: name ">
 		 		<label>ID</label>
@@ -427,7 +500,7 @@
 						<input type="text" name="label" value="" data-bind="value: label">
 					
 						<label>Type</label>
-						<select name="content_type" data-bind="options: $parent.types, optionsText: 'name', optionsValue: '_id', value: type">
+						<select name="content_type" data-bind="options: types, optionsText: 'name', optionsValue: '_id', value: type">
 						</select>
 					
 						<label>Default value</label>
@@ -438,7 +511,7 @@
 							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
 								Add a rule <span class="caret"></span>
 							</a>
-							<ul class="dropdown-menu" data-bind="foreach: $parent.rules">
+							<ul class="dropdown-menu" data-bind="foreach: rule_template">
 								<li><a class="rule_add" data-bind='text: fn, click: $parent.clickRulesAdd' href='#'></a></li>
 							</ul>
 						</div>
@@ -454,7 +527,7 @@
 							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
 								Add a transformation <span class="caret"></span>
 							</a>
-							<ul class="dropdown-menu" data-bind="foreach: $parent.transformations">
+							<ul class="dropdown-menu" data-bind="foreach: transformation_template">
 								<li><a data-bind='text: fn, click: $parent.clickTransformationsAdd' href='#'></a></li>
 							</ul>
 						</div>
@@ -493,6 +566,7 @@
 						<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
 						<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
 						<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
+						<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hide"> Do Not Render</label>
 					</div>
 				</fieldset>
 				</div>
