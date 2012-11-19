@@ -74,17 +74,25 @@
 				return false;
 			}
 			//Expect JSON
-			$content_type=$data->content_type;
-			$id = $content_type->id;
+			if (isset($data->content_types) && is_array($data->content_types)) {
+				foreach($data->content_types as $ct) {
+					$this->_save($ct);
+				}
+			} else {
+				$this->_save($data->content_type);
+			};
+			$this->data["content"]=$data;
+			$this->returndata();
+		}
+		
+		protected function _save($content_type) {
+			$id = $content_type->urlid;
 			$content_type->_id=$id;
 			unset($content_type->id);
-			print $id;
-			//unset($content_type->_id);
 			$this->data["msg"]="Saving";
 			$this->mongo_db->where(array("_id"=>$id))->delete("content_types");
 			$this->mongo_db->insert("content_types", $content_type);
-			$this->data["content"]=$data;
-			$this->returndata();
+			return true;
 		}
 		
 		/**

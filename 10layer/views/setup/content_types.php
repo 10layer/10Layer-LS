@@ -112,11 +112,14 @@
 			)
 		);
 		self.urlid = ko.observable(data._id);
+		self.url = ko.computed(function() {
+			return "/setup/content_types/" + self.urlid();
+		});
 		self.id = data._id; // We keep an immutable copy of this so we know which one to edit
 		self.name = ko.observable(data.name);
 		self.collection = ko.observable(data.collection);
 		self.order_by = ko.observable(data.order_by);
-		self.isActive = (data._id == content_type_urlid);
+		self.isActive = ko.observable(data.isActive);
 		
 		//Save at this level to not wipe all the content types
 		self.save = function() {
@@ -125,30 +128,70 @@
 				type: "post", contentType: "application/json",
 				success: function(result) { alert(result) }
 			});
-		}; 
+		};
+		
+		self.clickRemove = function(data) {
+			var pos = self.fields.indexOf(data);
+			self.fields.splice(pos, 1);
+		};
+		
+		self.clickAddField = function(data) {
+			self.fields.push(new Field({ 
+				name: "newtype",
+				label: "New Type",
+				type: "text"
+			}));
+		}
 	};
 		
 	var ContentTypesModel = function() {
 		var self = this;
 		
 		self.contentTypes = ko.observableArray([]);
-		self.contentType = ko.observableArray([]);
+		
+		self.content_type_urlid = ko.computed({
+			read: function() { return this },
+			write: function(value) {
+				var tmparr = self.contentTypes.removeAll();
+				_.each(tmparr, function(item) {
+					if (item.id == value) {
+						item.isActive = true;	
+					} else {
+						item.isActive = false;
+					}
+				});
+				self.contentTypes(tmparr);
+			}
+		});
 		
 		self.types = ko.observableArray(types);
 		self.rules = ko.observableArray(rule_template);
 		self.transformations = ko.observableArray(transformation_template);
 		
 		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
-			content_types=data.content;
-			var mappedContentTypes = _.map(content_types, function(item, key) { return new ContentType(item, item._id);  });
-			self.contentTypes(mappedContentTypes);
-			_.each(mappedContentTypes, function(item) {
-				if (item.urlid() == content_type_urlid) {
-					self.contentType(item);
-				}
-			});
-			//self.contentType(mappedContentTypes[content_type_urlid]);
+			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
+			self.contentTypes(self.mappedContentTypes);
+			self.content_type_urlid("<?= $content_type_urlid ?>");
 		});
+		
+		//Events
+		self.clickAddContentType = function() {
+			self.contentTypes.push(new ContentType( { collection: false, _id: "newtype", name: "New Content Type" } ));
+		};
+		
+		self.clickShowContentType = function(data) {
+			console.log(data.id);
+			self.content_type_urlid(data.id);
+		};
+		
+		self.save = function() {
+			console.log("Save");
+			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
+				data: ko.toJSON({ content_types: self.contentTypes() }),
+				type: "post", contentType: "application/json",
+				success: function(result) { alert(result) }
+			});
+		}
 	};
 	
 	var types = ([
@@ -309,8 +352,6 @@
 	
 	var req_types = new Array("urlid", "title", "last_modified", "start_date", "workflow_status");
 	
-	var content_type_urlid="<?= $content_type_urlid ?>";
-	
 	$(function() {
 		ko.applyBindings(new ContentTypesModel());
 		
@@ -344,35 +385,37 @@
 				<p>It's okay to accept the defaults. You'll be able to come back and change the content types later.</p>
 			</div>
 			<div class="span4">
-				<button class="btn btn-large btn-primary"><i class="icon-fire icon-white"></i> Onward!</button>
+				<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Onward!</button>
 			</div>
 		</div>
 		<div id="content_type_app">
 			<script> var x=0; </script>
 			<ul class="nav nav-tabs">
 				<!-- ko foreach: contentTypes -->
-				<li data-bind="attr: { class: (isActive) ? 'active' : '' }"><a data-bind="text: name, attr: { href: urlid }"></a></li>
+				<li data-bind="css: { active: isActive }, click: $parent.clickShowContentType"><a href="#" data-bind="text: name"></a></li>
 				<!-- /ko -->
-				<li><a href="#"><i class="icon-plus"></i></a></li>
+				<li><a href="#" data-bind="click: clickAddContentType"><i class="icon-plus"></i></a></li>
 			</ul>
+			<!-- ko foreach: contentTypes -->
+				<!-- ko if: isActive -->
 			<fieldset>
-				<button data-bind="click: contentType().save">Save</button>
+				<button data-bind="click: save">Save</button>
 	   			<legend>Core</legend>
 				<label>Name</label>
-				<input type="text" name="name" value="" data-bind="value: contentType().name ">
+				<input type="text" name="name" value="" data-bind="value: name ">
 		 		<label>ID</label>
-				<input type="text" name="urlid" value="" data-bind="value: contentType().urlid ">
+				<input type="text" name="urlid" value="" data-bind="value: urlid ">
 				<label>Order By</label>
-				<input type="text" name="order_by" value="" data-bind="value: contentType().order_by ">
-				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: contentType().collection"> Collection</label>
+				<input type="text" name="order_by" value="" data-bind="value: order_by ">
+				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: collection"> Collection</label>
 			</fieldset>
 			<legend>Fields</legend>
-			<div data-bind="foreach: contentType().fields">
+			<div data-bind="foreach: fields">
 				<div class="span3">
 				<fieldset>
 					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
 						<!-- ko if: isRemovable -->
-						<button class='field-delete btn btn-small btn-warning'><i class='icon-trash icon-white'></i></button>
+						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
 						<!-- /ko --> 
 						<span data-bind="text: name"></span> 
 					</legend>
@@ -384,8 +427,7 @@
 						<input type="text" name="label" value="" data-bind="value: label">
 					
 						<label>Type</label>
-						<select name="content_type" data-bind="foreach: $parent.types">
-							<option value='' data-bind="text: name, value: _id"></option>					
+						<select name="content_type" data-bind="options: $parent.types, optionsText: 'name', optionsValue: '_id', value: type">
 						</select>
 					
 						<label>Default value</label>
@@ -455,6 +497,12 @@
 				</fieldset>
 				</div>
 			</div>
+				
+			<div class="span3">
+				<button class="btn btn-primary" data-bind="click: clickAddField"><i class="icon-plus icon-white"></i></button>
+			</div>
+				<!-- /ko -->
+			<!-- /ko -->
 			<!-- <div id="fields"></div> -->
 		</div>
 	</div>
