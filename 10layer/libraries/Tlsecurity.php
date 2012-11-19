@@ -49,11 +49,14 @@
 		}
 		
 		public function checkSetup() {
-			$uri=$this->ci->uri->segment(1);
-			if ($uri == "setup") {
-				return true;
-			}
 			$collections=$this->ci->mongo_db->collections();
+			
+			//If we don't have any collections, let us set up an admin user
+			$uri=$this->ci->uri->uri_string();
+			if ($uri == "setup/admin") {
+				return empty($collections);
+			}
+			
 			if (empty($collections)) {
 				$this->ci->load->view("setup/first");
 				print $this->ci->output->get_output();

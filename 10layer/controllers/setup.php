@@ -79,7 +79,37 @@
 		
 		public function users() {
 			$this->load->model("model_user");
-			$this->load->view("setup/users");
+			$data=array();
+			$email=$this->input->post("email");
+			$password=$this->input->post("password");
+			$name = $this->input->post("name");
+			$fin = $this->input->post("fin");
+			$permissions = $this->input->post("permissions");
+			if (!empty($email)) {
+				$password_rules=array(
+					"required",
+					"minlen"=>5,
+					"password_strength"=>2
+				);
+				$email_rules=array(
+					"required",
+					"valid_email",
+					"database_nodupe"=>"email in users",
+				);
+				$this->validation->validate("email", "Email", $email, $email_rules);
+				$this->validation->validate("password", "Password", $password, $password_rules);
+				$this->validation->validate("name", "Name", $name, array("required"));
+				if (!$this->validation->passed) {
+					$data["errors"]=$this->validation->failed_messages;
+				} else {
+					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>$name, "date_created"=>date("c"), "status_id"=>"1", "otp"=>"", "status"=>"Active", "permissions"=>$permissions, "roles"=>array()));
+					
+					if (!empty($fin)) {
+						redirect("/setup/content_types");
+					}
+				}
+			}
+			$this->load->view("setup/users", $data);
 		}
 		
 		protected function json_check($filename="") {
