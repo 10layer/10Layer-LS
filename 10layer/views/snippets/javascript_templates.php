@@ -272,6 +272,28 @@
 	</div>
 </script>
 
+<script type='text/template' id='edit-field-hidden'>
+	<!-- edit-field-hidden -->
+	<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
+</script>
+
+<script type='text/template' id='create-field-hidden'>
+	<!-- create-field-file -->
+	<%= _.template($('#edit-field-hidden').html(), {field: field} ) %>
+</script>
+
+<script type='text/template' id='proto-field-hidden'>
+	<!-- proto-field-file -->
+	<div class="proto well">
+		<div class='control-group'>
+		    <label class='control-label '>Hidden</label>
+		    <div class="controls">
+		    	<em>Hidden Field</em>
+		    </div>
+		</div>
+	</div>
+</script>
+
 <script type='text/template' id='edit-field-image'>
 	<!-- edit-field-image -->
 	<div class='control-group'>
