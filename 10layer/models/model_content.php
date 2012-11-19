@@ -777,7 +777,7 @@ if(strlen($s) > 2) {
 			if ($public) {
 				//$this->mongo_db->where(array("public"=>true));
 			}
-			$result=$this->mongo_db->get("content_types");
+			$result=$this->mongo_db->order_by(array("_id"))->get("content_types");
 			return $result;
 		}
 		
