@@ -39,7 +39,7 @@
 		self.multiple = ko.observable(data.multiple);
 		self.showcount = ko.observable(data.showcount);
 		self.hidenew = ko.observable(data.hidenew);
-		self.hide = ko.observable(data.hide);
+		self.hidden = ko.observable(data.hidden);
 		self.rules = ko.observableArray(_.map(data.rules, function(item) { return new Rule(item) }));
 		self.transformations = ko.observableArray(_.map(data.transformations, function(item) { return new Transformation(item) }));
 		
@@ -533,7 +533,7 @@
 						</div>
 						<dl data-bind="foreach: transformations">
 							<div>
-							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span></dt>
+							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
 							<dd data-bind="text: hint"></dd>
 							</div>
 						</dl>
@@ -541,7 +541,7 @@
 						<label>Import from another Content Type</label>
 						<select name="content_type" multiple="multiple">
 							<option value="">None</option>
-							<!-- ko foreach: $parent.contentTypes -->
+							<!-- ko foreach: $root.contentTypes -->
 								<option data-bind="value: urlid, text: name" value=""></option>
 							<!-- /ko -->
 						</select>
@@ -566,7 +566,7 @@
 						<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
 						<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
 						<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
-						<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hide"> Do Not Render</label>
+						<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hidden"> Do Not Render</label>
 					</div>
 				</fieldset>
 				</div>

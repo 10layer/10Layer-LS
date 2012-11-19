@@ -694,6 +694,39 @@
 	</div>
 </script>
 
+<script type='text/template' id='edit-field-wysiwyg'>
+	<!-- edit-field-wysiwyg -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='create-field-wysiwyg'>
+	<!-- create-field-wysiwyg -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='proto-field-wysiwyg'>
+	<!-- proto-field-wysiwyg -->
+	<div class="proto well">
+		<div class='control-group'>
+		    <label class='control-label '>Text Area</label>
+		    <div class="controls">
+		    	<textarea name='proto_text' value='' class=''></textarea>
+		    </div>
+		</div>
+	</div>
+</script>
+
+
 <script type='text/template' id='button-new-template'>
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>
 	<span style='display:none;margin-left:10px;' class='label label-success'>Loading...</span>
