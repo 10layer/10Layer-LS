@@ -5,11 +5,11 @@
 		"transformations" : [
 			{ 
 				"fn": "copy",
-				"vars": [ "title" ]
+				"params": [ "title" ]
 			},
 			{
 				"fn": "urlid",
-				"vars": [ "true" ]
+				"params": [ "true" ]
 			}
 		]
 	},
@@ -89,7 +89,7 @@
 	{
 		"name" : "mainpic",
 		"label" : "Main photo",
-		"type" : "rich",
+		"type" : "image",
 		"contenttype" : "picture",
 		"multiple" : false
 	},
@@ -101,7 +101,7 @@
 	{
 		"name" : "related_articles",
 		"label" : "Related Articles",
-		"type" : "deepsearch",
+		"type" : "search",
 		"link" : true,
 		"contenttype" : "article",
 		"multiple" : true
@@ -116,11 +116,11 @@
 			},
 			{
 				"fn": "min_count",
-				"var": 1
+				"params": [ 1 ]
 			},
 			{
 				"fn": "max_count",
-				"var": 5
+				"params": [ 5 ]
 			}
 		],
 		"contenttype" : "author",
@@ -134,7 +134,7 @@
 	},
 	{
 		"name" : "section",
-		"type" : "nesteditems",
+		"type" : "tree",
 		"contenttype" : "section",
 		"rules" : [
 			{
@@ -142,4 +142,4 @@
 			}
 		]
 	}
-], "name" : "Article", "collection" : "0", "order_by" : [ "last_modified desc" ] }
+], "name" : "Article", "collection" : false, "order_by" : [ "last_modified desc" ] }

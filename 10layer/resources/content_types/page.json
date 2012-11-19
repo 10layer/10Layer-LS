@@ -5,11 +5,11 @@
 		"transformations" : [
 			{
 				"fn": "copy",
-				"vars": [ "title" ]
+				"params": [ "title" ]
 			},
 			{
 				"fn": "urlid",
-				"vars": [ false ]
+				"params": [ false ]
 			}
 		]
 	},
@@ -75,4 +75,4 @@
 			"search" : "like"
 		}
 	}
-], "name" : "Page", "collection" : "0", "order_by" : [ "timestamp DESC", "start_date" ] }
+], "name" : "Page", "collection" : false, "order_by" : [ "timestamp DESC", "start_date" ] }
