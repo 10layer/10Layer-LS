@@ -2,6 +2,7 @@
 	{
 		"name" : "urlid",
 		"hidden" : true,
+		"type" : "text",
 		"transformations" : [
 			{
 				"fn": "copy",
@@ -36,6 +37,7 @@
 	{
 		"name" : "last_modified",
 		"hidden" : true,
+		"type" : "datetime",
 		"transformations" : [
 			{
 				"fn": "date('c')"

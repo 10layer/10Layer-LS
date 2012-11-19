@@ -2,6 +2,7 @@
 	{
 		"name" : "urlid",
 		"hidden" : true,
+		"type" : "text",
 		"transformations" : [
 			{
 				"fn": "copy",
@@ -36,6 +37,7 @@
 	{
 		"name" : "last_modified",
 		"hidden" : true,
+		"type" : "datetime",
 		"transformations" : [
 			{ 
 				"fn": "date('c')" 
@@ -102,4 +104,4 @@
 		],
 		"directory" : "/content/authors/{date('Y')}/{date('m')}/{date('d')}/"
 	}
-], "name" : "Author", "collection" : false, "order_by" : [ "timestamp DESC", "start_date" ] }
+], "name" : "Author", "collection" : false, "order_by" : [ "title DESC", "start_date" ] }
