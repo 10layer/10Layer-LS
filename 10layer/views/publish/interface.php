@@ -112,26 +112,41 @@ $(function() {
 	$('.zone_selector').live('click', function(){
 		zone_id = $(this).attr('id');
 		$.getJSON('/publish/get_zone/'+zone_id, function(data) {
-			var zone_display = (data.title.length > 15) ? "<span class='tooltips' data-placement='top' data-original-title='"+data.title+"'>"+data.title.substring(0, 15) + '...</span>' : data.title;
-			$('#zone_indicator').html(zone_display);
-			var details = "<div class='tooltips' data-placement='top' data-original-title='"+data.content_types+"'><span class='small_text' rel='tooltip' >Content Types</span></div>";
-			details += "<div class='tooltips' data-placement='right' id='max_count' count='"+data.max_count+"' data-original-title='"+data.max_count+"'><span class='small_text' rel='tooltip' >Max Items</span></div>";
-			details += "<div class='tooltips' data-placement='right' id='min_count' count='"+data.min_count+"' data-original-title='"+data.min_count+"'><span class='small_text' rel='tooltip' >Min Items</span></div>";
-			var automated = (data.auto == 1) ? 'label-important' : 'label-success';
-			var instruction = (data.auto == 1) ? 'Click to de-automate' : 'Click to automate';
-			var label = (data.auto == 1) ? 'Deautomate' : 'Automate';
-			details += "<div class='tooltips' data-placement='right' data-original-title='"+instruction+"'><span class='label small_text "+automated+"' rel='tooltip' >"+label+"</span></div>";
-			details += "<div class='tooltips' data-placement='right' data-original-title='Current No. of Items'><span class='label label-success' id='current_count' rel='tooltip' >"+data.content.length+"</span></div>";
-			$('#zone_details').html(details);
-
-			$('#search_results').html(_.template($("#publishable_items_template").html(), { data:data.available_items }));
-			$('#publish_pane').html(_.template($("#unpublishable_items_template").html(), { data:data.content }));
+			zone_details(data);
+			if(data.auto == 0){
+				$('#search_results').html(_.template($("#publishable_items_template").html(), { data:data.available_items }));
+			}else{
+				$('#search_results').html('');
+			}
 			
-
-			$('.tooltips').tooltip();
-  			
-  			//var items = [];
+			$('#publish_pane').html(_.template($("#unpublishable_items_template").html(), { data:data.content }));
+			$('#publish_pane').sortable();
+			
   		});
+
+	});
+
+	$('#auto_switch').live('click', function(){
+		var pointer = $(this);
+		var auto_switch = pointer.hasClass('label-important') ? 0 : 1;
+		var params = {'switch':auto_switch, 'zone_id':zone_id};
+
+		$.getJSON('/publish/auto_switch', params, function(results){
+			if(auto_switch == 1){
+				$("#search_results").html('');
+				$('#publish_pane').html(_.template($("#unpublishable_items_template").html(), { data:results.item.content }));
+				zone_details(results.item);
+			}else{
+				$('#search_results').html(_.template($("#publishable_items_template").html(), { data:results.item.available_items }));
+				$('#publish_pane').html(_.template($("#unpublishable_items_template").html(), { data:results.item.content }));
+			}
+
+			zone_details(results.item);
+			show_pop(results.info, results.message);
+			$('.tooltip').hide();
+			//pointer.removeClass(present_class).addClass(destination_class).text(switch_label);
+		});
+
 
 	});
 
@@ -158,7 +173,6 @@ $(function() {
 			show_pop('info', 'The publish pane has reached minimum allowed items');
 		}
 	});
-
 	
 
 	$(".fly_edit").live('click', function(){
@@ -216,9 +230,24 @@ $(function() {
 		});
 	}
 
+	function zone_details(data){
+		var zone_display = (data.title.length > 15) ? "<span class='tooltips' data-placement='top' data-original-title='"+data.title+"'>"+data.title.substring(0, 15) + '...</span>' : data.title;
+		$('#zone_indicator').html(zone_display);
+		var details = "<div class='tooltips' data-placement='top' data-original-title='"+data.content_types+"'><span class='small_text' rel='tooltip' >Content Types</span></div>";
+		details += "<div class='tooltips' data-placement='right' id='max_count' count='"+data.max_count+"' data-original-title='"+data.max_count+"'><span class='small_text' rel='tooltip' >Max Items</span></div>";
+		details += "<div class='tooltips' data-placement='right' id='min_count' count='"+data.min_count+"' data-original-title='"+data.min_count+"'><span class='small_text' rel='tooltip' >Min Items</span></div>";
+		var automated = (data.auto == 1) ? 'label-important' : 'label-success';
+		var instruction = (data.auto == 1) ? 'Click to de-automate' : 'Click to automate';
+		var label = (data.auto == 1) ? 'Deautomate' : 'Automate';
+		details += "<div class='tooltips' data-placement='right' data-original-title='"+instruction+"'><span class='label clickable small_text "+automated+"' rel='tooltip' id='auto_switch' >"+label+"</span></div>";
+		details += "<div class='tooltips' data-placement='right' data-original-title='Current No. of Items'><span class='label label-success' id='current_count' rel='tooltip' >"+data.content.length+"</span></div>";
+		$('#zone_details').html(details);
+		$('.tooltips').tooltip();
+	}
+
 	function can_add(){
-		var max_count = $('#max_count').attr('count');
-		var current_count =  $('#current_count').html();
+		var max_count = parseInt($('#max_count').attr('count'));
+		var current_count =  parseInt($('#current_count').html());
 		if(max_count > current_count){
 			return true;
 		}else{
@@ -227,8 +256,8 @@ $(function() {
 	}
 
 	function can_remove(){
-		var min_count = $('#min_count').attr('count');
-		var current_count =  $('#current_count').html();
+		var min_count = parseInt($('#min_count').attr('count'));
+		var current_count =  parseInt($('#current_count').html());
 		if(current_count > min_count ){
 			return true;
 		}else{

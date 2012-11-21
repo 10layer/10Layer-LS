@@ -102,6 +102,11 @@ a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20
 	margin-right:10px;
 }
 
+#publish_pane div{
+	background-color: #fff;
+	cursor:pointer;
+}
+
 #search_results, #publish_pane{
 	padding:5px;
 	overflow: auto;
@@ -149,6 +154,9 @@ a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20
 	float:left;
 }
 
+.clickable{
+	cursor: pointer;
+}
 
 .wrapper {
 font-size: 25px;
