@@ -87,6 +87,14 @@
 			$this->mongo_db->where($where)->update('content', $item);
 		}
 
+		function auto_switch(){
+			$item['auto'] = $this->input->get('switch');
+			$zone_id = $this->input->get('zone_id');
+			$where = array('_id' => $zone_id);
+			$this->mongo_db->where($where)->update('content', $item);
+			$results = array('info' => 'results','message' => 'Auto swich succesful');	
+		}
+
 
 		function make_nest($collection_type){
 
@@ -116,14 +124,14 @@
 
 			foreach($options as $option) {
 				
-				$menu .= "<li class='collection_selector' id='".$option->_id."' ><a>".$option->title."</a>";
+				$menu .= "<li class='collection_selector clickable' id='".$option->_id."' ><a>".$option->title."</a>";
 					
 					if (isset($option->submenu)) {
 					
 					$menu .= "<ul>";
 					
 					foreach($option->submenu as $sub) {
-						$attrs = array('class'=>'collection_selector', 'id'=>$sub->_id);	
+						$attrs = array('class'=>'collection_selector clickable', 'id'=>$sub->_id);	
 						$menu .= "<li class='collection_selector' id='".$sub->_id."'><a>".$sub->title."</a></li>";
 					
 					}
