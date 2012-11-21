@@ -2,14 +2,15 @@
 	{
 		"name" : "urlid",
 		"hidden" : true,
+		"type" : "text",
 		"transformations" : [
 			{
 				"fn": "copy",
-				"vars": [ "title" ]
+				"params": [ "title" ]
 			},
 			{
 				"fn": "urlid",
-				"vars": [ false ]
+				"params": [ false ]
 			}
 		]
 	},
@@ -36,6 +37,7 @@
 	{
 		"name" : "last_modified",
 		"hidden" : true,
+		"type" : "datetime",
 		"transformations" : [
 			{
 				"fn": "date('c')"
@@ -56,4 +58,4 @@
 			"Published"
 		]
 	}
-], "name" : "Tag", "collection" : "0", "order_by" : [ "title ASC", "start_date" ] }
+], "name" : "Tag", "collection" : false, "order_by" : [ "title ASC", "start_date" ] }

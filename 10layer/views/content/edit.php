@@ -57,7 +57,7 @@
 	
 		function prepRouter() {
 			clear_ajaxqueue();
-			$('#dyncontent').children().find('.richedit').each(function() {
+			$('#dyncontent').children().find('.wysiwyg').each(function() {
 				var name=$(this).attr('name');
 				var o=CKEDITOR.instances[name];
 				if (o) o.destroy();

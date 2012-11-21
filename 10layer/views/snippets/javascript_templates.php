@@ -272,6 +272,28 @@
 	</div>
 </script>
 
+<script type='text/template' id='edit-field-hidden'>
+	<!-- edit-field-hidden -->
+	<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
+</script>
+
+<script type='text/template' id='create-field-hidden'>
+	<!-- create-field-file -->
+	<%= _.template($('#edit-field-hidden').html(), {field: field} ) %>
+</script>
+
+<script type='text/template' id='proto-field-hidden'>
+	<!-- proto-field-file -->
+	<div class="proto well">
+		<div class='control-group'>
+		    <label class='control-label '>Hidden</label>
+		    <div class="controls">
+		    	<em>Hidden Field</em>
+		    </div>
+		</div>
+	</div>
+</script>
+
 <script type='text/template' id='edit-field-image'>
 	<!-- edit-field-image -->
 	<div class='control-group'>
@@ -671,6 +693,39 @@
 		</div>
 	</div>
 </script>
+
+<script type='text/template' id='edit-field-wysiwyg'>
+	<!-- edit-field-wysiwyg -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='create-field-wysiwyg'>
+	<!-- create-field-wysiwyg -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='proto-field-wysiwyg'>
+	<!-- proto-field-wysiwyg -->
+	<div class="proto well">
+		<div class='control-group'>
+		    <label class='control-label '>Text Area</label>
+		    <div class="controls">
+		    	<textarea name='proto_text' value='' class=''></textarea>
+		    </div>
+		</div>
+	</div>
+</script>
+
 
 <script type='text/template' id='button-new-template'>
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>

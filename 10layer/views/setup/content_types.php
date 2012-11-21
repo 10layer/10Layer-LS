@@ -14,8 +14,6 @@
 		self.vars = ko.observable(data.vars);
 		self.params = ko.observable(data.var);
 		self.var_check = ko.observable(data.var_check);
-		
-		
 	}
 
 	var Rule = function(data) {
@@ -41,6 +39,7 @@
 		self.multiple = ko.observable(data.multiple);
 		self.showcount = ko.observable(data.showcount);
 		self.hidenew = ko.observable(data.hidenew);
+		self.hidden = ko.observable(data.hidden);
 		self.rules = ko.observableArray(_.map(data.rules, function(item) { return new Rule(item) }));
 		self.transformations = ko.observableArray(_.map(data.transformations, function(item) { return new Transformation(item) }));
 		
@@ -113,32 +112,95 @@
 				}
 			)
 		);
-		self._id = ko.observable(data._id);
+		self.urlid = ko.observable(data._id);
+		self.url = ko.computed(function() {
+			return "/setup/content_types/" + self.urlid();
+		});
+		self.id = data._id; // We keep an immutable copy of this so we know which one to edit
 		self.name = ko.observable(data.name);
 		self.collection = ko.observable(data.collection);
 		self.order_by = ko.observable(data.order_by);
-		self.isActive = (key == content_type_id);
+		self.isActive = ko.observable(data.isActive);		
+		self.clickRemove = function(data) {
+			var pos = self.fields.indexOf(data);
+			self.fields.splice(pos, 1);
+		};
+		
+		self.clickAddField = function(data) {
+			self.fields.push(new Field({ 
+				name: "newtype",
+				label: "New Type",
+				type: "text"
+			}));
+		}
 	};
 		
 	var ContentTypesModel = function() {
 		var self = this;
 		
 		self.contentTypes = ko.observableArray([]);
-		self.contentType = ko.observableArray([]);
+		
+		self.content_type_urlid = ko.computed({
+			read: function() { return this },
+			write: function(value) {
+				var tmparr = self.contentTypes.removeAll();
+				_.each(tmparr, function(item) {
+					if (item.id == value) {
+						item.isActive = true;	
+					} else {
+						item.isActive = false;
+					}
+				});
+				self.contentTypes(tmparr);
+			}
+		});
 		
 		self.types = ko.observableArray(types);
 		self.rules = ko.observableArray(rule_template);
 		self.transformations = ko.observableArray(transformation_template);
 		
 		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
-			content_types=data.content;
-			var mappedContentTypes = _.map(content_types, function(item, key) { return new ContentType(item, key);  });
-			self.contentTypes(mappedContentTypes);
-			self.contentType(mappedContentTypes[content_type_id]);
+			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
+			self.contentTypes(self.mappedContentTypes);
+			self.content_type_urlid("<?= $content_type_urlid ?>");
 		});
+		
+		//Events
+		self.clickAddContentType = function() {
+			//Make sure we don't already have a new content type
+			var found = false;
+			_.each(self.contentTypes(), function(item) {
+				if (item.urlid() == "new_content_type") {
+					found = true;
+				}
+			});
+			if (found) {
+				return false;
+			}
+			var emptyType = empty_type_template;
+			emptyType._id = "content_type_"+self.contentTypes().length;
+			self.contentTypes.push(new ContentType( empty_type_template ));
+			self.content_type_urlid(emptyType._id);
+		};
+		
+		self.clickShowContentType = function(data) {
+			self.content_type_urlid(data.id);
+		};
+		
+		self.clickRemoveContentType = function(data) {
+			self.contentTypes.remove(data);
+		}
+		
+		self.save = function() {
+			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
+				data: ko.toJSON({ content_types: self.contentTypes() }),
+				type: "post", contentType: "application/json",
+				success: function(result) { console.log("Saved") }
+			});
+		}
 	};
 	
-	var types = ([
+	var types = [
 		{ _id: "autocomplete", name: "Autocomplete" },
 		{ _id: "checkbox", name: "Checkbox" },
 		{ _id: "date", name: "Date" },
@@ -154,7 +216,76 @@
 		{ _id: "select", name: "Select" },
 		{ _id: "text", name: "Text" },
 		{ _id: "textarea", name: "Text Area" }
-	]);
+	];
+	
+	var empty_type_template = { 
+		"_id" : "new_content_type", 
+		"fields" : [
+		{
+			"name" : "urlid",
+			"hidden" : true,
+			"type" : "text",
+			"transformations" : [
+				{ 
+					"fn": "copy",
+					"params": [ "title" ]
+				},
+				{
+					"fn": "urlid",
+					"params": [ "true" ]
+				}
+			]
+		},
+		{
+			"name" : "title",
+			"class" : "bigger",
+			"label_class" : "bigger",
+			"rules" : [
+				{
+					"fn": "required"
+				}
+			],
+			"transformations" : [
+				{ 
+					"fn": "safetext" 
+				}
+			],
+			"libraries" : {
+				"semantic" : true,
+				"search" : "like"
+			},
+			"type" : "textarea"
+		},
+		{
+			"name" : "last_modified",
+			"hidden" : true,
+			"type" : "datetime",
+			"hidden" : true,
+			"transformations" : [
+				{ 
+					"fn": "date('c')",
+					"hint": "Today's date"
+				}
+			]
+		},
+		{
+			"name" : "start_date",
+			"type" : "date",
+			"value" : "Today"
+		},
+		{
+			"name" : "workflow_status",
+			"type" : "select",
+			"options" : [
+				"New",
+				"Edited",
+				"Published"
+			]
+		}], 
+		"name" : "New Content Type", 
+		"collection" : false, 
+		"order_by" : [ "last_modified desc" ] 
+	};
 	
 	var transformation_template = ([
 		{
@@ -196,7 +327,7 @@
 		}
 	]);
 	
-	var rule_template = ([
+	var rule_template = [
 		{
 			fn: "required",
 			hint: "Required"
@@ -292,15 +423,12 @@
 			hint: "Must match",
 			var_check: function(x) { return _.isString(x); }
 		}
-	]);
+	];
 	
 	var req_types = new Array("urlid", "title", "last_modified", "start_date", "workflow_status");
 	
-	var content_type_id=<?= $content_type_id ?>;
-	
 	$(function() {
 		ko.applyBindings(new ContentTypesModel());
-		
 		
 		//Events
 		$(document).on('click', '.field-edit', function(e) {
@@ -332,34 +460,35 @@
 				<p>It's okay to accept the defaults. You'll be able to come back and change the content types later.</p>
 			</div>
 			<div class="span4">
-				<button class="btn btn-large btn-primary"><i class="icon-fire icon-white"></i> Onward!</button>
+				<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Onward!</button>
 			</div>
 		</div>
 		<div id="content_type_app">
 			<script> var x=0; </script>
 			<ul class="nav nav-tabs">
 				<!-- ko foreach: contentTypes -->
-				<li data-bind="attr: { class: (isActive) ? 'active' : '' }"><a data-bind="text: name, attr: { href: _id }"></a></li>
+				<li data-bind="css: { active: isActive }"><a href="#" data-bind=""><span data-bind="text:name, click: $parent.clickShowContentType"></span> <i data-bind="click: $parent.clickRemoveContentType" class="icon-remove"></i></a> </li>
 				<!-- /ko -->
-				<li><a href="#"><i class="icon-plus"></i></a></li>
+				<li><a href="#" data-bind="click: clickAddContentType"><i class="icon-plus"></i></a></li>
 			</ul>
-			<fieldset>
-	   			<legend>Core</legend>
+			<!-- ko foreach: contentTypes -->
+				<!-- ko if: isActive -->
+			<fieldset class="form-inline">
 				<label>Name</label>
-				<input type="text" name="name" value="" data-bind="value: contentType().name ">
+				<input type="text" name="name" value="" data-bind="value: name ">
 		 		<label>ID</label>
-				<input type="text" name="_id" value="" data-bind="value: contentType()._id ">
+				<input type="text" name="urlid" value="" data-bind="value: urlid ">
 				<label>Order By</label>
-				<input type="text" name="order_by" value="" data-bind="value: contentType().order_by ">
-				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: contentType().collection"> Collection</label>
+				<input type="text" name="order_by" value="" data-bind="value: order_by ">
+				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: collection"> Collection</label>
 			</fieldset>
 			<legend>Fields</legend>
-			<div data-bind="foreach: contentType().fields">
+			<div data-bind="foreach: fields">
 				<div class="span3">
 				<fieldset>
 					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
 						<!-- ko if: isRemovable -->
-						<button class='field-delete btn btn-small btn-warning'><i class='icon-trash icon-white'></i></button>
+						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
 						<!-- /ko --> 
 						<span data-bind="text: name"></span> 
 					</legend>
@@ -371,8 +500,7 @@
 						<input type="text" name="label" value="" data-bind="value: label">
 					
 						<label>Type</label>
-						<select name="content_type" data-bind="foreach: $parent.types">
-							<option value='' data-bind="text: name, value: _id"></option>					
+						<select name="content_type" data-bind="options: types, optionsText: 'name', optionsValue: '_id', value: type">
 						</select>
 					
 						<label>Default value</label>
@@ -383,7 +511,7 @@
 							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
 								Add a rule <span class="caret"></span>
 							</a>
-							<ul class="dropdown-menu" data-bind="foreach: $parent.rules">
+							<ul class="dropdown-menu" data-bind="foreach: rule_template">
 								<li><a class="rule_add" data-bind='text: fn, click: $parent.clickRulesAdd' href='#'></a></li>
 							</ul>
 						</div>
@@ -399,13 +527,13 @@
 							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
 								Add a transformation <span class="caret"></span>
 							</a>
-							<ul class="dropdown-menu" data-bind="foreach: $parent.transformations">
+							<ul class="dropdown-menu" data-bind="foreach: transformation_template">
 								<li><a data-bind='text: fn, click: $parent.clickTransformationsAdd' href='#'></a></li>
 							</ul>
 						</div>
 						<dl data-bind="foreach: transformations">
 							<div>
-							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span></dt>
+							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
 							<dd data-bind="text: hint"></dd>
 							</div>
 						</dl>
@@ -413,8 +541,8 @@
 						<label>Import from another Content Type</label>
 						<select name="content_type" multiple="multiple">
 							<option value="">None</option>
-							<!-- ko foreach: $parent.contentTypes -->
-								<option data-bind="value: _id, text: name" value=""></option>
+							<!-- ko foreach: $root.contentTypes -->
+								<option data-bind="value: urlid, text: name" value=""></option>
 							<!-- /ko -->
 						</select>
 						
@@ -438,10 +566,17 @@
 						<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
 						<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
 						<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
+						<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hidden"> Do Not Render</label>
 					</div>
 				</fieldset>
 				</div>
 			</div>
+				
+			<div class="span3">
+				<button class="btn btn-primary" data-bind="click: clickAddField"><i class="icon-plus icon-white"></i></button>
+			</div>
+				<!-- /ko -->
+			<!-- /ko -->
 			<!-- <div id="fields"></div> -->
 		</div>
 	</div>

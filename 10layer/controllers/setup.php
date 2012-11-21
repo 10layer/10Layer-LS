@@ -48,7 +48,6 @@
 		
 		public function content_types($content_type_urlid=false) {
 			$this->load->model("model_content");
-			$data["content_type_id"]=0;
 			$content_types=$this->model_content->get_content_types();
 			if (empty($content_types)) {
 				$templates=glob(TLPATH."resources/content_types/*.json");
@@ -63,11 +62,12 @@
 					}
 				}
 			}
+			$data["content_type_urlid"]=$content_types[0]->_id;
 			if (!empty($content_type_urlid)) {
 				$x=0;
 				foreach($content_types as $content_type) {
 					if ($content_type->_id == $content_type_urlid) {
-						$data["content_type_id"]=$x;
+						$data["content_type_urlid"]=$content_type_urlid;
 					}
 					$x++;
 				}
@@ -79,7 +79,37 @@
 		
 		public function users() {
 			$this->load->model("model_user");
-			$this->load->view("setup/users");
+			$data=array();
+			$email=$this->input->post("email");
+			$password=$this->input->post("password");
+			$name = $this->input->post("name");
+			$fin = $this->input->post("fin");
+			$permissions = $this->input->post("permissions");
+			if (!empty($email)) {
+				$password_rules=array(
+					"required",
+					"minlen"=>5,
+					"password_strength"=>2
+				);
+				$email_rules=array(
+					"required",
+					"valid_email",
+					"database_nodupe"=>"email in users",
+				);
+				$this->validation->validate("email", "Email", $email, $email_rules);
+				$this->validation->validate("password", "Password", $password, $password_rules);
+				$this->validation->validate("name", "Name", $name, array("required"));
+				if (!$this->validation->passed) {
+					$data["errors"]=$this->validation->failed_messages;
+				} else {
+					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>$name, "date_created"=>date("c"), "status_id"=>"1", "otp"=>"", "status"=>"Active", "permissions"=>$permissions, "roles"=>array()));
+					
+					if (!empty($fin)) {
+						redirect("/setup/content_types");
+					}
+				}
+			}
+			$this->load->view("setup/users", $data);
 		}
 		
 		protected function json_check($filename="") {
