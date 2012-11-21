@@ -39,7 +39,8 @@
 				$ruleset=explode("|",$ruleset);
 			}
 			$tmparr=array();
-			foreach($ruleset as $key=>$rulevalue) {
+			foreach($ruleset as $key=>$val) {
+				$rulevalue = $val["fn"];
 				if (strpos($rulevalue,"=")!==false) {
 					$tmp=explode("=",$rulevalue);
 					$tmparr[$tmp[0]]=$tmp[1];
@@ -231,8 +232,8 @@
 		 */
 		public function database_nodupe($value,$var) {
 			$dbdata=explode(" in ",strtolower($var));
-			$result=$this->ci->db->get_where($dbdata[1],array($dbdata[0]=>$value));
-			return ($result->num_rows()==0);
+			$result=$this->ci->mongo_db->get_where($dbdata[1],array($dbdata[0]=>$value));
+			return (empty($result));
 		}
 		
 		/**

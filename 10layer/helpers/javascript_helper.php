@@ -12,7 +12,7 @@
 			function init_tinymce() {
 				//TinyMCE
 				var spell_timer=false;
-				$('.richedit').tinymce({
+				$('.wysiwyg').tinymce({
 					script_url: '/tlresources/file/tinymce/tiny_mce.js',
 					strict_loading_mode: true,
 					
@@ -98,8 +98,8 @@
 					} }
 					
 				};
-				$('.richedit').ckeditor(config);
-				editors[editors.length] = $('.richedit').ckeditorGet();	
+				$('.wysiwyg').ckeditor(config);
+				editors[editors.length] = $('.wysiwyg').ckeditorGet();	
 			}
 			
 			function parsePaste(data) {

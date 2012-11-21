@@ -699,7 +699,7 @@ function init_form() {
 		$(this).removeClass("countchars");
 	});
 	
-	if ($(".richedit").length) {
+	if ($(".wysiwyg").length) {
 		//init_tinymce();
 		//clearCKEditor();
 		initCKEditor();

@@ -18,36 +18,41 @@
 		</ul>
 	</div>
 	<div class="span5">
-		<p>Please set up an administrator account. We suggest you use a strong password for this account - it will have access to the entire CMS.</p>
-			
-				<fieldset>
-					<legend>Administrator</legend>
-					<?php
-						if (isset($errors)) {
-					?>
-					<ul>
-					<?php
-							foreach($errors as $error) {
-					?>
-					<li class="text-error"><?= $error ?></li>
-					<?php	
-							}
-					?>
-					</ul>
-					<?php
-						}
-					?>
-					<label>Email address</label>
-					<input type="text" name="email" placeholder="admin@10layer.com">
-					<label>Password</label>
-					<input type="password" name="password" placeholder="Password">
-					<span class="help-block">Random password: <?= $this->tlsecurity->random_pass(8, 10) ?></span>
-					<button type="submit" class="btn">Submit</button>
-				</fieldset>
-			
+		<p>Let's set up some users.</p>
+			<fieldset>
+				<input id="fin" type="hidden" name="fin" value="0" />
+			    <legend>Users</legend>
+			    <?php
+			    	if (isset($errors)) {
+			    ?>
+			    <ul>
+			    <?php
+			    		foreach($errors as $error) {
+			    ?>
+			    <li class="text-error"><?= $error ?></li>
+			    <?php	
+			    		}
+			    ?>
+			    </ul>
+			    <?php
+			    	}
+			    ?>
+			    <label>Name</label>
+			    <input type="text" name="name" placeholder="Joe Soap">
+			    <label>Email address</label>
+			    <input type="text" name="email" placeholder="admin@10layer.com">
+			    <label>Password</label>
+			    <input type="password" name="password" placeholder="Password">
+			    <span class="help-block">Random password: <?= $this->tlsecurity->random_pass(8, 10) ?></span>
+			    <label>Permissions</label>
+			    <label class="checkbox"><input type="checkbox" name="permissions[]" value="Administrator"> Administrator</label>
+			    <label class="checkbox"><input type="checkbox" name="permissions[]" value="User"> User</label>
+			    <label class="checkbox"><input type="checkbox" name="permissions[]" value="Viewer"> Viewer</label>
+			    <button type="submit" class="btn">Add</button>
+			</fieldset>
 	</div>
 	<div class="span3">
-		<a class="white" href="setup/content_types"><button type="submit" class="btn btn-large btn-primary" type="button"><i class="icon-thumbs-up icon-white"></i> Done here</button></a>
+		<a class="btn btn-large btn-primary" href="/setup/content_types"><i class="icon-thumbs-up icon-white"></i> Done here</a>
 	</div>
 </div>
 </form>
