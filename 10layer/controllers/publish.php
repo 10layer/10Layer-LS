@@ -32,6 +32,7 @@
 
 		public function load_publisher($collection_type){
 			$data["options"] = $this->make_nested_list($this->make_nest($collection_type));
+			$data['collection_type'] = $collection_type;
 			$this->load->view('templates/header',$data);
 			$this->load->view("publish/interface");
 			$this->load->view("templates/footer");
@@ -50,12 +51,40 @@
 		}
 
 		function get_zone($zone_id){
+
 			$item = $this->mongo_db->get_light($zone_id);
 			$content_types = explode(',', $item['content_types']);
-			$list = $this->mongo_db->where_in('content_type', $content_types)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');
+			$content = $item['content'];
+			$temp = array();
+
+			foreach ($item['content'] as $an_item) {
+				array_push($temp, $this->mongo_db->get_light($an_item));
+			}
+			$item['content'] = $temp;
+
+			$list = '';
+
+			if ($this->input->get('criteria')) {
+				$start_date = $this->input->get('start_date');
+				$end_date = $this->input->get('end_date');
+				$search_str = $this->input->get('searchstr');
+				$list = $this->mongo_db->like('title', $search_str)->where_in('content_type', $content_types)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');
+			}else{
+
+				$list = $this->mongo_db->where_in('content_type', $content_types)->where_not_in('_id', $content)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');	
+			}
+			
 			$item['available_items'] = $list;
 			echo json_encode($item);
 
+		}
+
+		function save_zone_content($zone_id){
+			$item = $this->mongo_db->get_light($zone_id);
+			unset($item['_id']);
+			$item['content'] = $this->input->get('published');
+			$where = array('_id' => $zone_id);
+			$this->mongo_db->where($where)->update('content', $item);
 		}
 
 
