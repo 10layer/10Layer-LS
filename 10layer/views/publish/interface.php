@@ -328,14 +328,6 @@ $(function() {
 				</div>
 			</div>
       		
-	      	<div id="date_slider_container">
-				<div id="date_slider_value"></div>
-				<div id="date_slider"></div>
-			</div>
-			<input type="text" id="publishSearch" value="Search..." title="Hit Enter key to search">
-
-			<span class='btn btn-mini' style="margin-top:10px;"  id="reset_search"><i class="icon-refresh"></i></span>
-
 			<div id='config_container'>
 
 				<ul class="nav nav-pills">
@@ -350,6 +342,15 @@ $(function() {
 
 	            </ul>
 			</div>
+      		
+	      	<div id="date_slider_container">
+				<div id="date_slider_value"></div>
+				<div id="date_slider"></div>
+			</div>
+			<input type="text" id="publishSearch" value="Search..." title="Hit Enter key to search">
+
+			<span class='btn btn-mini' style="margin-top:10px;"  id="reset_search"><i class="icon-refresh"></i></span>
+
 			<br clear='both'>
 
 		</div>

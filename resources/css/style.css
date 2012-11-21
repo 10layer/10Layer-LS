@@ -77,8 +77,7 @@ a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20
 
 #config_container{
 	float:left;
-	margin-left: 20px;
-	margin-top:5px;
+	margin-right: 20px;
 	height:20px;
 }
 
