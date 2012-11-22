@@ -1,11 +1,15 @@
 <?php
-	$headerdata["menu1"]="login";
-	$headerdata["menu2"]="login";
-	$headerdata["menu2_active"]="login";
+	$headerdata["menu1"]="main";
+	$headerdata["menu2"]="manage";
+	$headerdata["menu2_active"]="manage";
+	if ($wizard) {
+		$headerdata["menu1"]="login";
+		$headerdata["menu2"]="login";
+	}
 	$this->load->view("/templates/header",$headerdata);
 ?>
 <div class="page-header">
-	<h1>Setup</h1>
+	<h1>Setup Administrator</h1>
 </div>
 <form method="post">
 <div class="row">
