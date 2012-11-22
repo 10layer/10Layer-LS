@@ -33,10 +33,23 @@
 			$this->tlsecurity->ignore_security();
 			$this->secure=$this->_check_secure();
 			$json = json_decode(file_get_contents("php://input"));
-			if (empty($json)) {
-				$json = Array();
+			if (!empty($json)) {
+				$this->vars = $json;
+			} else {
+				$this->vars=array_merge($_GET, $_POST);
 			}
-			$this->vars=array_merge($_GET, $_POST, $json);
+		}
+		
+		protected function enforce_secure() {
+			$this->secure=$this->_check_secure();
+			if (!$this->secure) {
+				//You shouldn't be here. Bail.
+				$this->data["error"]=true;
+				$this->data["msg"]="Denied";
+				$this->returndata();
+				print $this->output->get_output();
+				die();
+			}
 		}
 				
 		/**

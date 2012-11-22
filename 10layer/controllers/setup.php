@@ -43,6 +43,7 @@
 					redirect("/setup/users");
 				}
 			}
+			$data["wizard"]=true;
 			$this->load->view("setup/admin", $data);
 		}
 		
