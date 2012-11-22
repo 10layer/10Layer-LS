@@ -198,7 +198,33 @@
 			return $menu;
 		}
 
+
+		function fix_dates(){
+			$count = $this->mongo_db->count('content');
+			$batches = round($count/1000);
+			echo $batches;
+
+			for ($i=0; $i < $batches ; $i++) { 
+				$offset = $i*1000;
+				$batch = $this->mongo_db->limit(1000,$offset)->get('content');
+				foreach($batch as $item){
+					//echo date('Y-m-d', $item->start_date).'<br />';
+
+					$update['start_date'] = strtotime($item->start_date);
+					$update['end_date'] = strtotime($item->end_date);
+					$update['last_modified'] = strtotime($item->last_modified);
+					$update['timestamp'] = strtotime($item->timestamp);
+
+					$where = array('_id' => $item->_id);
+					$this->mongo_db->where($where)->update('content', $update);
+				}
+			}
+			echo 'done';
+		}
+
+		
 	}
+
 
 /* End of file .php */
 /* Location: ./system/application/controllers/ */
