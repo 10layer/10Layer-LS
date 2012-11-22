@@ -108,8 +108,7 @@
 			if (!empty($data["password"])) {
 				$data["password"]=crypt($data["password"], substr($data["email"],0,4));
 			}
-			$this->mongo_db->where("id",$id);
-			$this->mongo_db->update("users",$data);
+			$this->mongo_db->where(array("_id"=>$id))->update("users",$data);
 			return true;
 		}
 		
