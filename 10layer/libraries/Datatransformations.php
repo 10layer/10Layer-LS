@@ -22,11 +22,11 @@ class Datatransformations {
 	 * @param bool $usedate. (default: true)
 	 * @return string
 	 */
-	public function urlid(&$sender, $value, $usedate=true) {
+	public function urlid(&$sender, $value, $usedate=true, $collection = "content") {
 		$ci=&get_instance();
 		$ci->load->helper("smarturl");
 		$urlid=smarturl($value, false, !$usedate);
-		$urlid=$this->safe_urlid($urlid);
+		$urlid=$this->safe_urlid($urlid, $collection);
 		return $urlid;
 	}
 	
@@ -119,9 +119,9 @@ class Datatransformations {
 	 * @param string $field
 	 * @return string
 	 */
-	public function safe_urlid($urlid) {
+	public function safe_urlid($urlid, $collection = "content") {
 		$ci=&get_instance();
-		$query=$ci->mongo_db->get_where("content", array("_id"=>$urlid), 1);
+		$query=$ci->mongo_db->get_where($collection, array("_id"=>$urlid), 1);
 		$addnum=0;
 		while (sizeof($query) > 0) {
 			$newnum="";
@@ -136,7 +136,7 @@ class Datatransformations {
 				$urlid=$urlid.$addnum;
 			}
 			
-			$query=$ci->mongo_db->get_where("content", array("_id"=>$urlid), 1);
+			$query=$ci->mongo_db->get_where($collection, array("_id"=>$urlid), 1);
 		}
 		return $urlid;
 	}
