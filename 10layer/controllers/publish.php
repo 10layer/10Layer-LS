@@ -54,21 +54,37 @@
 
 			$item = $this->mongo_db->get_light($zone_id);
 			$content_types = explode(',', $item['content_types']);
-			$content = $item['content'];
+			$content = array();
 			$temp = array();
-
-			foreach ($item['content'] as $an_item) {
-				array_push($temp, $this->mongo_db->get_light($an_item));
+			if(isset($item['content'])){
+				$content = $item['content'];
+				foreach ($item['content'] as $an_item) {
+					array_push($temp, $this->mongo_db->get_light($an_item));
+				}
 			}
+			
 			$item['content'] = $temp;
 
 			$list = '';
 
 			if ($this->input->get('criteria')) {
-				$start_date = $this->input->get('start_date');
-				$end_date = $this->input->get('end_date');
-				$search_str = $this->input->get('searchstr');
-				$list = $this->mongo_db->like('title', $search_str)->where_in('content_type', $content_types)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');
+				
+				if($this->input->get('start_date')){
+					$start_date = strtotime($this->input->get('start_date'));
+					$this->mongo_db->where_gte('start_date', $start_date);
+				}
+
+				if($this->input->get('end_date')){
+					$end_date = strtotime($this->input->get('end_date'));
+					$this->mongo_db->where_lte('start_date', $end_date);
+				}
+				
+				if($this->input->get('searchstr')){
+					$search_str = $this->input->get('searchstr');
+					$this->mongo_db->like('title', $search_str);
+				}
+
+				$list = $this->mongo_db->where_in('content_type', $content_types)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');
 			}else{
 
 				$list = $this->mongo_db->where_in('content_type', $content_types)->where_not_in('_id', $content)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');	
@@ -83,6 +99,53 @@
 			$item = $this->mongo_db->get_light($zone_id);
 			unset($item['_id']);
 			$item['content'] = $this->input->get('published');
+			$where = array('_id' => $zone_id);
+			$this->mongo_db->where($where)->update('content', $item);
+		}
+
+		function auto_switch(){
+			$item['auto'] = $this->input->get('switch');
+			$zone_id = $this->input->get('zone_id');
+
+			if($this->input->get('switch') == 1){
+				$this->automate($zone_id);
+			}
+			$where = array('_id' => $zone_id);
+			$this->mongo_db->where($where)->update('content', $item);
+
+			
+
+			$item = $this->mongo_db->get_light($zone_id);
+
+			$content = array();
+			$temp = array();
+			if(isset($item['content'])){
+				$content = $item['content'];
+				foreach ($item['content'] as $an_item) {
+					array_push($temp, $this->mongo_db->get_light($an_item));
+				}
+			}
+
+			$item['content'] = $temp;
+			$content_types = explode(',', $item['content_types']);
+			$item['available_items'] = $this->mongo_db->where_in('content_type', $content_types)->where_not_in('_id', $content)->order_by(array('start_date'=>'desc'))->limit(100)->get('content');
+
+
+
+			$results = array('info' => 'results','message' => 'Auto switch succesful', 'item' => $item);	
+			echo json_encode($results);
+		}
+
+		function automate($zone_id){
+			$item = $this->mongo_db->get_light($zone_id);
+			$content_types = explode(',', $item['content_types']);
+			$list = $this->mongo_db->where(array('section' => $item['section']))->where_in('content_type', $content_types)->order_by(array('start_date'=>'desc'))->limit($item['auto_limit'])->get('content');
+			$content = array();
+			foreach($list as $i){
+				array_push($content, $i->_id);
+			}
+			$item['content'] = $content;
+			unset($item['_id']);
 			$where = array('_id' => $zone_id);
 			$this->mongo_db->where($where)->update('content', $item);
 		}
@@ -116,14 +179,14 @@
 
 			foreach($options as $option) {
 				
-				$menu .= "<li class='collection_selector' id='".$option->_id."' ><a>".$option->title."</a>";
+				$menu .= "<li class='collection_selector clickable' id='".$option->_id."' ><a>".$option->title."</a>";
 					
 					if (isset($option->submenu)) {
 					
 					$menu .= "<ul>";
 					
 					foreach($option->submenu as $sub) {
-						$attrs = array('class'=>'collection_selector', 'id'=>$sub->_id);	
+						$attrs = array('class'=>'collection_selector clickable', 'id'=>$sub->_id);	
 						$menu .= "<li class='collection_selector' id='".$sub->_id."'><a>".$sub->title."</a></li>";
 					
 					}
@@ -135,7 +198,33 @@
 			return $menu;
 		}
 
+
+		function fix_dates(){
+			$count = $this->mongo_db->count('content');
+			$batches = round($count/1000);
+			echo $batches;
+
+			for ($i=0; $i < $batches ; $i++) { 
+				$offset = $i*1000;
+				$batch = $this->mongo_db->limit(1000,$offset)->get('content');
+				foreach($batch as $item){
+					//echo date('Y-m-d', $item->start_date).'<br />';
+
+					$update['start_date'] = strtotime($item->start_date);
+					$update['end_date'] = strtotime($item->end_date);
+					$update['last_modified'] = strtotime($item->last_modified);
+					$update['timestamp'] = strtotime($item->timestamp);
+
+					$where = array('_id' => $item->_id);
+					$this->mongo_db->where($where)->update('content', $update);
+				}
+			}
+			echo 'done';
+		}
+
+		
 	}
+
 
 /* End of file .php */
 /* Location: ./system/application/controllers/ */

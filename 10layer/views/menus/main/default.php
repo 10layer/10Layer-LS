@@ -56,53 +56,27 @@
 	<?php
 	$collections=$this->model_collections->get_all();
 	foreach($collections as $collection) {
-		$options=$this->model_collections->get_options($collection->_id);
+		// $options=$this->model_collections->get_options($collection->_id);
 		
-		//Here we check if we have nested collections
-		$tmp=array();
-		foreach($options as $option) {
-			if (!isset($option->{$collection->_id})) {
-				$tmp[$option->_id]=$option;
-			}
-		}
-		foreach($options as $option) {
-			if (isset($option->{$collection->_id}) && is_string($option->{$collection->_id})) {
-				if (array_key_exists($option->{$collection->_id}, $tmp)) {
-					$tmp[$option->{$collection->_id}]->submenu[]=$option;
-				}
-			}
-		}
-		$options=$tmp;
+		// //Here we check if we have nested collections
+		// $tmp=array();
+		// foreach($options as $option) {
+		// 	if (!isset($option->{$collection->_id})) {
+		// 		$tmp[$option->_id]=$option;
+		// 	}
+		// }
+		// foreach($options as $option) {
+		// 	if (isset($option->{$collection->_id}) && is_string($option->{$collection->_id})) {
+		// 		if (array_key_exists($option->{$collection->_id}, $tmp)) {
+		// 			$tmp[$option->{$collection->_id}]->submenu[]=$option;
+		// 		}
+		// 	}
+		// }
+		// $options=$tmp;
 		//print_r($tmp);
 	?>
 		<li class="dropdown-submenu">
-			<a tabindex="-1" href="#"><?= $collection->name ?></a>
-			<ul class="dropdown-menu">
-				<?php
-				foreach($options as $option) {
-				?>
-				<li class="menuitem">
-					<?= anchor("/publish/".$option->_id, $option->title) ?>
-					<?php
-					if (isset($option->submenu)) {
-					?>
-					<ul class="dropdown-menu">
-					<?php
-					foreach($option->submenu as $sub) {
-					?>
-						<li class="menuitem"><?= anchor("/publish/".$sub->_id, $sub->title) ?></li>
-					<?php
-					}
-					?>
-					</ul>
-					<?php
-					}
-					?>
-				</li>
-				<?php
-				}
-				?>
-			</ul>
+			<?= anchor("/publish/".$collection->_id, $collection->name.'s') ?>
 		</li>
 	<?php
 	//die();
