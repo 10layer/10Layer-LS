@@ -8,18 +8,14 @@ function capitaliseFirstLetter(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
-var date_slider_options=new Array("Forever","2 years ago","1 year ago","6 months ago","2 months ago","1 month ago","2 weeks ago","1 week ago","2 days ago","1 day ago","8 hours ago","1 hour ago","Now");
-var max_slider=12;
-var min_slider=0;
-var def_max_slider=12;
-var def_min_slider=8;
+
 
 $(function() {
 
 	$('#publish').click(function(){
 		publish(zone_id);
 	});
-	$('.menu').menu();
+	//$('.menu').menu();
 
 	$('#publishSearch').focus(function(){
 		$(this).val('');
@@ -46,41 +42,24 @@ $(function() {
 		}
 	});
 
-	$('#open_collection_selector').click(function(){
-		$( "#collection_selector" ).dialog({
-            modal: true,
-            height:500,
-            width:600,
-            buttons: {
-                Cancel: function() {
-                    $( this ).dialog( "close" );
-                }
-            }
-        });
-	});
-	
-	$("#date_slider").slider({
-	    range: true,
-	    min: min_slider,
-	    max: max_slider,
-	    values: [ def_min_slider, def_max_slider ],
-	    stop: function(event, ui) {
-	    	
-	    	if(collection != ''){
-	    		update_panel();
-	    	}else{
-	    		show_pop('info', 'please select '+collection_type);
-	    	}
-	    	
-	    },
-	    slide: function(event, ui) {
-	    	$("#date_slider_value").html(date_slider_options[ui.values[0]]+" to "+date_slider_options[ui.values[1]]);
-	    }
-	});
-	
-	var d1=date_slider_options[$("#date_slider").slider( "values", 0 )];
-	var d2=date_slider_options[$("#date_slider").slider( "values", 1 )];
-	$("#date_slider_value").html(d1+" to "+d2);
+
+	$('#reportrange').daterangepicker(
+    {
+        ranges: {
+            'Today': ['today', 'today'],
+            'Yesterday': ['yesterday', 'yesterday'],
+            'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
+            'Last 30 Days': [Date.today().add({ days: -29 }), 'today'],
+            'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
+            'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })]
+        }
+    }, 
+    function(start, end) {
+        $('#reportrange span').html(start.toString('MMMM d, yyyy') + ' - ' + end.toString('MMMM d, yyyy'));
+        update_panel();
+    });
+
+
 
 
 	$("#reset_search").click(function(){
@@ -99,8 +78,8 @@ $(function() {
 				zone_options += "<li><a tabindex='-1' href='#' class='zone_selector' id='"+zone._id+"'>"+zone.title+"</a></li>";
 				$('#zone_indicator').text('Select a Zone');
 				$('#zone_options').html(zone_options);
-				$( "#collection_selector" ).dialog( "close" );
 				$('.tooltips').tooltip();
+				$('#collection_selector').modal('hide')
 			});
 
 			
@@ -120,7 +99,7 @@ $(function() {
 			}
 			
 			$('#publish_pane').html(_.template($("#unpublishable_items_template").html(), { data:data.content }));
-			$('#publish_pane').sortable();
+	
 			
   		});
 
@@ -192,22 +171,20 @@ $(function() {
 
 
 	function show_pop(title, message){
-		$( "#pop" ).attr('title', title).html(message).dialog({
-            modal: true,
-            buttons: {
-                Ok: function() {
-                    $( this ).dialog( "close" );
-                }
-            }
-        });
+		$("#pop_message").html(message);
+		$("#pop_label").html(title);
+		$('#pop').modal('show');
 	}
 
 	function reset_panel(){
 		collection = '';
 		$('#search_results').html('');
 		$('#publish_pane').html('');
-		var d1=date_slider_options[$("#date_slider").slider( "values", 0 )];
-		var d2=date_slider_options[$("#date_slider").slider( "values", 1 )];
+		//var d1=date_slider_options[$("#date_slider").slider( "values", 0 )];
+		//var d2=date_slider_options[$("#date_slider").slider( "values", 1 )];
+		var today = new Date();
+		var start = Date.today().add({ days: -6 });
+		$('#reportrange span').html(start.toString('MMMM d, yyyy') + ' - ' + today.toString('MMMM d, yyyy'));
 		$("#date_slider_value").html(d1+" to "+d2);
 		$('#publishSearch').val('Search...');
 		$('#collection_header').html("Select a <?php echo ucfirst($collection_type); ?>");
@@ -218,11 +195,19 @@ $(function() {
 	}
 
 	function update_panel(){
-		var start_date = date_slider_options[$("#date_slider").slider( "values", 0)];
-		var end_date = date_slider_options[$("#date_slider").slider( "values", 1 )];
+		//var start_date = date_slider_options[$("#date_slider").slider( "values", 0)];
+		//var end_date = date_slider_options[$("#date_slider").slider( "values", 1 )];
+
+		var date_range = $("#range_value").text();
+		var pieces = date_range.split("-");
+
+		var start_date = pieces[0].trim();
+		var end_date = pieces[1].trim();
+
+
 		var searchstr = ($("#publishSearch").val() == "Search...") ? "" : $("#publishSearch").val() ;
 		var selecteds = get_selected();
-		var url = $("#active_zone").val()+"/"+d1+"/"+d2+"/"+searchstr;
+		//var url = //$("#active_zone").val()+"/"+d1+"/"+d2+"/"+searchstr;
 		var params = {'criteria':1, 'start_date':start_date, 'end_date':end_date,'searchstr':searchstr, 'selecteds[]': selecteds};
 
 		$.getJSON('/publish/get_zone/'+zone_id,params, function(data) {
@@ -322,9 +307,18 @@ $(function() {
 
       	<div id='search_criterion'>
       		<div id='collection_selector_container'>
-				<span id='open_collection_selector' class="btn"><i class="icon-list"></i> Select <?php echo ucfirst($collection_type); ?> here</span>
-				<div id='collection_selector'>
-						<div><?php echo $options; ?></div>
+				<a href='#collection_selector' id='open_collection_selector' class="btn" data-toggle="modal"><i class="icon-list"></i> Select <?php echo ucfirst($collection_type); ?> here</a>
+				<div  id='collection_selector' class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				    <h4 id="myModalLabel">Select Collection to publish to</h4>
+				  </div>
+				  <div class="modal-body">
+				    <div><?php echo $options; ?></div>
+				  </div>
+				  <div class="modal-footer">
+				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				  </div>
 				</div>
 			</div>
       		
@@ -344,9 +338,15 @@ $(function() {
 			</div>
       		
 	      	<div id="date_slider_container">
-				<div id="date_slider_value"></div>
-				<div id="date_slider"></div>
+				<div id="reportrange" class="pull-right">
+				    <i class="icon-calendar icon-large"></i>
+				    <span id='range_value'><?php echo date("F j, Y", strtotime('-30 day')); ?> - <?php echo date("F j, Y"); ?></span> <b class="caret"></b>
+				</div>
 			</div>
+
+
+
+
 			<input type="text" id="publishSearch" value="Search..." title="Hit Enter key to search">
 
 			<span class='btn btn-mini' style="margin-top:10px;"  id="reset_search"><i class="icon-refresh"></i></span>
@@ -374,7 +374,17 @@ $(function() {
 
 </div>
 
-<div id='pop'>
+<div id='pop' class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    <h4 id="pop_label"></h4>
+	</div>
+	<div id='pop_message' class="modal-body">
+	    
+	</div>
+	<div class="modal-footer">
+	    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	</div>
 
 </div>
 
