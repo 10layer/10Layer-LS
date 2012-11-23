@@ -93,6 +93,14 @@
 			}
 		}
 		
+		protected function show_error($msg) {
+			$this->data["error"]=true;
+			$this->data["message"]=$msg;
+			$this->returndata();
+			print $this->output->get_output();
+			die();
+		}
+		
 		protected function json_check($filename="") {
 			switch (json_last_error()) {
 				case JSON_ERROR_NONE:
