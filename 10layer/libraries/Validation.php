@@ -36,11 +36,16 @@
 		 */
 		public function validate($fieldname, $name, $value, $ruleset=array()) {
 			if (!is_array($ruleset)) {
-				$ruleset=explode("|",$ruleset);
+				show_error("Ruleset must be array");
 			}
 			$tmparr=array();
 			foreach($ruleset as $key=>$val) {
-				$rulevalue = $val["fn"];
+				if (is_array($val)) {
+					$rulevalue = $val["fn"]; //New style
+					print $val["fn"];
+				} else {
+					$rulevalue = $val; //Old style
+				}
 				if (strpos($rulevalue,"=")!==false) {
 					$tmp=explode("=",$rulevalue);
 					$tmparr[$tmp[0]]=$tmp[1];
