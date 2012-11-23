@@ -175,26 +175,28 @@
 
 		function make_nested_list($options){
 
-			$menu  = "<ul class='menu'>";
+			$menu  = "<div class='dropdown clearfix'>
+                <ul class='dropdown-menu' role='menu' aria-labelledby='dropdownMenu' style='display: block; position: static; margin-bottom: 5px; *width: 180px;'>";
+
+
 
 			foreach($options as $option) {
-				
-				$menu .= "<li class='collection_selector clickable' id='".$option->_id."' ><a>".$option->title."</a>";
-					
-					if (isset($option->submenu)) {
-					
-					$menu .= "<ul>";
-					
-					foreach($option->submenu as $sub) {
-						$attrs = array('class'=>'collection_selector clickable', 'id'=>$sub->_id);	
-						$menu .= "<li class='collection_selector' id='".$sub->_id."'><a>".$sub->title."</a></li>";
-					
-					}
-					$menu .= "</ul>";
-					}
-				$menu .= "</li>";
+
+				if (isset($option->submenu)) {
+					$menu .= "<li class='dropdown-submenu'>
+                    			<a tabindex='-1' href='#'>".$option->title."</a>
+                    			<ul class='dropdown-menu'>";
+                    			foreach($option->submenu as $sub) {
+                    				$menu .= "<li ><a id='".$sub->_id."' class='collection_selector clickable' tabindex='-1' href='#'>".$sub->title."</a></li>";
+                    			}
+                    			$menu .='</ul>';
+				}else{
+					$menu .= "<li><a tabindex='-1' id='".$option->_id."' class='collection_selector clickable'>".$option->title."</a></li>";
+				}
 			}
-			$menu .= "</ul>";
+
+			$menu .= '</ul></div>';
+
 			return $menu;
 		}
 
@@ -222,7 +224,7 @@
 			echo 'done';
 		}
 
-		
+
 	}
 
 
