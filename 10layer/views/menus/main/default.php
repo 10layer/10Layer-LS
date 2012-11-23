@@ -87,10 +87,10 @@
 <li class="menuitem dropdown">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
 	<ul class="dropdown-menu">
-		<li class="menuitem"><a href="<?= base_url() ?>manage/healthchecks">Health Check</a></li>
-		<li class="menuitem"><a href="<?= base_url() ?>manage/users">Users</a></li>
-		<li class="menuitem"><a href="<?= base_url() ?>manage/content_types">Content Types</a></li>
-		
+		<li class="menuitem"><a href="<?= base_url() ?>setup/healthchecks">Health Check</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>setup/users">Users</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>setup/content_types">Content Types</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>setup/security">Security</a></li>
 	</ul>
 </li>
 <li class="menuitem"><?= anchor("user/logout","Logout") ?></li>
