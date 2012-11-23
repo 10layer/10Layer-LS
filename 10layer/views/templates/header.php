@@ -32,56 +32,9 @@
 			if (empty($menu1_active)) {
 				$menu1_active="";
 			}
-			if (empty($menu2_active)) {
-				$menu2_active="";
-			}
+			
 		?>
 		$(function() {
-			$("#menu2 div").each(function() {
-				if ($(this).find("a").first().attr("href")=="<?= base_url().$menu2_active ?>") {
-					$(this).addClass("active");
-				} else {
-					$(this).removeClass("active");
-				}
-			});
-			if ($("#menu2_container").width() > 768) {
-				
-				$("#menu2_scrollr").show();
-				
-				var showMenu=false;
-				$("#menu2_scrollr").click(function() {
-					if (showMenu) {
-						$("#menu2").animate({height:40}, 300, 
-							function() {
-								showMenu=false;
-								$("#menu2_scrollr").button({
-								icons: { primary:"ui-icon-triangle-1-s" },
-							});
-						});
-						
-					} else {
-						$("#menu2").animate({height:80}, 300, 
-						function() { 
-							showMenu=true;
-							$("#menu2_scrollr").button({
-								icons: { primary:"ui-icon-triangle-1-n" },
-							});
-							
-						});
-					}
-				});
-			} else {
-				
-			}
-			
-			$("#menu2_container div a").each(function() { //Fix ridiculous Chrome bug
-				if (!$(this).parent().hasClass("active")) {
-					$(this).css("text-decoration", "none");
-				}
-				
-			});
-			
-			
 			$("#menu1 div").each(function() {
 				if ($(this).find("a").first().attr("href")=="<?= base_url().$menu1_active ?>") {
 					$(this).addClass("active");

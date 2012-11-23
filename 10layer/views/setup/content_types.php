@@ -1,8 +1,5 @@
 <?php
-	$headerdata["menu1"]="login";
-	$headerdata["menu2"]="login";
-	$headerdata["menu2_active"]="login";
-	$this->load->view("/templates/header",$headerdata);
+	$this->load->view("/templates/header",array("menu1"=>"default"));
 ?>
 <script src="/resources/knockout/knockout-2.2.0.js"></script>
 <script>
@@ -440,7 +437,7 @@
 </script>
 
 <div class="page-header">
-	<h1>Setup</h1>
+	<h1>Setup Content Types</h1>
 </div>
 <form method="post">
 <div class="row">
