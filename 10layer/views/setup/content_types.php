@@ -213,10 +213,8 @@
 				success: function(result) { 
 					if (result.error) {
 						$("#save_fail").show();
-						console.log("Fail");
 					} else {
 						$("#save_success").show();
-						console.log("Success");
 					}
 				}
 			});
