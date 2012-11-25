@@ -36,7 +36,7 @@
 				$this->returndata();
 				return false;
 			}
-			$this->data["content"] = $this->mongo_db->order_by(array("_id"))->get("users");
+			$this->data["content"] = $this->mongo_db->order_by(array("name"))->get("users");
 			$this->returndata();
 		}
 		
