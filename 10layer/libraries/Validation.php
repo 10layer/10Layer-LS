@@ -42,7 +42,6 @@
 			foreach($ruleset as $key=>$val) {
 				if (is_array($val)) {
 					$rulevalue = $val["fn"]; //New style
-					print $val["fn"];
 				} else {
 					$rulevalue = $val; //Old style
 				}
