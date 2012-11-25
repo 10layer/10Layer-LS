@@ -9,7 +9,7 @@
 		self.fn = ko.observable(data.fn);
 		self.hint = ko.observable(data.hint);
 		self.vars = ko.observable(data.vars);
-		self.params = ko.observable(data.var);
+		self.params = ko.observable(data.params);
 		self.var_check = ko.observable(data.var_check);
 	}
 
