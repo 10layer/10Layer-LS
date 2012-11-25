@@ -13,7 +13,6 @@
 		self.email = ko.observable(data.email);
 		self.password = ko.observable("");
 		self.permission = ko.observable(data.permission);
-		console.log(self.permission());
 		self.isActive = ko.observable(false);
 		self.title = ko.computed(function() {
 			return (self.name().length > 0) ? self.name() : "New User";
@@ -28,32 +27,39 @@
 			mapped = _.map(data.content, function(item) { return new User(item) });
 			self.users(mapped);
 			self.users()[0].isActive(true);
-			console.log(ko.toJSON(self.users));
 		});
 		
 		self.save = function() {
 			$.ajax("/api/users/save?api_key=<?= $this->config->item("api_key") ?>", {
 				data: ko.toJSON({ users: self.users }),
 				type: "post", contentType: "application/json",
-				success: function(result) { console.log("Saved") }
+				success: function(result) { 
+					if (result.error) {
+						$("#save_fail").show();
+					} else {
+						$("#save_success").show();
+					}
+				}
 			});
 		}
 		
 		self.add = function() {
-			console.log("Pushing");
 			var tmparr = self.users.removeAll();
 			_.each(tmparr, function(item) {
 				item.isActive = false;
 			});
 			self.users(tmparr);
 			self.users.push(new User( { id: "new", name: "", email: "", password: "", permissions: [], isActive: true } ));
-			console.log(ko.toJSON(self.users));
 		};
 	}
 	
 	$(function() {
-		//ko.applyBindings(new User({ name: "", email: "", password: "", permissions: [] }));
 		ko.applyBindings(new Users());
+		
+		$(".alert").on('click', '.close', function(e) {
+			e.preventDefault();
+			$(this).parent().hide();
+		});
 	});
 </script>
 
@@ -83,7 +89,6 @@
   			<div class="tab-content" >
 				<!-- ko foreach: users -->
 				<div data-bind="attr: { id: id }, css: { active: isActive }" class="tab-pane">
-					
 					<label>Name</label>
 					<input type="text" name="name" placeholder="Joe Soap" data-bind="value: name">
 					<label>Email address</label>
@@ -102,6 +107,9 @@
 	</div>
 	<div class="span3">
 		<a class="btn btn-large btn-primary" href="#" data-bind="click: save"><i class="icon-thumbs-up icon-white"></i> Save users</a>
+		<p />
+				<div id="save_success" class="alert alert-success fade in" style="display: none"><a class="close" href="#">&times;</a> Users updated</div>
+				<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> Failed to update Users</div>
 	</div>
 </div>
 </form>
