@@ -182,7 +182,73 @@
 			$("#createdialog").data("fieldname",fieldname);
 			return false;
 		});
-
+		
+		$(document).on('change', 'input[type=file]', function() {
+			console.log("Change");
+			content_type=$(document.body).data('content_type');
+			var files=this.files; //FileList object
+			var file=files[0]; //Only handle single upload at a time
+			var el=$(this);
+			var container=el.parent();
+			var fd = new FormData();
+			fd.append("data", file);
+			fd.append("filename", $(this).val());
+			$.ajax({
+				url: "<?= base_url() ?>api/content/upload?api_key=<?= $this->config->item('api_key') ?>&filename="+file.name,  //server script to process data
+				type: 'POST',
+				xhr: function() {  // custom xhr
+					myXhr = $.ajaxSettings.xhr();
+					if(myXhr.upload){ // check if upload property exists
+						myXhr.upload.addEventListener('progress', function(data) {
+							var percentage = Math.round((data.position / data.total) * 100);
+							container.find('.preview-image .progress .bar').css('width', percentage + '%');
+						}, false); // for handling the progress of the upload
+					}
+					return myXhr;
+				},
+				//Ajax events
+				beforeSend: function(data) {
+					container.find('.preview-image .progress').show();
+					container.find('.preview-image').slideDown();
+					container.find('.preview-image .progress .bar').removeClass('bar-success').removeClass('bar-danger');
+				},
+				success: function(data) {
+					if (data.error) {
+						container.find('.preview-image .progress').hide();
+						container.find('.alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed</h4> '+data.message).show();
+						container.find('.preview-image .progress .bar').removeClass('bar-danger').addClass('bar-success');
+						return false;
+					}
+					container.find('.preview-image .progress').hide();
+					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show();
+					container.find('input').each(function() { $(this).val(data.content.full_name) });
+				},
+				error: function(data) {
+					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').show();
+					container.find('.preview-image .progress .bar').removeClass('bar-success').addClass('bar-danger');
+				},
+				// Form data
+				data: file,
+				//Options to tell JQuery not to process data or worry about content-type
+				cache: false,
+				contentType: false,
+				processData: false
+			});
+			
+			var viewer = new FileReader();
+			viewer.onload = (function(f) {
+				if (file.type.match(/image.*/)) {
+					container.find('.preview-image img').attr('src', f.target.result).show();
+				} else {
+					container.find('.preview-image img').hide();
+				}
+				
+				
+			});
+			
+			viewer.readAsDataURL(file);
+			
+		});
 	});
 </script>
 
