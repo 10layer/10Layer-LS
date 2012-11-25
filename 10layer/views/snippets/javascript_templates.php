@@ -302,9 +302,17 @@
 			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
 			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
 		<% if (urlid) { %>
-			<div class="preview-image">
-				<img src="/workers/picture/display/<%= urlid %>/cropThumbnailImage/500/300?<%= Math.random() * 1000 %>" />
+		<div class="row">
+			<div class="preview-image span3" >
+				<div class="progress progress-striped active" style="display: none">
+					<div class="bar" style="width: 0%;"></div>
+				</div>
+				<div class="alert" style="display: none"></div>
+				<div class="image-crop" style="max-height: 220px; overflow: hidden">
+					<img src="<%= field.value %>" />
+				</div>
 			</div>
+		</div>
 		<% } %>
 		<% if (field.linkformat && urlid) { %>
 			<label>Download link</label>
