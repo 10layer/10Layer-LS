@@ -129,6 +129,24 @@
 				label: "New Type",
 				type: "text"
 			}));
+		};
+		
+		self.moveLeft = function(data) {
+			var pos = self.fields.indexOf(data);
+			if (pos <= 0) {
+				return false;
+			}
+			var tmp = self.fields();
+			self.fields.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
+		}
+		
+		self.moveRight = function(data) {
+			var pos = self.fields.indexOf(data);
+			if (pos >= self.fields().length - 1) {
+				return;
+			}
+			var tmp = self.fields();
+			self.fields.splice(pos, 2, tmp[pos + 1], tmp[pos]);
 		}
 	};
 		
@@ -192,7 +210,15 @@
 			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
 				data: ko.toJSON({ content_types: self.contentTypes() }),
 				type: "post", contentType: "application/json",
-				success: function(result) { console.log("Saved") }
+				success: function(result) { 
+					if (result.error) {
+						$("#save_fail").show();
+						console.log("Fail");
+					} else {
+						$("#save_success").show();
+						console.log("Success");
+					}
+				}
 			});
 		}
 	};
@@ -433,6 +459,11 @@
 			$(this).parent().next().toggle();
 		});
 		
+		$(".alert").on('click', '.close', function(e) {
+			e.preventDefault();
+			$(this).parent().hide();
+		});
+		
 	});
 </script>
 
@@ -457,7 +488,10 @@
 				<p>It's okay to accept the defaults. You'll be able to come back and change the content types later.</p>
 			</div>
 			<div class="span4">
-				<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Onward!</button>
+				<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Update content types</button>
+				<p />
+				<div id="save_success" class="alert alert-success fade in" style="display: none"><a class="close" href="#">&times;</a> Content Types updated</div>
+				<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> Failed to update Content Types</div>
 			</div>
 		</div>
 		<div id="content_type_app">
@@ -486,8 +520,9 @@
 					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
 						<!-- ko if: isRemovable -->
 						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
-						<!-- /ko --> 
+						<!-- /ko -->
 						<span data-bind="text: name"></span> 
+						<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-left'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-right'></i></a></span>
 					</legend>
 					<div class='field-details' style='display: none'>
 						<label>Name</label>
