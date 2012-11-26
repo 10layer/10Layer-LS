@@ -215,16 +215,17 @@
 				success: function(data) {
 					if (data.error) {
 						container.find('.preview-image .progress').hide();
-						container.find('.alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed</h4> '+data.message).show();
+						container.find('.alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed</h4> '+data.message).slideDown(500).delay(2000).slideUp(500);
 						container.find('.preview-image .progress .bar').removeClass('bar-danger').addClass('bar-success');
 						return false;
 					}
 					container.find('.preview-image .progress').hide();
-					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show();
+					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').slideDown(500).delay(2000).slideUp(500);
 					container.find('input').each(function() { $(this).val(data.content.full_name) });
+					container.find('.download').html('<a href="/api/files/download'+data.content.full_name+'"><i class="icon-download"></i> Download '+baseName(data.content.full_name)+'</a>');
 				},
 				error: function(data) {
-					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').show();
+					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').slideDown(500).delay(2000).slideUp(500);
 					container.find('.preview-image .progress .bar').removeClass('bar-success').addClass('bar-danger');
 				},
 				// Form data
