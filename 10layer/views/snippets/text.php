@@ -1,1 +1,0 @@
-<input type="text" name="<?= $field->tablename ?>_<?= $field->name ?>" value="<?= $field->value ?>" class="<?= $field->class ?>" />
