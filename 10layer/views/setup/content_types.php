@@ -28,6 +28,7 @@
 		self.label = ko.observable(data.label);
 		self.type = ko.observable(data.type);
 		self.defaultValue = ko.observable(data.default);
+		self.content_types = ko.observable(data.content_types);
 		self.options = ko.observable(data.options);
 		self.external = ko.observable(data.external);
 		self.filetypes = ko.observable(data.filetypes);
@@ -174,11 +175,19 @@
 		self.rules = ko.observableArray(rule_template);
 		self.transformations = ko.observableArray(transformation_template);
 		
+		
 		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
 			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
 			self.contentTypes(self.mappedContentTypes);
 			self.content_type_urlid("<?= $content_type_urlid ?>");
+			contentTypesList = _.map(data.content, function(item) {
+				return { id: item._id, val: item.name }
+			});
+			console.log(contentTypesList);
+			self.contentTypesList = ko.observableArray(contentTypesList);
 		});
+		
+		contentTypesList=[];
 		
 		//Events
 		self.clickAddContentType = function() {
@@ -569,13 +578,8 @@
 						</dl>
 						
 						<label>Import from another Content Type</label>
-						<select name="content_type" multiple="multiple">
-							<option value="">None</option>
-							<!-- ko foreach: $root.contentTypes -->
-								<option data-bind="value: urlid, text: name" value=""></option>
-							<!-- /ko -->
+						<select name="content_type" data-bind="options: $root.contentTypes, optionsText: 'name', optionsValue: 'id', value: content_types, optionsCaption: 'None'">
 						</select>
-						
 						<div><strong>OR</strong></div>
 						
 						<label>Set pre-defined Options</label>
