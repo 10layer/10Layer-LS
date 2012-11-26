@@ -246,18 +246,12 @@
 
 <script type='text/template' id='edit-field-file'>
 	<!-- edit-field-file -->
-	<div class='control-group'>
-		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
-		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-		</div>
-	</div>
+	<%= _.template($('#edit-field-image').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='create-field-file'>
 	<!-- create-field-file -->
-	<%= _.template($('#edit-field-file').html(), {field: field} ) %>
+	<%= _.template($('#create-field-image').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='proto-field-file'>
@@ -301,7 +295,6 @@
 		<div class='controls'>
 			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
 			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-		<% if (urlid) { %>
 		<div class="row">
 			<div class="preview-image span3" >
 				<div class="progress progress-striped active" style="display: none">
@@ -309,11 +302,30 @@
 				</div>
 				<div class="alert" style="display: none"></div>
 				<div class="image-crop" style="max-height: 220px; overflow: hidden">
+				<% 
+				if (field.value) {
+					if (isImage(field.value)) {
+				%>
 					<img src="<%= field.value %>" />
+					<div class="download"><a href="/api/files/download<%= field.value %>" target="_blank"><i class="icon-download"></i> Download</a></div>
+				<%
+					} else {
+				%>
+					<img src="" />
+					<div class="download"><a href="/api/files/download<%= field.value %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
+					
+				<%
+					}
+				} else {
+				%>
+					<img src="" />
+					<div class="download"></div>
+				<%
+				}
+				%>
 				</div>
 			</div>
 		</div>
-		<% } %>
 		<% if (field.linkformat && urlid) { %>
 			<label>Download link</label>
 			<div class='download_url'><input type='text' class='span8 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', (field.value) ? field.value : '') %>' /></div>
@@ -337,6 +349,7 @@
 				<div class="alert" style="display: none"></div>
 				<div class="image-crop" style="max-height: 220px; overflow: hidden">
 					<img src="<%= field.value %>" />
+					<div class="download"></div>
 				</div>
 			</div>
 		</div>

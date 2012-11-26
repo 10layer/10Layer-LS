@@ -50,7 +50,23 @@
 			$this->returndata();
 		}
 		
-		
+		public function download() {
+			$dir = "/content/";
+			$uria = $this->uri->rsegment_array();
+			$uria = array_slice($uria, 2);
+			$filename = "./".rawurldecode(implode("/", $uria));
+			if (!is_file($filename)) {
+				show_404();
+			}
+			header("Pragma: public"); 
+			header('Content-type: '.mime_content_type($filename));
+			header('Content-Disposition: attachment; filename="'.basename($filename).'"');
+			header('Content-Transfer-Encoding: binary'); 
+			header('Content-Length: '.filesize($filename));
+			ob_clean(); 
+			flush(); 
+			readfile($filename);
+		}
 	}
 
 /* End of file files.php */

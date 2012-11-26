@@ -22,3 +22,19 @@ function sqlCurrentTime() {
     var d = new Date();
     return leadingZeros(sqlCurrentDate())+' '+leadingZeros(d.getHours())+':'+leadingZeros(d.getMinutes());
 }
+
+function fileExt(filename) {
+	return filename.split('.').pop().toLowerCase();
+}
+
+function baseName(filename) {
+	return filename.split('/').pop();
+}
+
+function isImage(filename) {
+	imgTypes=["jpg", "jpeg", "png", "gif"];
+	if (imgTypes.indexOf(fileExt(filename))>0) {
+		return true;
+	}
+	return false;
+}
