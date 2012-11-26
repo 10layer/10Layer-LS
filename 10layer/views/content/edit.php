@@ -334,7 +334,7 @@
 			fd.append("data", file);
 			fd.append("filename", $(this).val());
 			$.ajax({
-				url: "<?= base_url() ?>api/content/upload?api_key=<?= $this->config->item('api_key') ?>&filename="+file.name,  //server script to process data
+				url: "<?= base_url() ?>api/files/upload?api_key=<?= $this->config->item('api_key') ?>&filename="+file.name,  //server script to process data
 				type: 'POST',
 				xhr: function() {  // custom xhr
 					myXhr = $.ajaxSettings.xhr();
