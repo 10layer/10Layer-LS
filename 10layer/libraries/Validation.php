@@ -41,7 +41,11 @@
 			$tmparr=array();
 			foreach($ruleset as $key=>$val) {
 				if (is_array($val)) {
-					$rulevalue = $val["fn"]; //New style
+					if (isset($val["fn"])) {
+						$rulevalue = $val["fn"]; //New style
+					} else {
+						$rulevalue=$val;
+					}
 				} else {
 					$rulevalue = $val; //Old style
 				}
