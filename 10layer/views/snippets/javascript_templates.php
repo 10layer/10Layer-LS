@@ -751,10 +751,71 @@
 	<!-- proto-field-wysiwyg -->
 	<div class="proto well">
 		<div class='control-group'>
-		    <label class='control-label '>Text Area</label>
+		    <label class='control-label '>WYSIWYG</label>
 		    <div class="controls">
 		    	<textarea name='proto_text' value='' class=''></textarea>
 		    </div>
+		</div>
+	</div>
+</script>
+
+<script type='text/template' id='edit-field-zone'>
+	<!-- edit-field-zone -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-bottom: 10px"><i class="icon-plus icon-white"></i> Add a zone</a>
+				<% _.each(field.value, function(item) { %>
+				<%= _.template($("#field-zone-item").html(), { fieldname: field.contenttype+"_"+ field.name, zone: item }) %>
+				<% }); %>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='create-field-zone'>
+	<!-- create-field-zone -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-bottom: 10px"><i class="icon-plus icon-white"></i> Add a zone</a>
+			</div>
+		</div>
+</script>
+
+<script type='text/template' id='proto-field-zone'>
+	<!-- proto-field-zone -->
+	<div class="proto well">
+		<div class='control-group'>
+		    <label class='control-label '>Zone</label>
+		    <div class="controls">
+		    	
+		    </div>
+		</div>
+	</div>
+</script>
+
+<script type='text/template' id='field-zone-item'>
+	<div class="row">
+		<div class="span10">
+			<label>Name</label>
+			<input type="text" name="zone_name" value="<%= nullStr(zone.zone_name) %>" class="zone-field" />
+			<label>Auto or manual</label>
+			<select name="zone_auto" class="zone-field">
+				<option value="manual">Manual</option>
+				<option value="auto">Auto</option>
+			</select>
+			<label>Min items</label>
+			<input type="text" name="zone_min_items" value="<%= nullStr(zone.zone_min_items) %>" class="zone-field" />
+			<label>Max items</label>
+			<input type="text" name="zone_max_items" value="<%= nullStr(zone.zone_max_items) %>" class="zone-field" />
+			<label>Position ID</label>
+			<select name="zone_position_id" class="zone-field">
+				<% for(var x=1; x < 10; x++) { %>
+				<option <%= (zone.zone_position_id==x) ? 'selected="selected"' : '' %>><%= x %></option>
+				<% } %>
+			</select>
+			<input type="hidden" class="zone-data" name="<%= fieldname %>[]" value='<%= JSON.stringify(zone) %>' />
+			<div style="margin-top: 20px"><a href="#" class="btn btn-warning btn-mini remove-zone">Remove zone</a></div>
 		</div>
 	</div>
 </script>
