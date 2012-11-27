@@ -43,8 +43,6 @@
 				if (is_array($val)) {
 					if (isset($val["fn"])) {
 						$rulevalue = $val["fn"]; //New style
-					} else {
-						$rulevalue=$val;
 					}
 				} else {
 					$rulevalue = $val; //Old style
