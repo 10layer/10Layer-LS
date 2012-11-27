@@ -184,7 +184,6 @@
 		});
 		
 		$(document).on('change', 'input[type=file]', function() {
-			console.log("Change");
 			content_type=$(document.body).data('content_type');
 			var files=this.files; //FileList object
 			var file=files[0]; //Only handle single upload at a time
@@ -249,6 +248,27 @@
 			
 			viewer.readAsDataURL(file);
 			
+		});
+		
+		$(document).on("click", ".add-zone", function(e) {
+			e.preventDefault();
+			var fieldname=$(this).attr("data-fieldname");
+			$(this).after(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
+		});
+		
+		$(document).on("change", ".zone-field", function() {
+			var data={};
+			$(this).parent().find(".zone-field").each(function() {
+				var name = $(this).attr("name");
+				var val = $(this).val();
+				data[name]=val;
+			});
+			datael=$(this).parent().find(".zone-data");
+			datael.val(JSON.stringify(data));
+		});
+		
+		$(document).on("click", ".remove-zone", function() {
+			$(this).parent().parent().parent().remove();
 		});
 	});
 </script>
