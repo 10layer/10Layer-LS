@@ -291,7 +291,6 @@
 			hide_progress_bar();
 		}
 
-
 		function uploadComplete(data) {
 			setTimeout(hide_progress_bar, 5000);
 			//hide_progress_bar();
@@ -324,9 +323,6 @@
 
 			}
 		}
-
-
-
 		
 		$(document).on('change', 'input[type=file]', function() {
 			content_type=$(document.body).data('content_type');
@@ -467,8 +463,27 @@
 			return false;
 		});
 		
+		$(document).on("click", ".add-zone", function(e) {
+			e.preventDefault();
+			var fieldname=$(this).attr("data-fieldname");
+			$(this).after(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
+		});
 		
-	});
+		$(document).on("change", ".zone-field", function() {
+			var data={};
+			$(this).parent().find(".zone-field").each(function() {
+				var name = $(this).attr("name");
+				var val = $(this).val();
+				data[name]=val;
+			});
+			datael=$(this).parent().find(".zone-data");
+			datael.val(JSON.stringify(data));
+		});
+		
+		$(document).on("click", ".remove-zone", function() {
+			$(this).parent().parent().parent().remove();
+		});
+	}); //End of $(function)
 	
 	<?php
 		$this->load->model('model_workflow');

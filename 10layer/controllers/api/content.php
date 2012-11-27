@@ -149,6 +149,20 @@
 					continue;
 				}
 				$fieldval=$this->input->post($field->contenttype."_".$field->name);
+				//Check if it's JSON, if so extract
+				@$json = json_decode($fieldval);
+				if (!empty($json)) {
+					$fieldval = $json;
+				}
+				//Check if it's JSON in an array
+				if (is_array($fieldval)) {
+					for($x=0; $x<sizeof($fieldval); $x++) {
+						@$json = json_decode($fieldval[$x]);
+						if (!empty($json)) {
+							$fieldval[$x]=$json;
+						}
+					}
+				}
 				if (empty($fieldval)) {
 					$contentobj->{$field->name}="";
 				} else {
