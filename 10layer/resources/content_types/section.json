@@ -75,8 +75,7 @@
 	},
 	{
 		"name" : "zone",
-		"type" : "autocomplete",
+		"type" : "zone",
 		"multiple" : true,
-		"contenttype" : "zone"
 	}
 ], "name" : "Section", "collection" : true, "order_by" : [ "title ASC", "start_date" ] }
