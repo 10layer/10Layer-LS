@@ -180,14 +180,7 @@
 			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
 			self.contentTypes(self.mappedContentTypes);
 			self.content_type_urlid("<?= $content_type_urlid ?>");
-			contentTypesList = _.map(data.content, function(item) {
-				return { id: item._id, val: item.name }
-			});
-			console.log(contentTypesList);
-			self.contentTypesList = ko.observableArray(contentTypesList);
 		});
-		
-		contentTypesList=[];
 		
 		//Events
 		self.clickAddContentType = function() {
@@ -245,7 +238,8 @@
 		{ _id: "wysiwyg", name: "WYSIWYG editor" },
 		{ _id: "select", name: "Select" },
 		{ _id: "text", name: "Text" },
-		{ _id: "textarea", name: "Text Area" }
+		{ _id: "textarea", name: "Text Area" },
+		{ _id: "zone", name: "Zone" }
 	];
 	
 	var empty_type_template = { 
