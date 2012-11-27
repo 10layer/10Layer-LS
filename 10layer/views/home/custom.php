@@ -1,7 +1,87 @@
-<link rel="stylesheet" href="/resources/css/home.css" type="text/css" media="screen, projection" charset="utf-8" />
-<script type="text/javascript" src="/resources/backbone/backbone-min.js"></script>
-<script type="text/javascript" src="/tlresources/file/jquery/jquery.center.js"></script>
-<script type="text/javascript" src="/tlresources/file/js/queues/queues.js"></script>
+
+<script src="/resources/js/davis.min.js"></script>
+<script type="text/javascript" >
+
+$(function(){
+
+	$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
+	$('#dyncontent').html("Loading...");
+	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 15, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
+		$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: '', data:data}));
+	});
+
+	<?php
+		$this->load->model('model_workflow');
+		$workflows=$this->model_workflow->getAll();
+		$workflow_array=array();
+		foreach($workflows as $workflow) {
+			$workflow_array[]="'$workflow->name'";
+		}
+	?>
+	version_map=new Array(
+		<?= implode(",", $workflow_array); ?>
+	);
+		
+		
+
+});
+
+</script>
+
+
+<script type="text/template" id="listing-template">
+	<div id="contentlist" class="boxed full">
+		<div id='content-table'>
+			<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
+		</div>
+	</div>
+</script>
+
+<script type='text/template' id='listing-template-content'>
+	<h2>Latest Content Items</h2>
+	<table class='table  table-striped'>
+	    <thead>
+	    <tr>
+	    	<th>Title</th>
+	    	<th>Last Edit</th>
+	    	<th>Edited by</th> 
+	    	<th>Start Date</th>
+	    	<th>Content Type</th>
+	    	<th>Workflow</th>
+	    </tr>
+	    </thead>
+	    <tbody>
+		<% var x=0; _.each(content, function(item) {  %>
+		    <tr id="row_<%= item.id %>">
+		    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= item.content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
+		    	<td><%= item.last_modified %></td>
+		    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
+		    	
+		    	<td><%= item.start_date %></td>
+		    	<td><%= item.content_type %></td>
+		    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
+		    	
+		    </tr>
+		<% x++; }); %>
+	    </tbody>
+	</table>
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script type="text/template" id="content-template">
 	<div class="content">
@@ -59,16 +139,7 @@
 	</div>
 </script>
 
-<div id="homepage">
-	<div id="dialog_first_queue" style="display: none">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>You don't have any queues. Create one now?</p>
-	<div id="dialog_confirm_queue_delete" style="display: none">
-		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>Delete this queue?</p>
-	</div>
-	</div>
-	<div id="topbuttons">
-		<div class="addqueue">Add a queue</div> <div id="tiles">Tile queues</div>
-	</div>
-	<div id="queues"></div>
+<div id="dyncontent">
+	
 </div>
 

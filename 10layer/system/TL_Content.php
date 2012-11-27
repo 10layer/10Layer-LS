@@ -242,23 +242,27 @@ class TLContent {
 	    $ci->load->library("datatransformations");
 	    foreach($this->fields as $field) {
 	    	foreach($field->transformations as $key=>$value) {
-	    		$transformation = $value["fn"];
-	    		$params = array();
-	    		if (isset($value["params"])) {
-		    		$params= $value["params"];
-		    	}
-	    		if (!is_array($params)) {
-	     			$params=array($params);
-	     		}
-	     		$params=array_merge(array($field->value),$params);
-	     		if (method_exists($ci->datatransformations, $transformation)) {
-	     			$params=array_merge(array(&$this), $params);
-	     			$field->value=call_user_func_array(array(&$ci->datatransformations, $transformation), $params);
-	     		} else {
-	     			if (function_exists($transformation)) {
-	     				$field->value=call_user_func_array($transformation,$params);
-	     			}
-	     		}
+	    		if(isset($value["fn"])){
+	    			$transformation = $value["fn"];
+		    		$params = array();
+		    		if (isset($value["params"])) {
+			    		$params= $value["params"];
+			    	}
+		    		if (!is_array($params)) {
+		     			$params=array($params);
+		     		}
+		     		$params=array_merge(array($field->value),$params);
+		     		if (method_exists($ci->datatransformations, $transformation)) {
+		     			$params=array_merge(array(&$this), $params);
+		     			$field->value=call_user_func_array(array(&$ci->datatransformations, $transformation), $params);
+		     		} else {
+		     			if (function_exists($transformation)) {
+		     				$field->value=call_user_func_array($transformation,$params);
+		     			}
+		     		}
+	    		}
+
+	    		
 	     	}
 	     }
 	}
