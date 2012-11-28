@@ -680,6 +680,17 @@ class TLField {
 	public $hidenew=false;
 	
 	/**
+	 * defaultValue
+	 * 
+	 * (default value: "")
+	 * 
+	 * @var string
+	 * @access public
+	 */
+	public $defaultValue="";
+	
+	
+	/**
 	 * __construct function.
 	 * 
 	 * @access public
