@@ -56,7 +56,7 @@
 	<?php
 	$collections=$this->model_collections->get_all();
 	foreach($collections as $collection) {
-		// $options=$this->model_collections->get_options($collection->_id);
+		$options=$this->model_collections->get_options($collection->_id);
 		
 		// //Here we check if we have nested collections
 		// $tmp=array();
@@ -77,6 +77,15 @@
 	?>
 		<li class="dropdown-submenu">
 			<?= anchor("/publish/".$collection->_id, $collection->name.'s') ?>
+			<ul class="dropdown-menu">
+			<?php
+			foreach($options as $option) {
+			?>
+				<li><?= anchor("/publish/".$collection->_id."/".$option->_id, $option->title) ?></li>
+			<?php
+			}
+			?>
+			</ul>
 		</li>
 	<?php
 	//die();

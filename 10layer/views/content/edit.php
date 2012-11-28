@@ -16,6 +16,8 @@
 <script>
 	var currentpage=false;
 	
+	var content_types=<?= json_encode($content_types); ?>;
+
 	$(function() {
 		
 		$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
@@ -466,7 +468,7 @@
 		$(document).on("click", ".add-zone", function(e) {
 			e.preventDefault();
 			var fieldname=$(this).attr("data-fieldname");
-			$(this).after(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
+			$(this).before(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
 		});
 		
 		$(document).on("change", ".zone-field", function() {
@@ -483,6 +485,7 @@
 		$(document).on("click", ".remove-zone", function() {
 			$(this).parent().parent().parent().remove();
 		});
+		
 	}); //End of $(function)
 	
 	<?php
