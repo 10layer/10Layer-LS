@@ -6,8 +6,19 @@ $(function(){
 
 	$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
 	$('#dyncontent').html("Loading...");
-	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 15, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
-		$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: '', data:data}));
+	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
+		
+		$('#dyncontent').html(_.template($("#listing-template").html(), {heading: 'Latest Content Items', data:data}));
+	});
+
+	$("#quick_search_button").live('click',function(){
+		$(this).text('searching...');
+		var search_string = $('#search_query').val();
+		var heading = 'Search results for "'+search_string+'"';
+		$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: search_string, order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
+			$('#dyncontent').html(_.template($("#listing-template").html(), {heading: heading, data:data}));
+			$(this).text('Quick Search');
+		});
 	});
 
 	<?php
@@ -30,19 +41,32 @@ $(function(){
 
 
 <script type="text/template" id="listing-template">
+	<h3 style="float:left;"><%= heading %></h3>
+	<%= _.template($('#quick-search-template').html(),{}) %>
+	<br clear="both">
 	<div id="contentlist" class="boxed full">
 		<div id='content-table'>
-			<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
+			<%= _.template($('#listing-template-content').html(), { content: data.content }) %>
 		</div>
 	</div>
 </script>
 
+<script type="text/template" id="quick-search-template">
+	<div id="quick_search_container" style="margin-top:10px;float:right;">
+		<div class="input-append">
+		  <input type="text" id='search_query' class="">
+		  <a id="quick_search_button" class="btn">Quick Search</a>
+		 </div>
+		
+	</div>
+</script>
+
 <script type='text/template' id='listing-template-content'>
-	<h2>Latest Content Items</h2>
+	
 	<table class='table  table-striped'>
 	    <thead>
 	    <tr>
-	    	<th>Title</th>
+	    	<th width='500px'>Title</th>
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
 	    	<th>Start Date</th>
