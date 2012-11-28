@@ -295,83 +295,66 @@ $(function() {
 
 
 </script>
-
-
-
-<div class="row show-grid">
-  
-  <div class="span12" style='height:650px;overflow: auto;'>
-  	<div class="row">
-      <div class="span12">
-
-
-      	<div id='search_criterion'>
-      		<div id='collection_selector_container'>
-				<a href='#collection_selector' id='open_collection_selector' class="btn" data-toggle="modal"><i class="icon-list"></i> Select <?php echo ucfirst($collection_type); ?> here</a>
-				<div  id='collection_selector' class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				  <div class="modal-header">
-				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-				    <h4 id="myModalLabel">Select Collection to publish to</h4>
-				  </div>
-				  <div class="modal-body">
-				    <div><?php echo $options; ?></div>
-				  </div>
-				  <div class="modal-footer">
-				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-				  </div>
-				</div>
-			</div>
-      		
-			<div id='config_container'>
-
-				<ul class="nav nav-pills">
-	              <li class="dropdown">
-	                <a class="dropdown-toggle" id="config_section" role="button" data-toggle="dropdown" href="#">Zone Selector<b class="caret"></b></a>
-	                <ul id="zone_options" class="dropdown-menu" role="menu" aria-labelledby="drop5">
-	                  <li><a href="#">Please select a <?php echo ucfirst($collection_type); ?></a></li>
-	                </ul>
-	              </li>
-
-	              <li class="active"> <a> <span id='collection_header'>Select a <?php echo ucfirst($collection_type); ?> </span> | <span id='zone_indicator'>Select a Zone</span></a></li>
-
-	            </ul>
-			</div>
-      		
-	      	<div id="date_slider_container">
-				<div id="reportrange" class="pull-right">
-				    <i class="icon-calendar icon-large"></i>
-				    <span id='range_value'><?php echo date("F j, Y", strtotime('-30 day')); ?> - <?php echo date("F j, Y"); ?></span> <b class="caret"></b>
-				</div>
-			</div>
-
-
-
-
-			<input type="text" id="publishSearch" value="Search..." title="Hit Enter key to search">
-
-			<span class='btn btn-mini' style="margin-top:10px;"  id="reset_search"><i class="icon-refresh"></i></span>
-
-			<br clear='both'>
-
-		</div>
+<div class="row">
+	<div class="span2">
+		<ul class="nav nav-pills nav-stacked">
+		<?php
+			foreach($collections as $c) {
+				
+		?>
+			<li <?= ($c->_id==$collection->_id) ? 'class="active"' : '' ?>><?= anchor("/publish/".$collection_type."/".$c->_id, $c->title) ?></li>
+		<?php
+			}
+		?>
+		</ul>
+	</div>
 	
-
-      </div>
-    </div>
-    <div class="row">
-      <div class="span8"><div id='search_results'></div></div>
-      <div class="span1"><div id='zone_details'></div></div>
-      <div class="span3">
-      	<div id='publish_pane'></div>
-      	<br />
-      	<span style='float:right;margin-right:10px;' class='btn btn-success' id='publish'>Publish</span>
-  	  </div>
-      
-    </div>
-
-  </div>
-
-
+	<div class="span10">
+		<div class="row">
+			<div class="span10">
+				<ul class="nav nav-tabs">
+				<?php
+					$active="class='active'";
+					foreach($collection->zone as $zone) {
+				?>
+					<li <?= $active ?>><a href="#"><?= $zone["zone_name"] ?></a></li>
+				<?php
+						$active='';
+					}
+				?>
+				</ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span10">
+				<div class="well">
+					<div class="span3">
+						<div class="input-append">
+							<input class="span2" id="search" type="text" placeholder="search...">
+							<button class="btn" type="button">Search</button>
+						</div>
+					</div>
+					<div class="span4">
+						<div id="date_slider_container">
+							<div id="reportrange">
+							    <i class="icon-calendar"></i>
+						    	<span id='range_value'><?php echo date("F j, Y", strtotime('-30 day')); ?> - <?php echo date("F j, Y"); ?></span> <b class="caret"></b>
+							</div>
+						</div>
+					</div>
+					<div class="span1 pull-right">
+						<span style='float:right;margin-right:10px;' class='btn btn-success' id='publish'>Publish</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span7"><div id='search_results'></div></div>
+			<div class="span1"><div id='zone_details'></div></div>
+			<div class="span3"><div id='publish_pane'></div></div>
+		</div>
+	</div> <!-- End main body -->
+	
 </div>
 
 <div id='pop' class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

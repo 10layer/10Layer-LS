@@ -782,6 +782,19 @@ if(strlen($s) > 2) {
 		}
 		
 		/**
+		 * get_content_types_list function.
+		 * 
+		 * Returns a list of possible content types, just id and name
+		 *
+		 * @access public
+		 * @param $public Show only public content types
+		 * @return object
+		 */
+		public function get_content_types_list() {
+			return $this->mongo_db->select(array("_id", "name"))->order_by(array("_id"))->get("content_types");
+		}
+		
+		/**
 		 * get_content_type function.
 		 * 
 		 * Returns a single content type

@@ -31,6 +31,12 @@
 		}
 
 		public function load_publisher($collection_type){
+			$data["collection_id"] = $this->uri->segment(3);
+			$data["collection"]=$this->model_collections->get($data["collection_id"]);
+			if (empty($data["collection"])) {
+				show_404();
+			}
+			$data["collections"] = $this->model_collections->get_options($collection_type);
 			$data["options"] = $this->make_nested_list($this->make_nest($collection_type));
 			$data['collection_type'] = $collection_type;
 			$this->load->view('templates/header',$data);

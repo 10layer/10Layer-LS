@@ -33,6 +33,11 @@
 			$this->returndata();
 		}
 		
+		public function listing() {
+			$this->data["content"] = $this->mongo_db->select(array("_id", "name"))->order_by(array("_id"))->get("content_types");
+			$this->returndata();
+		}
+		
 		/**
 		 * save function.
 		 * 
