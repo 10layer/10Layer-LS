@@ -764,10 +764,10 @@
 		<div class='control-group'>
 			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
 			<div class="controls">
-				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-bottom: 10px"><i class="icon-plus icon-white"></i> Add a zone</a>
 				<% _.each(field.value, function(item) { %>
 				<%= _.template($("#field-zone-item").html(), { fieldname: field.contenttype+"_"+ field.name, zone: item }) %>
 				<% }); %>
+				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-top: 20px"><i class="icon-plus icon-white"></i> Add a zone</a>
 			</div>
 		</div>
 </script>
@@ -777,7 +777,7 @@
 		<div class='control-group'>
 			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
 			<div class="controls">
-				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-bottom: 10px"><i class="icon-plus icon-white"></i> Add a zone</a>
+				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-top: 20px"><i class="icon-plus icon-white"></i> Add a zone</a>
 			</div>
 		</div>
 </script>
@@ -813,6 +813,12 @@
 				<% for(var x=1; x < 10; x++) { %>
 				<option <%= (zone.zone_position_id==x) ? 'selected="selected"' : '' %>><%= x %></option>
 				<% } %>
+			</select>
+			<label>Content Types</label>
+			<select name="zone_content_types" class="zone-field select-content-types" multiple="multiple">
+				<% _.each(content_types, function(item) { %>
+					<option value="<%= item._id %>" <%= (zone.zone_content_types.indexOf(item._id) >= 0) ? "selected='selected'" : '' %>><%= item.name %></option>
+				<% }); %>
 			</select>
 			<input type="hidden" class="zone-data" name="<%= fieldname %>[]" value='<%= JSON.stringify(zone) %>' />
 			<div style="margin-top: 20px"><a href="#" class="btn btn-warning btn-mini remove-zone">Remove zone</a></div>

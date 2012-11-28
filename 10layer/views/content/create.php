@@ -12,8 +12,10 @@
 
 <link rel="stylesheet" href="/resources/bootstrap-datepicker/css/datepicker.css">
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
-
 <script language="javascript">
+	
+	var content_types=<?= json_encode($content_types); ?>;
+	
 	$(function() {
 		//Set the API key
 		$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
@@ -253,7 +255,7 @@
 		$(document).on("click", ".add-zone", function(e) {
 			e.preventDefault();
 			var fieldname=$(this).attr("data-fieldname");
-			$(this).after(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
+			$(this).before(_.template($("#field-zone-item").html(), { fieldname: fieldname, zone: {} }));
 		});
 		
 		$(document).on("change", ".zone-field", function() {
