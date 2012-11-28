@@ -23,6 +23,7 @@
 			$urlid=$this->uri->segment(2);
 			$data["type"]=$type;
 			$data["urlid"]=$urlid;
+			$data["content_types"]=$this->model_content->get_content_types_list();
 			$this->load->view("content/edit",$data);
 		}
 	}
