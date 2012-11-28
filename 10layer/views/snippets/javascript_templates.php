@@ -112,7 +112,12 @@
 
 <script type='text/template' id='create-field-checkbox'>
 	<!-- create-field-checkbox -->
-	<%= _.template($('#edit-field-checkbox').html(), {field: field} ) %>
+	<div class='control-group'>
+	    <label class='control-label <%= field.label_class %>'><%= field.label %></label>
+	    <div class="controls">
+	    	<input type='checkbox' name='<%= field.contenttype %>_<%= field.name %>' value='1' class='<%= field.class %>' <%= (field.defaultValue) ? "checked='checked'" : '' %> />
+	    </div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-checkbox'>
@@ -139,7 +144,12 @@
 
 <script type='text/template' id='create-field-date'>
 	<!-- create-field-date -->
-	<%= _.template($('#edit-field-date').html(), {field: field} ) %>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datepicker <%= field.class %>' data-date="<%= (field.defaultValue) ? field.defaultValue : '' %>" data-date-format="yyyy-mm-dd" />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-date'>
@@ -181,7 +191,27 @@
 
 <script type='text/template' id='create-field-datetime'>
 	<!-- create-field-datetime -->
-	<%= _.template($('#edit-field-datetime').html(), {field: field} ) %>
+	<%
+		var val_date = val_hour = val_minute = "";
+		if (field.defaultValue) {
+			parts = field.defaultValue.split(" ");
+			val_date = parts[0];
+			if (parts[1]) {
+				times = parts[1].split(":");
+				val_hour = times[0];
+				(times[1]) ? val_minute = times[1] : val_minute = "00";
+			}
+		}
+	%>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.defaultValue) ? field.defaultValue : '' %>' />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' value="<%= val_hour %>" /> :
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' value="<%= val_minute %>" />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-datetime'>
@@ -273,7 +303,7 @@
 
 <script type='text/template' id='create-field-hidden'>
 	<!-- create-field-file -->
-	<%= _.template($('#edit-field-hidden').html(), {field: field} ) %>
+	<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= nullStr(field.defaultValue) %>" />
 </script>
 
 <script type='text/template' id='proto-field-hidden'>
@@ -491,7 +521,12 @@
 
 <script type='text/template' id='create-field-password'>
 	<!-- create-field-password -->
-	<%= _.template($('#edit-field-password').html(), {field: field} ) %>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-password'>
@@ -525,7 +560,19 @@
 
 <script type='text/template' id='create-field-radio'>
 	<!-- create-field-radio -->
-	<%= _.template($('#edit-field-radio').html(), {field: field} ) %>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<div class='radiogroup'>
+			<% _.each(field.options, function(option, key) { %>
+				<div class='radio'>
+					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' value='<%= key %>' <%= (field.defaultValue==key) ? 'checked="checked"' : '' %> />
+					<div class='radio_label'><%= option %></div>
+				</div>
+			<% }); %>
+			</div>
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-radio'>
@@ -565,7 +612,12 @@
 
 <script type='text/template' id='create-field-readonly'>
 	<!-- create-field-readonly -->
-	<%= _.template($('#edit-field-readonly').html(), {field: field} ) %>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' readonly='readonly' />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-readonly'>
@@ -648,7 +700,25 @@
 
 <script type='text/template' id='create-field-select'>
 	<!-- create-field-select -->
-	<%= _.template($('#edit-field-select').html(), {field: field} ) %>
+	<div class='control-group'>
+	    <label class='control-label <%= field.label_class %>'><%= field.label %></label>
+	    <div class='controls'>
+	    	<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %>'>
+	    	<option value="0"></option>
+	    	<% 
+	    	var keyadjust=0;
+	    	_.each(field.options, function(val, key) {
+	    		if (key==0) {
+	    			keyadjust=1;
+	    		}
+	    	});
+	    	%>
+	    	<% _.each(field.options, function(option, key) { %>
+	    		<option value='<%= ( key + keyadjust) %>' <%= (field.defaultValue==( key + keyadjust) || (field.defaultValue==option) ) ? 'selected="selected"' : '' %> ><%= option %></option>
+	    	<% }); %>
+	    	</select>
+	    </div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-select'>
@@ -680,7 +750,12 @@
 
 <script type='text/template' id='create-field-text'>
 	<!-- create-field-text -->
-	<%= _.template($('#edit-field-text').html(), {field: field} ) %>
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class="controls">
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' />
+		</div>
+	</div>
 </script>
 
 <script type='text/template' id='proto-field-text'>
@@ -710,7 +785,7 @@
 		<div class='control-group'>
 			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
 			<div class="controls">
-				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= nullStr(field.defaultValue) %></textarea>
 			</div>
 		</div>
 </script>
@@ -742,7 +817,7 @@
 		<div class='control-group'>
 			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
 			<div class="controls">
-				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= (field.value) ? field.value : '' %></textarea>
+				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= nullStr(field.defaultValue) %></textarea>
 			</div>
 		</div>
 </script>
@@ -817,7 +892,7 @@
 			<label>Content Types</label>
 			<select name="zone_content_types" class="zone-field select-content-types" multiple="multiple">
 				<% _.each(content_types, function(item) { %>
-					<option value="<%= item._id %>" <%= (zone.zone_content_types.indexOf(item._id) >= 0) ? "selected='selected'" : '' %>><%= item.name %></option>
+					<option value="<%= item._id %>" <%= ((zone.zone_content_types) && (zone.zone_content_types.indexOf(item._id)) >= 0) ? "selected='selected'" : '' %>><%= item.name %></option>
 				<% }); %>
 			</select>
 			<input type="hidden" class="zone-data" name="<%= fieldname %>[]" value='<%= JSON.stringify(zone) %>' />
