@@ -249,7 +249,7 @@
 		/**
 		 * content_type function.
 		 * 
-		 * Only return content of a certain type
+		 * Only return content of a certain type. Send an array to return from multiple content types.
 		 *
 		 * @access protected
 		 * @return void
