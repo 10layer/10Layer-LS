@@ -91,7 +91,11 @@
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
 			$content=$this->mongo_db->get("content");
-			$meta = $this->data['meta'];
+			if (!isset($this->data['meta'])) {
+				$meta = false;
+			} else {
+				$meta = $this->data['meta'];
+			}
 
 			//print_r($content[0]);
 			//print_r($meta); die();
@@ -253,7 +257,11 @@
 		protected function content_type() {
 			$content_type=$this->input->get_post("content_type");
 			if (!empty($content_type)) {
-				$this->mongo_db->where(array("content_type"=>$content_type));
+				if (is_array($content_type)) {
+					$this->mongo_db->where_in("content_type", $content_type);
+				} else {
+					$this->mongo_db->where(array("content_type"=>$content_type));
+				}
 				$this->data["criteria"]["content_type"]=$content_type;
 			}
 		}
@@ -355,6 +363,24 @@
 				$fields=array($fields);
 			}
 			$this->mongo_db->select($fields);
+		}
+		
+		/**
+		 * exclude function.
+		 *
+		 * Exclude items with _id from the results
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		protected function exclude() {
+			$exclude=$this->vars["exclude"];
+			if (!empty($exclude)) {
+				if (!is_array($exclude)) {
+					$exclude=array($exclude);
+				}
+				$this->mongo_db->where_not_in("_id", $exclude); //Only ID for now - we should probably allow any field
+			}
 		}
 		
 		/**
