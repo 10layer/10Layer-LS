@@ -1,3 +1,105 @@
+<script src="/resources/knockout/knockout-2.2.0.js"></script>
+<script type="text/javascript">
+
+	var Content = function(data) {
+		var self = this;
+		self.title = ko.observable(data.title);
+		self.id = ko.observable(data._id);
+		self.content_type = ko.observable(data.content_type);
+		self.isPublished = ko.observable(false);
+		self.zone = ko.observable(0);
+		
+		self.clickEdit = function() {
+			window.open("/edit/"+this.content_type()+"/"+this.id());
+		}
+	}
+	
+	var Zone = function(data, key) {
+		var self = this;
+		self.name = ko.observable(data.zone_name);
+		self.id = ko.observable(key);
+		self.content_types = ko.observableArray(data.zone_content_types);
+		self.isActive = ko.observable(false);
+		self.content = ko.observableArray([]);
+		self.published = ko.observableArray([]);
+		
+		
+		
+		$.getJSON("/api/publish/zone/<?= $collection->_id ?>/"+self.id(), function(data) {
+			if (data.content.length) {
+				var mapped = _.map( data.content, function(item) {
+					return new Content(item);
+				});
+				var exclude = _.map( data.content, function(item) {
+					return item.id;
+				});
+				self.published(mapped);
+			} else {
+				exclude=[];
+			}
+			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC" }, function(data) {
+				var mapped = _.map(data.content, function(item) { return new Content(item) });
+				self.content(mapped);
+			});
+		});
+		
+		self.clickPublish = function() {
+			var pos = self.content.indexOf(this);
+			var item = self.content.splice(pos, 1)[0];
+			item.isPublished(true);
+			item.zone = self.id;
+			self.published.unshift(item);
+		}
+		
+		self.clickUnpublish= function () {
+			var pos = self.published.indexOf(this);
+			var item = self.published.splice(pos, 1)[0];
+			item.isPublished(false);
+			self.content.unshift(item);
+		}
+	}
+	
+	var Section = function() {
+		var self = this;
+		self.zones = ko.observableArray();
+		
+		$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
+			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
+			self.zones(mapped);
+			self.zones()[0].isActive(true);
+		});
+		
+		self.clickZone = function() {
+			var pos = self.zones.indexOf(this);
+			var tmparr = self.zones.removeAll();
+			_.each(tmparr, function(item, key) {
+				item.isActive(false);
+				if (key == pos) {
+					item.isActive(true);
+				}
+			});
+			self.zones(tmparr);
+		};
+		
+		self.save = function() {
+			$.ajax("/api/publish/save?api_key=<?= $this->config->item("api_key") ?>", {
+				data: ko.toJSON({ _id: "<?= $collection->_id ?>", zones: _.map(self.zones(), function(item) { return item.published() }) }),
+				type: "post", contentType: "application/json",
+				success: function(result) { 
+					if (result.error) {
+						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
+					} else {
+						$("#save_success").slideDown(1000).delay(3000).slideUp(1000);
+					}
+				}
+			});
+		}		
+	}
+	
+	$(function() {
+		ko.applyBindings(new Section());
+	});
+</script>
 <script type="text/javascript">
 
 var collection_type = '<?php echo $collection_type; ?>';
@@ -12,19 +114,13 @@ function capitaliseFirstLetter(string)
 
 $(function() {
 
-	$('#publish').click(function(){
+	/*$('#publish').click(function(){
 		publish(zone_id);
 	});
 	//$('.menu').menu();
 
 	$('#publishSearch').focus(function(){
 		$(this).val('');
-	});
-
-	$('#publishSearch').blur(function(){
-		if($(this).val() == ''){
-			$(this).val('Search...');
-		}
 	});
 
 	$('#publishSearch').keyup(function(e){
@@ -40,6 +136,10 @@ $(function() {
 				show_pop('Info', 'please enter a search value');
 			}
 		}
+	});
+	
+	$("#btnSearch").on("click", function() {
+		update_panel();
 	});
 
 
@@ -205,12 +305,11 @@ $(function() {
 		var end_date = pieces[1].trim();
 
 
-		var searchstr = ($("#publishSearch").val() == "Search...") ? "" : $("#publishSearch").val() ;
+		var searchstr = $("#publishSearch").val() ;
 		var selecteds = get_selected();
-		//var url = //$("#active_zone").val()+"/"+d1+"/"+d2+"/"+searchstr;
 		var params = {'criteria':1, 'start_date':start_date, 'end_date':end_date,'searchstr':searchstr, 'selecteds[]': selecteds};
 
-		$.getJSON('/publish/get_zone/'+zone_id,params, function(data) {
+		$.getJSON('/publish/get_zone/'+zone_id, params, function(data) {
 			$('#search_results').html(_.template($("#publishable_items_template").html(), { data:data.available_items }));
 		});
 	}
@@ -285,7 +384,7 @@ $(function() {
 	  		selecteds.push(elm.id);
 		});
 		return selecteds.length;
-	}
+	}*/
 	
 
 
@@ -312,16 +411,8 @@ $(function() {
 	<div class="span10">
 		<div class="row">
 			<div class="span10">
-				<ul class="nav nav-tabs">
-				<?php
-					$active="class='active'";
-					foreach($collection->zone as $zone) {
-				?>
-					<li <?= $active ?>><a href="#"><?= $zone["zone_name"] ?></a></li>
-				<?php
-						$active='';
-					}
-				?>
+				<ul class="nav nav-tabs" data-bind="foreach: zones">
+					<li data-bind="css: { active: isActive }"><a href="#" data-bind="text: name, click: $parent.clickZone"></a></li>
 				</ul>
 			</div>
 		</div>
@@ -330,8 +421,8 @@ $(function() {
 				<div class="well">
 					<div class="span3">
 						<div class="input-append">
-							<input class="span2" id="search" type="text" placeholder="search...">
-							<button class="btn" type="button">Search</button>
+							<input class="span2" id="search" type="text" placeholder="Search...">
+							<a class="btn" href="#" id="btnSearch">Search</a>
 						</div>
 					</div>
 					<div class="span4">
@@ -343,20 +434,42 @@ $(function() {
 						</div>
 					</div>
 					<div class="span1 pull-right">
-						<span style='float:right;margin-right:10px;' class='btn btn-success' id='publish'>Publish</span>
+						<span style='float:right;margin-right:10px;' class='btn btn-success' data-bind="click: save">Publish</span>
+					</div>
+					<div class="row">
+						<div class="span2 pull-right alert alert-error" style="display: none" id="save_fail">Failed to save section</div>
+						<div class="span2 pull-right alert alert-success" style="display: none" id="save_success">Section saved</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="row">
-			<div class="span7"><div id='search_results'></div></div>
+			<div class="span7" data-bind="foreach: zones">
+				<!-- ko if: isActive -->
+				<div data-bind="foreach: content">
+					<div class="span2">
+						<div><a href="#" data-bind="text: title, click: clickEdit"></a></div>
+						<a class="label label-info" data-bind="click: $parent.clickPublish">Publish</a>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
 			<div class="span1"><div id='zone_details'></div></div>
-			<div class="span3"><div id='publish_pane'></div></div>
+			<div class="span2 well" data-bind="foreach: zones">
+				<!-- ko if: isActive -->
+				<div data-bind="foreach: published">
+					<div class="span2">
+						<div><a href="#" data-bind="text: title, click: clickEdit"></a></div>
+						<a class="label label-warning" data-bind="click: $parent.clickUnpublish">Unpublish</a>
+					</div>
+				</div>
+				<!-- /ko -->
+			</div>
 		</div>
 	</div> <!-- End main body -->
 	
 </div>
-
+<div class="span12" data-bind="text: ko.toJSON($root)"></div>
 <div id='pop' class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-header">
 	    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

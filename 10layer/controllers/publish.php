@@ -57,7 +57,6 @@
 		}
 
 		function get_zone($zone_id){
-
 			$item = $this->mongo_db->get_light($zone_id);
 			$content_types = explode(',', $item['content_types']);
 			$content = array();
