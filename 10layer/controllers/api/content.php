@@ -347,6 +347,7 @@
 				$this->mongo_db->like("title", $search);
 				$this->data["criteria"]["search"]=$search;
 			}
+
 		}
 		
 		/**
