@@ -27,7 +27,7 @@
 		self.isRemovable = (!_.contains(req_types, data.name));
 		self.label = ko.observable(data.label);
 		self.type = ko.observable(data.type);
-		self.defaultValue = ko.observable(data.default);
+		self.defaultValue = ko.observable(data.defaultValue);
 		self.content_types = ko.observable(data.content_types);
 		self.options = ko.observable(data.options);
 		self.external = ko.observable(data.external);
