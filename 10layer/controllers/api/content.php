@@ -381,6 +381,7 @@
 					$exclude=array($exclude);
 				}
 				$this->mongo_db->where_not_in("_id", $exclude); //Only ID for now - we should probably allow any field
+				$this->data["criteria"]["exclude"]=$exclude;
 			}
 		}
 		

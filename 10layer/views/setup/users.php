@@ -13,7 +13,12 @@
 		self.email = ko.observable(data.email);
 		self.password = ko.observable("");
 		self.permission = ko.observable(data.permission);
-		self.isActive = ko.observable(false);
+		self.isActive = ko.observable(data.isActive);
+		self.status = ko.observable(data.status);
+		self.statusIsActive = ko.computed({
+			read: function() { return (self.status() == "Active") },
+			write: function(data) { if (data) { self.status("Active"); } else { self.status("Suspended") }  }
+		});
 		self.title = ko.computed(function() {
 			return (self.name().length > 0) ? self.name() : "New User";
 		});
@@ -35,9 +40,11 @@
 				type: "post", contentType: "application/json",
 				success: function(result) { 
 					if (result.error) {
-						$("#save_fail").show();
+						console.log(result.message.join("<br />"));
+						$("#fail_message").html(result.message.join("<br />"));
+						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
 					} else {
-						$("#save_success").show();
+						$("#save_success").slideDown(1000).delay(3000).slideUp(1000);
 					}
 				}
 			});
@@ -49,7 +56,8 @@
 				item.isActive = false;
 			});
 			self.users(tmparr);
-			self.users.push(new User( { id: "new", name: "", email: "", password: "", permissions: [], isActive: true } ));
+			self.users.push(new User( { id: "new", name: "", email: "", password: "", permission: "Editor", isActive: true, status: "Active" } ));
+			console.log(ko.toJSON(self.users));
 		};
 	}
 	
@@ -94,12 +102,13 @@
 					<label>Email address</label>
 				    <input type="text" name="email" placeholder="admin@10layer.com" data-bind="value: email">
 				    <label>Password</label>
-				    <input type="password" name="password" placeholder="Password" data-bind="value: password">
-				    <span class="help-block">Random password: <?= $this->tlsecurity->random_pass(8, 10) ?></span>
+				    <input type="password" name="password" placeholder="Leave blank to not change" data-bind="value: password">
+				    <span class="help-block">Random password: <?= $this->tlsecurity->random_pass(8, 12) ?></span>
 				    <label>Permissions</label>
 				    <label class="radio"><input type="radio" name="permission" value="Administrator"  data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Administrator</label>
 				    <label class="radio"><input type="radio" name="permission" value="Editor" data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Editor</label>
 				    <label class="radio"><input type="radio" name="permission" value="Viewer" data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Viewer</label>
+				    <label class="checkbox"><input type="checkbox" name="status" value="1" data-bind="checked: statusIsActive" /> Account is Active</label>
 				</div>
 				<!-- /ko -->
 			</div>
@@ -109,7 +118,7 @@
 		<a class="btn btn-large btn-primary" href="#" data-bind="click: save"><i class="icon-thumbs-up icon-white"></i> Save users</a>
 		<p />
 				<div id="save_success" class="alert alert-success fade in" style="display: none"><a class="close" href="#">&times;</a> Users updated</div>
-				<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> Failed to update Users</div>
+				<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> <h4>Failed to update Users</h4> <span id="fail_message"></span></div>
 	</div>
 </div>
 </form>
