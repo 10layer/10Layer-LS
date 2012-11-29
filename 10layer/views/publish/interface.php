@@ -4,13 +4,13 @@
 	var Content = function(data) {
 		var self = this;
 		self.title = ko.observable(data.title);
-		self.id = ko.observable(data._id);
+		self._id = ko.observable(data._id);
 		self.content_type = ko.observable(data.content_type);
 		self.isPublished = ko.observable(false);
 		self.zone = ko.observable(0);
 		
 		self.clickEdit = function() {
-			window.open("/edit/"+this.content_type()+"/"+this.id());
+			window.open("/edit/"+this.content_type()+"/"+this._id());
 		}
 	}
 	
@@ -31,7 +31,7 @@
 					return new Content(item);
 				});
 				var exclude = _.map( data.content, function(item) {
-					return item.id;
+					return item._id;
 				});
 				self.published(mapped);
 			} else {

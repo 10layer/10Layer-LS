@@ -76,7 +76,6 @@
 			}
 			$this->validation->validate("email", "Email", $user->email, array("required", "valid_email"));
 			if ($is_new) {
-				print "Checking email ".$user->email;
 				$this->validation->validate("email", "Email", $user->email, array("database_nodupe"=>"email in users"));
 			}
 			if (!empty($this->var->password) && !$is_new) {
