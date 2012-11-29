@@ -76,6 +76,6 @@
 	{
 		"name" : "zone",
 		"type" : "zone",
-		"multiple" : true,
+		"multiple" : true
 	}
 ], "name" : "Section", "collection" : true, "order_by" : [ "title ASC", "start_date" ] }

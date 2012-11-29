@@ -9,6 +9,7 @@
 	
 	<link rel="stylesheet" href="/resources/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, projection" charset="utf-8" />
 	<link rel="stylesheet" href="/resources/bt-dp/daterangepicker.css" type="text/css" media="screen, projection" charset="utf-8" />
+	<link rel="stylesheet" href="/resources/chosen/chosen.css" type="text/css" media="screen, projection" charset="utf-8" />
 	<link rel="stylesheet" href="/resources/css/style.css" type="text/css" media="screen, projection" charset="utf-8" />
 	
 	
@@ -26,6 +27,7 @@
 	<script type="text/javascript" src="/resources/js/underscore-min.js"></script>
 	<script type="text/javascript" src="/resources/bootstrap/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="/resources/bt-dp/daterangepicker.js"></script>
+	<script type="text/javascript" src="/resources/chosen/chosen.jquery.js"></script>
 	<script type="text/javascript" src="/resources/bt-dp/date.js"></script>
 	<script type="text/javascript" src="/resources/js/10layer.js"></script>
 	
