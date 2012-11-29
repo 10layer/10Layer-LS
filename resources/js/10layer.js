@@ -33,7 +33,7 @@ function baseName(filename) {
 
 function isImage(filename) {
 	imgTypes=["jpg", "jpeg", "png", "gif"];
-	if (imgTypes.indexOf(fileExt(filename))>0) {
+	if (imgTypes.indexOf(fileExt(filename))>=0) {
 		return true;
 	}
 	return false;
