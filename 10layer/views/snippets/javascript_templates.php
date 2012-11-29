@@ -144,10 +144,20 @@
 
 <script type='text/template' id='create-field-date'>
 	<!-- create-field-date -->
+	<%
+		var val = "";
+		if (field.defaultValue) {
+			val = field.defaultValue;
+			if (val.toLowerCase() == "now" || val.toLowerCase() == "today") {
+				var d = new Date();
+				val = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+			}
+		}
+	%>
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datepicker <%= field.class %>' data-date="<%= (field.defaultValue) ? field.defaultValue : '' %>" data-date-format="yyyy-mm-dd" />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= val %>' class='datepicker <%= field.class %>' data-date="<%= val %>" data-date-format="yyyy-mm-dd" />
 		</div>
 	</div>
 </script>
@@ -194,6 +204,10 @@
 	<%
 		var val_date = val_hour = val_minute = "";
 		if (field.defaultValue) {
+			if (field.defaultValue.toLowerCase() == "now" || field.defaultValue.toLowerCase() == "today") {
+				var d = new Date();
+				field.defaultValue = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()+" "+d.getHours()+":"+d.getMinutes();
+			}
 			parts = field.defaultValue.split(" ");
 			val_date = parts[0];
 			if (parts[1]) {
