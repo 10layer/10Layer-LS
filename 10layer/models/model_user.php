@@ -107,6 +107,8 @@
 		public function update($id, $data) {
 			if (!empty($data["password"])) {
 				$data["password"]=crypt($data["password"], substr($data["email"],0,4));
+			} elseif (isset($data["password"])) {
+				unset($data["password"]);
 			}
 			$this->mongo_db->where(array("_id"=>$id))->update("users",$data);
 			return true;
