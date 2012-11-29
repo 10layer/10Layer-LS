@@ -23,6 +23,13 @@
 			$x = 0;
 			//foreach($this->vars->zones as $zone) {
 			$this->mongo_db->where(array("_id"=>$this->vars->_id))->delete("published");
+			for($x=0; $x<sizeof($this->vars->zones); $x++) {
+				for($y=0; $y<sizeof($this->vars->zones[$x]); $y++) {
+					$id=$this->vars->zones[$x][$y]->_id;
+					$item=$this->model_content->get($id);
+					$this->vars->zones[$x][$y]=$item[0];
+				}
+			}
 			$this->mongo_db->insert("published", $this->vars);
 			$this->data["message"]="Section updated";
 			$this->returndata();
