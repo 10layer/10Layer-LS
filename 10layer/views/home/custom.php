@@ -1,24 +1,20 @@
 
-<script src="/resources/js/davis.min.js"></script>
+
 <script type="text/javascript" >
 
 $(function(){
-
+	$(".chzn-select").chosen().change(function(){
+		filter();
+	});
+	
 	$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
 	$('#dyncontent').html("Loading...");
 	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
-		
-		$('#dyncontent').html(_.template($("#listing-template").html(), {heading: 'Latest Content Items', data:data}));
+		$('#dyncontent').html(_.template($("#listing-template").html(), { data:data}));
 	});
 
 	$("#quick_search_button").live('click',function(){
-		$(this).text('searching...');
-		var search_string = $('#search_query').val();
-		var heading = 'Search results for "'+search_string+'"';
-		$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: search_string, order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
-			$('#dyncontent').html(_.template($("#listing-template").html(), {heading: heading, data:data}));
-			$(this).text('Quick Search');
-		});
+		filter();
 	});
 
 	<?php
@@ -32,6 +28,35 @@ $(function(){
 	version_map=new Array(
 		<?= implode(",", $workflow_array); ?>
 	);
+
+
+
+	function filter(){
+		$("#quick_search_button").text('searching...');
+		var edited_by = $("#edited_by").val();
+		var content_types = $("#content_types").val();
+		var workflows = $("#workflows").val();
+		var search_string = $('#search_query').val();
+		var params = {order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }
+		if(search_string != ''){
+			params.search = search_string;
+		}
+		if(content_types != ''){
+			params.content_type = content_types;
+		}
+		if(workflows != ''){
+			params.workflow = workflows;
+		}
+		if(edited_by != ''){
+			params.last_editor = edited_by;
+		}
+
+
+		$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", params, function(data) {
+			$('#dyncontent').html(_.template($("#listing-template").html(), {data:data}));
+			$("#quick_search_button").text('Quick Search');
+		});
+	}
 		
 		
 
@@ -39,11 +64,7 @@ $(function(){
 
 </script>
 
-
 <script type="text/template" id="listing-template">
-	<h3 style="float:left;"><%= heading %></h3>
-	<%= _.template($('#quick-search-template').html(),{}) %>
-	<br clear="both">
 	<div id="contentlist" class="boxed full">
 		<div id='content-table'>
 			<%= _.template($('#listing-template-content').html(), { content: data.content }) %>
@@ -51,18 +72,7 @@ $(function(){
 	</div>
 </script>
 
-<script type="text/template" id="quick-search-template">
-	<div id="quick_search_container" style="margin-top:10px;float:right;">
-		<div class="input-append">
-		  <input type="text" id='search_query' class="">
-		  <a id="quick_search_button" class="btn">Quick Search</a>
-		 </div>
-		
-	</div>
-</script>
-
 <script type='text/template' id='listing-template-content'>
-	
 	<table class='table  table-striped'>
 	    <thead>
 	    <tr>
@@ -107,62 +117,59 @@ $(function(){
 
 
 
-<script type="text/template" id="content-template">
-	<div class="content">
-		<div class="content-tools">
-			<div class="btn-send" id="<%= id %>">Send to</div>
-			<a href="/edit/<%= content_type %>/<%= urlid %>" target="_blank"><div class="btn-edit">Edit</div></a>
-			<div class="btn-workflowprev">Revert Workflow</div>
-			<div class="btn-workflownext">Advance Workflow</div>
-			<div class="btn-live"><%= live ? 'Make unlive' : 'Make live' %></div>
+<div id="filter_pane">
+	
+	<div id="quick_search_container" >
+		<h5>Quick Search / Filters </h5>
+		<div style="float:left; margin-right:10px; margin-top:4px;">
+			<select id='edited_by' class="chzn-select" data-placeholder="Edited by..." name="edited_by" id="" style='width:200px;display:none;'>
+				<option value=''></option>
+				<?php
+					$this->load->model('model_user');
+					$users=$this->model_user->getAllUsers();
+					foreach($users as $user){
+						echo "<option value='".$user->name."'>".$user->name."</option>";
+					}
+				?>
+			</select>
 		</div>
-		<div class="directory_container shadow"></div>
-		<div class="content-title content-workflow-<%= major_version %>"><%= title %></div>
-	</div>
-</script>
 
-<script type="text/template" id="filters-template">
-	<div class="option">
-		<div class="option_header"><%= label %></div>
-		<div class="allnone" queueid="<%= queueid %>"><span class="select-all">All</span> | <span class="select-none">None</span></div>
-		<ul>
-		<% _.each(options, function(option) { %>
-			<%= _.template($("#filter-template").html(), option) %>
-		<% }); %>
-		</ul>
-	</div>
-	<br clear="both" />
-</script>
-
-<script type="text/template" id="filter-template">
-	<div class="filter">
-		<input class="filter_check" type="checkbox" <%= checked ? 'checked="checked"' : '' %> value="<%= urlid %>" />
-		<%= value %>
-	</div>
-</script>
-
-<script type="text/template" id="queue-template">
-	<div id="<%= id %>" class="<%= personal %>" >
-		<div class="options_icons">
-			<div class="queue-name"><input class="queuename-edit" name="queuename" value="<%= name %>" /></div>
-			<div class="options_close">Delete queue</div>
-			<div class="options_dropdown">Filter queue</div>
-			<div class="options_personalise">Make this queue personal</div>
+		<div <div style="float:left; margin-right:10px; margin-top:4px;">
+			<select id='content_types' class="chzn-select" data-placeholder="Content Types..." name="tag_workflow_status" id="" style='width:200px;display:none;'>
+				<option value=''></option>
+				<?php
+					$this->load->model('model_content');
+					$content_types=$this->model_content->get_content_types();
+					foreach($content_types as $ct){
+						echo "<option value='".$ct->_id."'>".$ct->name."</option>";
+					}
+				?>
+			</select>
 		</div>
-		
-		
-		<div class="queue_formatter" style="height:<%= height %>px; width:<%= width %>px">
-		<div class="queue-content"></div>
-		
-	</div>
-	<div class="options shadow" style="z-index:100000">
-		<a class="config_close">close</a>
-		<h4><%= name %> Configuarations...</h4>
-		<div class="filters">
-		</div>
-	</div>
-</script>
 
+		<div <div style="float:left; margin-right:10px; margin-top:4px;">
+			<select id='workflows' class="chzn-select" data-placeholder="Choose Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
+				<option value=''></option>
+				<?php
+					$this->load->model('model_workflow');
+					$workflows=$this->model_workflow->getAll();
+					$i = 0;
+					foreach($workflows as $workflow) {
+						echo "<option value='".$i."'>".$workflow->name."</option>";
+						$i++;
+					}
+				?>
+			</select>
+		</div>
+
+		<div class="input-append" style="float:right;">
+		  <input type="text" id='search_query' class="">
+		  <a id="quick_search_button" class="btn">Quick Search</a>
+		 </div>
+		
+	</div>
+
+</div>
 <div id="dyncontent">
 	
 </div>
