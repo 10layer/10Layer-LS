@@ -90,33 +90,10 @@
 			$this->data["count"]=1;
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
-			$content=$this->mongo_db->get("content");
-			if (!isset($this->data['meta'])) {
-				$meta = false;
-			} else {
-				$meta = $this->data['meta'];
+			$content=$this->mongo_db->limit(1)->get("content");
+			if (isset($content[0])) {
+				$this->data["content"]=$content[0];
 			}
-
-			//print_r($content[0]);
-			//print_r($meta); die();
-
-			foreach ($meta as $item) {
-				if($item->type == 'autocomplete'){
-					$field_name = $item->name;
-					if(isset($content[0]->$field_name) AND is_array($content[0]->$field_name)){
-						
-						$set_items = $content[0]->$field_name;
-						$values = array();
-						foreach($set_items as $pointer){
-							array_push($values, $this->mongo_db->get_light($pointer));
-						}
-						$content[0]->$field_name = $values;
-					}
-					
-				}
-			}
-
-			$this->data["content"]=$content[0];
 			$this->returndata();
 		}
 		
@@ -464,6 +441,16 @@
 			foreach($this->vars as $key=>$val) {
 				if (method_exists($this, $key)) {
 					call_user_func(array($this, $key));
+				} elseif ($this->secure) {
+					if (substr($key, 0, 6)=="where_") {
+						$key=substr($key, 6);
+						if (is_array($val)) {
+							$this->mongo_db->where_in($key, $val);
+						} else {
+							$this->mongo_db->where(array($key=>$val));
+						}
+						$this->data["criteria"]["where_$key"]=$val;
+					} 
 				}
 			}
 		}
