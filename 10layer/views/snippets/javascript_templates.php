@@ -137,7 +137,7 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? field.value : '' %>' class='datepicker <%= field.class %>' data-date="<%= (field.value) ? field.value : '' %>" data-date-format="yyyy-mm-dd" />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? dateToString(field.value) : '' %>' class='datepicker <%= field.class %>' data-date="<%= (field.value) ? dateToString(field.value) : '' %>" data-date-format="yyyy-mm-dd" />
 		</div>
 	</div>
 </script>
@@ -150,7 +150,9 @@
 			val = field.defaultValue;
 			if (val.toLowerCase() == "now" || val.toLowerCase() == "today") {
 				var d = new Date();
-				val = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+				val = d.getFullYear()+"-"+leadingZeros(d.getMonth()+1)+"-"+leadingZeros(d.getDate());
+			} else {
+				val = dateToString(val);
 			}
 		}
 	%>
