@@ -94,7 +94,7 @@
 			});
 			$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
 				$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: content_type, data:data}));
 				update_pagination(content_type, data.count, 0, 100 );
 				update_autos();
@@ -113,7 +113,7 @@
 			$('#content-table').html("Loading...");
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
 				//update_pagination( data.count, offset, data.perpage );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -132,7 +132,7 @@
 			$('#pagination').html('');
 			//Cancel any existing Ajax calls
 			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "major_version", "last_editor" ] }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
 				update_pagination( content_type, data.count, offset, 100 );
 				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
 				update_autos();
@@ -488,17 +488,7 @@
 		
 	}); //End of $(function)
 	
-	<?php
-		$this->load->model('model_workflow');
-		$workflows=$this->model_workflow->getAll();
-		$workflow_array=array();
-		foreach($workflows as $workflow) {
-			$workflow_array[]="'$workflow->name'";
-		}
-	?>
-	version_map=new Array(
-		<?= implode(",", $workflow_array); ?>
-	);
+	version_map=new Array( "", "New", "Edited", "Published" );
 	
 </script>
 <script type="text/template" id="listing-template">
@@ -528,19 +518,17 @@
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
 	    	<th>Start Date</th>
-	    	<th>Live</th>
 	    	<th>Workflow</th>
 	    </tr>
 	    </thead>
 	    <tbody>
 		<% var x=0; _.each(content, function(item) {  %>
 	    <tr id="row_<%= item.id %>">
-	    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
-	    	<td><%= item.last_modified %></td>
+	    	<td class='content-workflow-<%= item.workflow_status %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
+	    	<td><%= dateToString(item.last_modified) %></td>
 	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-	    	<td><%= item.start_date %></td>
-	    	<td class="<%= (item.live==1) ? 'green' : 'red' %>"><%= (item.live==1) ? 'Live' : 'Not live' %></td>
-	    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
+	    	<td><%= dateToString(item.start_date) %></td>
+	    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
 	    </tr>
 		<% x++; }); %>
 	    </tbody>
@@ -578,12 +566,6 @@
     </div>
 
 </div>
-
-
-
-	
-
-	
 
 	<div id='bottom_bar' class="navbar navbar-fixed-bottom">
 		<div class="navbar-inner">
