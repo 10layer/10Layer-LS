@@ -50,7 +50,9 @@
 			if (empty($section)) {
 				$this->show_error("No results found for $section_id");
 			}
-			$this->data["content"] = $section->zones[$zone_id];
+			if (isset($section->zones[$zone_id])) {
+				$this->data["content"] = $section->zones[$zone_id];
+			}
 			$this->returndata();
 		}
 	}
