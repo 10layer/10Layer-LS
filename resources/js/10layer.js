@@ -23,6 +23,18 @@ function sqlCurrentTime() {
     return leadingZeros(sqlCurrentDate())+' '+leadingZeros(d.getHours())+':'+leadingZeros(d.getMinutes());
 }
 
+// Assumes date is Unix timestamp if integer, else assume it's a string
+function dateToString(date) {
+	if (date == "") return "";
+	di = Number(date);
+	if (!_.isNaN(di)) {
+		var d = new Date(di * 1000); // Javascript to Unix Epoch
+	} else {
+		var d = new Date(date);
+	}
+	return d.getFullYear()+"-"+leadingZeros(d.getMonth()+1)+"-"+leadingZeros(d.getDate());
+}
+
 function fileExt(filename) {
 	return filename.split('.').pop().toLowerCase();
 }
