@@ -50,3 +50,13 @@ function isImage(filename) {
 	}
 	return false;
 }
+
+function encodeURIName(str) {
+	var parts = str.split('/');
+	var base = parts.pop();
+    return parts.join('/') + '/' + encodeURIComponent(base);
+}
+
+function capitaliseFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
