@@ -347,29 +347,34 @@
 					<div class="bar" style="width: 0%;"></div>
 				</div>
 				<div class="alert" style="display: none"></div>
-				<div class="image-crop" style="max-height: 220px; overflow: hidden">
+				
 				<% 
 				if (field.value) {
 					if (isImage(field.value)) {
 				%>
-					<img src="<%= field.value %>" />
-					<div class="download"><a href="/api/files/download<%= field.value %>" target="_blank"><i class="icon-download"></i> Download</a></div>
+					<div class="image-crop" style="max-height: 220px; overflow: hidden">
+						<img src="<%= encodeURIName(field.value) %>" />
+					</div>
+					<div class="download"><a href="/api/files/download<%= encodeURIName(field.value) %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
 				<%
 					} else {
 				%>
-					<img src="" />
-					<div class="download"><a href="/api/files/download<%= field.value %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
+					<div class="image-crop" style="max-height: 220px; overflow: hidden">
+						<img src="" />
+					</div>
+					<div class="download"><a href="/api/files/download<%= encodeURIName(field.value) %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
 					
 				<%
 					}
 				} else {
 				%>
-					<img src="" />
+					<div class="image-crop" style="max-height: 220px; overflow: hidden">
+						<img src="" />
+					</div>
 					<div class="download"></div>
 				<%
 				}
 				%>
-				</div>
 			</div>
 		</div>
 		<% if (field.linkformat && urlid) { %>
@@ -395,8 +400,8 @@
 				<div class="alert" style="display: none"></div>
 				<div class="image-crop" style="max-height: 220px; overflow: hidden">
 					<img src="<%= field.value %>" />
-					<div class="download"></div>
 				</div>
+				<div class="download"></div>
 			</div>
 		</div>
 		</div>
@@ -701,7 +706,9 @@
 				<% 
 				var keyadjust=0;
 				_.each(field.options, function(val, key) {
-					if (key==0) {
+					if (!_.isNumber(key)) {
+						keyadjust = "";
+					} else if (key==0) {
 						keyadjust=1;
 					}
 				});
