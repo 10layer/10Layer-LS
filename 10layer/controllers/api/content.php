@@ -447,6 +447,9 @@
 						if (is_array($val)) {
 							$this->mongo_db->where_in($key, $val);
 						} else {
+							if (is_numeric($val)) {
+								$val = (Integer) $val;
+							}
 							$this->mongo_db->where(array($key=>$val));
 						}
 						$this->data["criteria"]["where_$key"]=$val;
