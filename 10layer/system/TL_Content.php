@@ -196,7 +196,7 @@ class TLContent {
 		foreach($this->fields as $key=>$field) {
 			if (($field->type=="select") && empty($this->fields[$key]->options)) {
 				$ci->mongo_db->state_save();
-				$result=$ci->mongo_db->where(array("content_type"=>$field->contenttype))->limit(500)->order_by(array("title", "desc"))->select(array("title", "_id"))->get("content");
+				$result=$ci->mongo_db->where(array("content_type"=>$field->content_types))->limit(500)->order_by(array("title", "desc"))->select(array("title", "_id"))->get("content");
 				$ci->mongo_db->state_restore();
 				if(!empty($result)) {
 					foreach($result as $item) {
@@ -534,7 +534,7 @@ class TLField {
 	 * libraries
 	 * 
 	 * Use external libraries like search or tagging (default value: array())
-	 * Set to 'any' when used to link to any content type or 'mixed' in conjunction with 'contenttypes' for a list of types
+	 * Set to 'any' when used to link to any content type or 'mixed' in conjunction with 'content_types' for a list of types
 	 * 
 	 * @var array
 	 * @access public
@@ -630,16 +630,16 @@ class TLField {
 	public $directory=false;
 	
 	/**
-	 * contenttypes
+	 * content_types
 	 * 
-	 * An array of content types (primarily for searching when contenttype is 'mixed'
+	 * An array of content types (primarily for searching when contenttype is 'mixed')
 	 *
 	 * (default value: array())
 	 * 
 	 * @var bool
 	 * @access public
 	 */
-	public $contenttypes=array();
+	public $content_types=array();
 	
 	/**
 	 * showcount
