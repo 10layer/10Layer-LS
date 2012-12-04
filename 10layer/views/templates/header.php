@@ -74,7 +74,7 @@
 	
 	<div class="container" style="margin-top: 60px">
 	
-		<div id="cookiecrumbs"><?= cookiecrumb() ?></div>
+		<div id="cookiecrumbs"></div>
 		<?php
 			if (!empty($msg)) {
 		?>

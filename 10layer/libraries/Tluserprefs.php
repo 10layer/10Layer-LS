@@ -18,7 +18,6 @@
 		
 		public function __construct() {
 			$this->ci=&get_instance();
-			$this->ci->load->library("mongo_db");
 			$this->userid=$this->ci->session->userdata("id");
 			$this->get_data();
 		}
@@ -104,8 +103,7 @@
 		}
 		
 		function get_all_users(){
-			$users = $this->ci->db->query("select * from tl_users")->result();//=&get_instance();
-			return $users;
+			return $this->ci->mongo_db->get("users");
 		}
 		
 		function get_personal_pref(){

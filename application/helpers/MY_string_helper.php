@@ -1,5 +1,5 @@
 <?php
-	function url_to_text($url,$link=true,$join=" &gt; ") {
+	function url_to_text_DEPRECATED($url,$link=true,$join=" &gt; ") {
 		if (substr($url,0,1)=="/") {
 			$url=substr($url,1);
 		}
