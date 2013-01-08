@@ -1,7 +1,6 @@
 
 
 <script type="text/javascript" >
-
 $(function(){
 	$(".chzn-select").chosen().change(function(){
 		filter();
@@ -9,7 +8,7 @@ $(function(){
 	
 	$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
 	$('#dyncontent').html("Loading...");
-	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }, function(data) {
+	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
 		$('#dyncontent').html(_.template($("#listing-template").html(), { data:data}));
 	});
 
@@ -17,19 +16,12 @@ $(function(){
 		filter();
 	});
 
-	<?php
-		$this->load->model('model_workflow');
-		$workflows=$this->model_workflow->getAll();
-		$workflow_array=array();
-		foreach($workflows as $workflow) {
-			$workflow_array[]="'$workflow->name'";
-		}
-	?>
 	version_map=new Array(
-		<?= implode(",", $workflow_array); ?>
+		"",
+		"New",
+		"Edited",
+		"Published"
 	);
-
-
 
 	function filter(){
 		$("#quick_search_button").text('searching...');
@@ -37,7 +29,7 @@ $(function(){
 		var content_types = $("#content_types").val();
 		var workflows = $("#workflows").val();
 		var search_string = $('#search_query').val();
-		var params = {order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "major_version", "last_editor", "content_type" ] }
+		var params = {order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }
 		if(search_string != ''){
 			params.search = search_string;
 		}
@@ -57,9 +49,6 @@ $(function(){
 			$("#quick_search_button").text('Quick Search');
 		});
 	}
-		
-		
-
 });
 
 </script>
@@ -93,29 +82,12 @@ $(function(){
 		    	
 		    	<td><%= item.start_date %></td>
 		    	<td><%= item.content_type %></td>
-		    	<td class='content-workflow-<%= item.major_version %>'><%= version_map[item.major_version] %></td>
-		    	
+		    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
 		    </tr>
 		<% x++; }); %>
 	    </tbody>
 	</table>
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 <div id="filter_pane">
 	
@@ -150,15 +122,9 @@ $(function(){
 		<div <div style="float:left; margin-right:10px; margin-top:4px;">
 			<select id='workflows' class="chzn-select" data-placeholder="Choose Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
 				<option value=''></option>
-				<?php
-					$this->load->model('model_workflow');
-					$workflows=$this->model_workflow->getAll();
-					$i = 0;
-					foreach($workflows as $workflow) {
-						echo "<option value='".$i."'>".$workflow->name."</option>";
-						$i++;
-					}
-				?>
+				<option>New</option>
+				<option>Edited</option>
+				<option>Published</option>
 			</select>
 		</div>
 
@@ -173,4 +139,3 @@ $(function(){
 <div id="dyncontent">
 	
 </div>
-
