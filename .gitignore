@@ -3,6 +3,5 @@
 */logs/!index.html
 */cache/*
 */cache/!index.html
-10layer/config/mongodb.php
 application/config/mongodb.php
 /content
