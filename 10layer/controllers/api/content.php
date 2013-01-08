@@ -69,7 +69,11 @@
 			$this->_check_callbacks();
 			$content_type=$this->input->get_post("content_type");
 			if (!empty($content_type)) {
-				$this->mongo_db->where(array("content_type"=>$content_type));
+				if (is_array($content_type)) {
+					$this->mongo_db->where_in("content_type", $content_type);
+				} else {
+					$this->mongo_db->where(array("content_type"=>$content_type));
+				}
 			}
 			$this->data["count"]=$this->mongo_db->count("content");
 			$this->returndata();
