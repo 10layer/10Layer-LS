@@ -180,7 +180,9 @@
 	<!-- edit-field-datetime -->
 	<%
 		var val_date = val_hour = val_minute = "";
+		field.value = dateToString(field.value);
 		if (field.value) {
+			//console.log(field.value);
 			parts = field.value.split(" ");
 			val_date = parts[0];
 			if (parts[1]) {
@@ -205,6 +207,7 @@
 	<!-- create-field-datetime -->
 	<%
 		var val_date = val_hour = val_minute = "";
+		field.value = dateToString(field.value);
 		if (field.defaultValue) {
 			if (field.defaultValue.toLowerCase() == "now" || field.defaultValue.toLowerCase() == "today") {
 				var d = new Date();
@@ -897,6 +900,8 @@
 		<div class="span10">
 			<label>Name</label>
 			<input type="text" name="zone_name" value="<%= nullStr(zone.zone_name) %>" class="zone-field" />
+			<label>Url ID</label>
+			<input type="text" name="zone_urlid" value="<%= nullStr(zone.zone_urlid) %>" class="zone-field" />
 			<label>Auto or manual</label>
 			<select name="zone_auto" class="zone-field">
 				<option value="manual">Manual</option>
