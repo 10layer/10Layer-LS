@@ -52,7 +52,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('database', 'session', 'xmlrpc');
 */
 
-$autoload['libraries'] = array('mongo_db', 'database','session', 'autoloader', 'exists', 'datatransformations', 'tlsecurity', 'tluserprefs');
+$autoload['libraries'] = array('mongo_db','session', 'autoloader', 'exists', 'datatransformations', 'tlsecurity', 'tluserprefs');
 
 
 /*
