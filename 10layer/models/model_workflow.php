@@ -31,7 +31,8 @@
 		}
 		
 		public function getAll() {
-			return $this->db->order_by("major_version ASC")->get("tl_workflows")->result();
+			//return $this->db->order_by("major_version ASC")->get("tl_workflows")->result();
+			return array("Created", "Edited", "Published");
 		}
 		
 		public function getContentInQueue_deprecated($urlid, $subsection=false, $startdate=false, $enddate=false, $limit=50, $start=0) {
