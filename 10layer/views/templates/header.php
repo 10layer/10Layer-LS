@@ -59,14 +59,13 @@
 					<li id="logo" class="brand">
 						<img src="/resources/images/logo_navbar.png" />
 					</li>
-		<?php
-			if (isset($menu1)) {
-				$this->load->view_if_exists("menus/main/".$menu1);
-			} else {
-				$this->load->view_if_exists("menus/main/default");
-			}
-		?>
-		
+					<?php
+						if (isset($menu1)) {
+							$this->load->view_if_exists("menus/main/".$menu1);
+						} else {
+							$this->load->view_if_exists("menus/main/default");
+						}
+					?>
 				</ul>
 			</div>
 		</div>
