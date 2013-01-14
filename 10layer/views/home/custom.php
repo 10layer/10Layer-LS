@@ -77,10 +77,10 @@ $(function(){
 		<% var x=0; _.each(content, function(item) {  %>
 		    <tr id="row_<%= item.id %>">
 		    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= item.content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
-		    	<td><%= item.last_modified %></td>
+		    	<td><%= dateToString(item.last_modified) %></td>
 		    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
 		    	
-		    	<td><%= item.start_date %></td>
+		    	<td><%= dateToString(item.start_date) %></td>
 		    	<td><%= item.content_type %></td>
 		    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
 		    </tr>

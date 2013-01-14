@@ -35,6 +35,19 @@ function dateToString(date) {
 	return d.getFullYear()+"-"+leadingZeros(d.getMonth()+1)+"-"+leadingZeros(d.getDate());
 }
 
+function stringToDate(str) {
+	if (str == "") return "";
+	if (_.isNumber(str)) {
+		return str;
+	}
+	var d = str.split(/[^0-9]+/);
+	while (d.length < 5) {
+		d.push(0);
+	}
+	val = new Date(d[0], d[1] - 1, d[2], d[3], d[4]);
+	return val/1000;
+}
+
 function fileExt(filename) {
 	return filename.split('.').pop().toLowerCase();
 }
