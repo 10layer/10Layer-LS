@@ -172,7 +172,7 @@
 			unset($data->id);
 			unset($data->urlid);
 			unset($data->content_id);
-			$data->last_modified=date("Y-m-d H:i:s");
+			$data->last_modified=time();
 			$content_title = $data->title;
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
 			$data->last_editor=$user->name;
@@ -193,7 +193,7 @@
 				$result=$this->mongo_db->upsert('content', $data);
 			} else {
 				$data->content_type=$content_type;
-				$data->timestamp=date("Y-m-d H:i:s");
+				$data->timestamp=time();
 				$data->_id=$urlid;
 				$result=$this->mongo_db->insert('content', $data);
 			}

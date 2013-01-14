@@ -394,6 +394,12 @@ $(function() {
 		updateDateTime(this);
 	});
 	
+	function updateDate(sender) {
+		var parent = $(sender).parent();
+		var val = $(this).val();
+		$(sender).siblings(':hidden').val(stringToDate(val));
+	}
+	
 	function updateDateTime(sender) {
 		var parent = $(sender).parent();
 		var val = "";
@@ -402,7 +408,7 @@ $(function() {
 		val += (parent.children('.datetime_hour').val()) ? parent.children('.datetime_hour').val() : "00";
 		val += ":";
 		val += (parent.children('.datetime_minute').val()) ? parent.children('.datetime_minute').val() : "00";
-		$(sender).siblings(':hidden').val(val);
+		$(sender).siblings(':hidden').val(stringToDate(val));
 	}
 	
 	
