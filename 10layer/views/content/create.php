@@ -224,6 +224,7 @@
 					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').slideDown(500).delay(2000).slideUp(500);
 					fullname = data.content.full_name;
 					container.find('.file_value').val(fullname);
+					container.find('.file_upload').val('');
 					container.find('.download').html('<a href="/api/files/download'+data.content.full_name+'"><i class="icon-download"></i> Download '+baseName(data.content.full_name)+'</a>');
 				},
 				error: function(xhr, s) {
