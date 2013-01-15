@@ -331,7 +331,7 @@
 			var files=this.files; //FileList object
 			var file=files[0]; //Only handle single upload at a time
 			var el=$(this);
-			var container=el.parent();
+			var container=$(this).parent();
 			var fd = new FormData();
 			fd.append("data", file);
 			fd.append("filename", $(this).val());
@@ -363,8 +363,9 @@
 					}
 					container.find('.preview-image .progress').hide();
 					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
-					container.find('input').each(function() { $(this).val(data.content.full_name) });
-					container.find('.download').html('<a href="/api/files/download'+data.content.full_name+'"><i class="icon-download"></i> Download '+baseName(data.content.full_name)+'</a>');
+					fullname = data.content.full_name;
+					container.find('.file_value').val(fullname);
+					container.find('.download').html('<a href="/api/files/download'+fullname+'"><i class="icon-download"></i> Download '+baseName(fullname)+'</a>');
 				},
 				error: function(data) {
 					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').slideDown(500).delay(2000).slideUp(500);
@@ -375,7 +376,8 @@
 				//Options to tell JQuery not to process data or worry about content-type
 				cache: false,
 				contentType: false,
-				processData: false
+				processData: false,
+				async: true
 			});
 			
 			var viewer = new FileReader();
