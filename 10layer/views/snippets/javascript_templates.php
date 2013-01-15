@@ -344,8 +344,9 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
+			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
 			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
+			
 		<div class="row">
 			<div class="preview-image span3" >
 				<div class="progress progress-striped active" style="display: none">
@@ -395,20 +396,20 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
+			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
 			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" />
-			<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-		<div class="row">
-			<div class="preview-image span3" style="display: none">
-				<div class="progress progress-striped active" style="display: none">
-					<div class="bar" style="width: 0%;"></div>
+			<div class="row">
+				<div class="preview-image span3" style="display: none">
+					<div class="progress progress-striped active" style="display: none">
+						<div class="bar" style="width: 0%;"></div>
+					</div>
+					<div class="alert" style="display: none"></div>
+					<div class="image-crop" style="max-height: 220px; overflow: hidden">
+						<img src="<%= field.value %>" />
+					</div>
+					<div class="download"></div>
 				</div>
-				<div class="alert" style="display: none"></div>
-				<div class="image-crop" style="max-height: 220px; overflow: hidden">
-					<img src="<%= field.value %>" />
-				</div>
-				<div class="download"></div>
 			</div>
-		</div>
 		</div>
 	</div>
 </script>
