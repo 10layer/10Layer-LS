@@ -345,7 +345,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
 			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
 			
 		<div class="row">
 			<div class="preview-image span3" >
@@ -397,7 +397,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
 			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>" class="file_upload <%= field.class %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" />
 			<div class="row">
 				<div class="preview-image span3" style="display: none">
 					<div class="progress progress-striped active" style="display: none">
