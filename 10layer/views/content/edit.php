@@ -367,8 +367,8 @@
 					container.find('.file_value').val(fullname);
 					container.find('.download').html('<a href="/api/files/download'+fullname+'"><i class="icon-download"></i> Download '+baseName(fullname)+'</a>');
 				},
-				error: function(data) {
-					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').slideDown(500).delay(2000).slideUp(500);
+				error: function(xhr, s) {
+					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed: '+s).slideDown(500).delay(2000).slideUp(500);
 					container.find('.preview-image .progress .bar').removeClass('bar-success').addClass('bar-danger');
 				},
 				// Form data
@@ -377,7 +377,8 @@
 				cache: false,
 				contentType: false,
 				processData: false,
-				async: true
+				async: true,
+				timeout: 600000 //10 mins
 			});
 			
 			var viewer = new FileReader();
