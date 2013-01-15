@@ -226,8 +226,8 @@
 					container.find('.file_value').val(fullname);
 					container.find('.download').html('<a href="/api/files/download'+data.content.full_name+'"><i class="icon-download"></i> Download '+baseName(data.content.full_name)+'</a>');
 				},
-				error: function(data) {
-					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed').slideDown(500).delay(2000).slideUp(500);
+				error: function(xhr, s) {
+					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed: '+s).slideDown(500).delay(2000).slideUp(500);
 					container.find('.preview-image .progress .bar').removeClass('bar-success').addClass('bar-danger');
 				},
 				// Form data
@@ -235,7 +235,8 @@
 				//Options to tell JQuery not to process data or worry about content-type
 				cache: false,
 				contentType: false,
-				processData: false
+				processData: false,
+				timeout: 600000 //10 mins
 			});
 			
 			var viewer = new FileReader();
