@@ -342,6 +342,7 @@
 					myXhr = $.ajaxSettings.xhr();
 					if(myXhr.upload){ // check if upload property exists
 						myXhr.upload.addEventListener('progress', function(data) {
+							console.log(data);
 							var percentage = Math.round((data.position / data.total) * 100);
 							container.find('.preview-image .progress .bar').css('width', percentage + '%');
 						}, false); // for handling the progress of the upload
@@ -380,7 +381,7 @@
 				cache: false,
 				contentType: false,
 				processData: false,
-				async: true,
+				//async: true,
 				timeout: 600000 //10 mins
 			});
 			
