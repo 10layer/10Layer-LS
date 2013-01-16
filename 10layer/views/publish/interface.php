@@ -21,6 +21,7 @@
 		self.isActive = ko.observable(false);
 		self.content = ko.observableArray([]);
 		self.published = ko.observableArray([]);
+		self.searchStr = ko.observable();
 		
 		$.getJSON("/api/publish/zone/<?= $collection->_id ?>/"+self.id(), function(data) {
 			if (data.content.length) {
@@ -34,7 +35,6 @@
 			} else {
 				exclude=[];
 			}
-			console.log(self.content_types());
 			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC" }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
@@ -72,6 +72,17 @@
 			}
 			var tmp = self.published();
 			self.published.splice(pos, 2, tmp[pos + 1], tmp[pos]);
+		}
+		
+		self.clickSearch = function() {
+			exclude=new Array();
+			_.each(self.published(), function(item) {
+				exclude.push(item._id());
+			});
+			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr }, function(data) {
+				var mapped = _.map(data.content, function(item) { return new Content(item) });
+				self.content(mapped);
+			});
 		}
 	}
 	
@@ -146,12 +157,16 @@ var zone_id = '';
 			</div>
 		</div>
 		<div class="row">
+			
+		</div>
+		<div class="row" data-bind="foreach: zones">
+			<!-- ko if: isActive -->
 			<div class="span10">
 				<div class="well">
 					<div class="span3">
 						<div class="input-append">
-							<input class="span2" id="search" type="text" placeholder="Search...">
-							<a class="btn" href="#" id="btnSearch">Search</a>
+							<input class="span2" id="search" type="text" placeholder="Search..." data-bind="value: searchStr">
+							<a class="btn" href="#" id="btnSearch" data-bind="click: clickSearch">Search</a>
 						</div>
 					</div>
 					<div class="span4">
@@ -163,7 +178,7 @@ var zone_id = '';
 						</div>
 					</div>
 					<div class="span1 pull-right">
-						<span style='float:right;margin-right:10px;' class='btn btn-success' data-bind="click: save">Publish</span>
+						<span style='float:right;margin-right:10px;' class='btn btn-success' data-bind="click: $parent.save">Publish</span>
 					</div>
 					<div class="row">
 						<div class="span2 pull-right alert alert-error" style="display: none" id="save_fail">Failed to save section</div>
@@ -171,20 +186,16 @@ var zone_id = '';
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="span7" data-bind="foreach: zones">
-				<!-- ko if: isActive -->
+			<div class="span7" >
+				
 				<div data-bind="foreach: content">
 					<div class="span2">
 						<div><a href="#" data-bind="text: title, click: clickEdit"></a></div>
 						<a class="label label-info" data-bind="click: $parent.clickPublish">Publish</a>
 					</div>
 				</div>
-				<!-- /ko -->
 			</div>
-			<div class="span2" data-bind="foreach: zones">
-				<!-- ko if: isActive -->
+			<div class="span2">
 				<div data-bind="foreach: published">
 					<div class="span2 well">
 						<div><a href="#" data-bind="text: title, click: clickEdit"></a></div>
@@ -193,8 +204,8 @@ var zone_id = '';
 						<a href="#" data-bind="click: $parent.clickDown"><i class="icon-arrow-down"></i></a>
 					</div>
 				</div>
-				<!-- /ko -->
 			</div>
+			<!-- /ko -->
 		</div>
 	</div> <!-- End main body -->
 	
