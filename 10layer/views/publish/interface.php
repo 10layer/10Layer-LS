@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="/resources/daterangepicker/daterangepicker.css" type="text/css" media="screen, projection" charset="utf-8" />
+<script type="text/javascript" src="/resources/daterangepicker/daterangepicker.js"></script>
+<script type="text/javascript" src="/resources/daterangepicker/date.js"></script>
 <script src="/resources/knockout/knockout-2.2.0.js"></script>
 <script type="text/javascript">
 
@@ -21,7 +24,9 @@
 		self.isActive = ko.observable(false);
 		self.content = ko.observableArray([]);
 		self.published = ko.observableArray([]);
-		self.searchStr = ko.observable();
+		self.searchStr = ko.observable("");
+		self.startDate = ko.observable(<?= date("U", strtotime('-30 day')) ?>);
+		self.endDate = ko.observable(<?= time() ?>);
 		
 		$.getJSON("/api/publish/zone/<?= $collection->_id ?>/"+self.id(), function(data) {
 			if (data.content.length) {
@@ -75,11 +80,24 @@
 		}
 		
 		self.clickSearch = function() {
+			self.update();
+		}
+		
+		self.dateRangeChanged = function(obj, e, start, end) {
+			console.log(start, end);
+			self.startDate(start);
+			self.endDate(end);
+			self.update();
+		}
+		
+		self.update = function() {
 			exclude=new Array();
 			_.each(self.published(), function(item) {
 				exclude.push(item._id());
 			});
-			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr }, function(data) {
+			console.log(self.startDate(), self.endDate());
+			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
+				console.log(data);
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -94,6 +112,21 @@
 			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
 			self.zones(mapped);
 			self.zones()[0].isActive(true);
+			$(".daterange").daterangepicker(
+				{
+					ranges: {
+						'Today': ['today', 'today'],
+						'Yesterday': ['yesterday', 'yesterday'],
+						'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
+						'Last 30 Days': [Date.today().add({ days: -29 }), 'today'],
+						'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
+						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })]
+        			}
+				},
+				function(start, end) {
+					$('.daterange span').html(start.toString('MMMM d, yyyy') + ' - ' + end.toString('MMMM d, yyyy')).trigger("change", [(Date.parse(start) / 1000), (Date.parse(end) / 1000)] );
+				}
+			);
 		});
 		
 		self.clickZone = function() {
@@ -106,6 +139,21 @@
 				}
 			});
 			self.zones(tmparr);
+			$(".daterange").daterangepicker(
+				{
+					ranges: {
+						'Today': ['today', 'today'],
+						'Yesterday': ['yesterday', 'yesterday'],
+						'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
+						'Last 30 Days': [Date.today().add({ days: -29 }), 'today'],
+						'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
+						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })]
+        			}
+				},
+				function(start, end) {
+					$('.daterange span').html(start.toString('MMMM d, yyyy') + ' - ' + end.toString('MMMM d, yyyy')).trigger("change", [(Date.parse(start) / 1000), (Date.parse(end) / 1000)] );
+				}
+			);
 		};
 		
 		self.save = function() {
@@ -170,10 +218,10 @@ var zone_id = '';
 						</div>
 					</div>
 					<div class="span4">
-						<div id="date_slider_container">
-							<div id="reportrange">
+						<div class="date_slider_container">
+							<div class="daterange">
 							    <i class="icon-calendar"></i>
-						    	<span id='range_value'><?php echo date("F j, Y", strtotime('-30 day')); ?> - <?php echo date("F j, Y"); ?></span> <b class="caret"></b>
+						    	<span  data-bind="event: { change: dateRangeChanged }" class='range_value'><?php echo date("F j, Y", strtotime('-30 day')); ?> - <?php echo date("F j, Y"); ?></span> <b class="caret"></b>
 							</div>
 						</div>
 					</div>
