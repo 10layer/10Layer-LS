@@ -84,9 +84,8 @@
 		}
 		
 		self.dateRangeChanged = function(obj, e, start, end) {
-			console.log(start, end);
 			self.startDate(start);
-			self.endDate(end);
+			self.endDate(end); //Take it to end of the day
 			self.update();
 		}
 		
@@ -95,9 +94,7 @@
 			_.each(self.published(), function(item) {
 				exclude.push(item._id());
 			});
-			console.log(self.startDate(), self.endDate());
 			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
-				console.log(data);
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -120,7 +117,9 @@
 						'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
 						'Last 30 Days': [Date.today().add({ days: -29 }), 'today'],
 						'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
-						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })]
+						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })],
+						'Last 6 Months': [Date.today().add({ months: -6 }), 'today'],
+						'Last Year': [Date.today().add({ months: -12 }), 'today']
         			}
 				},
 				function(start, end) {
@@ -147,7 +146,9 @@
 						'Last 7 Days': [Date.today().add({ days: -6 }), 'today'],
 						'Last 30 Days': [Date.today().add({ days: -29 }), 'today'],
 						'This Month': [Date.today().moveToFirstDayOfMonth(), Date.today().moveToLastDayOfMonth()],
-						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })]
+						'Last Month': [Date.today().moveToFirstDayOfMonth().add({ months: -1 }), Date.today().moveToFirstDayOfMonth().add({ days: -1 })],
+						'Last 6 Months': [Date.today().add({ months: -6 }), 'today'],
+						'Last Year': [Date.today().add({ months: -12 }), 'today']
         			}
 				},
 				function(start, end) {
