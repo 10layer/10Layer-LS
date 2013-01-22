@@ -28,7 +28,6 @@
 			}
 			if (!empty($user)) {
 				$user=$user[0];
-				print_r($user);
 				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$user->status));
 				
 				return true;
