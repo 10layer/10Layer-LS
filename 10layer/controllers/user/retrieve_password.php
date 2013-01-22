@@ -16,6 +16,7 @@
 		 */
 		public function __construct() {
 			parent::__construct();
+			$this->tlsecurity->ignore_security();
 			$this->load->helper("password");
 			//$this->load->model("model_user");
 		}
@@ -28,7 +29,6 @@
 				$password=$this->model_user->get_password_by_email($email);
 				if (!empty($password)) {
 					$otp=$this->model_user->updateOtp($email);
-					
 					$this->email_otp($email, $otp);
 					$data["email_sent"]=true;
 				}

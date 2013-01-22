@@ -5,7 +5,6 @@
 	link_js("/resources/js/forms.js");
 	ckeditor();
 ?>
-
 <script src="/resources/js/davis.min.js"></script>
 <link rel="stylesheet" href="/resources/chosen/chosen.css">
 <script src="/resources/chosen/chosen.jquery.js"></script>
@@ -275,35 +274,76 @@
 		$(document).on("click", ".remove-zone", function() {
 			$(this).parent().parent().parent().remove();
 		});
+		
+		$(document).on('click', '.do_publish', function() {
+			var zone_urlid = $(this).attr("data-urlid");
+			var zone_title = $(this).html();
+			var section_id = $(this).attr("data-sectionid");
+			var section_title = $(this).attr("data-sectiontitle");
+			console.log("<li><a href='#'>"+section_title+" :: "+zone_title+"</li>");
+			$("#published_list").append("<li><a href='#'>"+section_title+" :: "+zone_title+"</li>");
+		});
 	});
 </script>
 
 <script type='text/template' id='create-template'>
-
+<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
+				<input type='hidden' name='action' value='submit' />
 <div class="row" >
-
+	
 	<div style='margin-left:0;' class='main_form_container span10'>
 		<div class='root'>
-			
 			<div id="edit-content" class="span10" >
 				<h2>Create - <%= content_type %></h2>
-				<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
-				<input type='hidden' name='action' value='submit' />
+				
 				<% _.each(data.meta, function(field) { %>
 					<% if (!field.hidden) { %>
 						<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
 					<% } %>
 				<% }); %>
-				</form>
-
 			</div>
 			<br clear='both'>
 		</div>
 
 		<div class="over_lay slider span10"></div>
     </div>
-
+    <div class="span2">
+    	<div class="well">
+			<h4>Published to</h4>
+			<ul class="nav nav-stacked" id="published_list">
+			</ul>
+		</div>
+		<div class="well">
+			<h4>Publish to</h4>
+			<ul class="nav nav-stacked">
+<?php
+	$collections=$this->model_collections->get_all();
+	foreach($collections as $collection) {
+		$options=$this->model_collections->get_options($collection->_id);
+		foreach($options as $option) {
+		?>
+				<li class="publish_section dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b> <?= $option->title ?> </a>
+					<ul class="dropdown-menu">
+						<?php
+						foreach($option->zone as $zone) {
+						?>
+						<li ><a href="#" class="do_publish" data-sectionid="<?= $option->_id ?>" data-sectiontitle="<?= $option->title ?>" data-urlid="<?= isset($zone['zone_urlid']) ? $zone['zone_urlid'] : '' ?>"><?= $zone['zone_name'] ?></a></li>
+						<?php
+						}
+						?>
+					</ul>
+				</li>
+		<?php
+		}
+	}
+?>
+			</ul>
+		</div>
+	</div>
 </div>
+
+</form>
 
 </script>
 
