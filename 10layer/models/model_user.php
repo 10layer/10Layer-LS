@@ -28,7 +28,8 @@
 			}
 			if (!empty($user)) {
 				$user=$user[0];
-				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$user->status, "roles"=>$user->roles, "permissions"=>$user->permissions));
+				print_r($user);
+				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$user->status));
 				
 				return true;
 			}
@@ -40,9 +41,9 @@
 			if (empty($otp)) {
 				return false;
 			}
-			$user=$this->mongo_db->get_where("users",array("otp"=>$otp)); //We need to limit this to avoid deleted users
+			$user=array_shift($this->mongo_db->get_where("users",array("otp"=>$otp))); //We need to limit this to avoid deleted users
 			if (!empty($user)) {
-				$this->update($user->_id,array("otp"=>"","status_id"=>1));
+				//$this->update($user->_id,array("otp"=>"","status_id"=>1));
 				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status_id"=>1, "roles"=>$user->roles, "permissions"=>$user->permissions));
 				return true;
 			}
@@ -61,8 +62,9 @@
 			if (empty($user)) {
 				return false;
 			}
-			$key=genkey("email");
-			$this->mongo_db->where("_id", $user->_id)->update("users", array("otp"=>$key));
+			$user = $user[0];
+			$key = genkey($user->email.$user->password.time());
+			$this->mongo_db->where(array("_id" => $user->_id))->update("users", array("otp"=>$key));
 			return $key;
 		}
 		
@@ -101,7 +103,7 @@
 			if (empty($otp)) {
 				return false;
 			}
-			return $this->mongo_db->get_where("users",array("otp"=>$otp));
+			return array_shift($this->mongo_db->get_where("users",array("otp"=>$otp)));
 		}
 		
 		public function update($id, $data) {
@@ -141,110 +143,7 @@
 			if (empty($user)) {
 				return false;
 			}
-			return $user->password;
-		}
-		
-		/**
-		 * function queue_check
-		 *
-		 * Checks if anything is in the action queue for the user
-		 * 
-		 * @var $user_id Int
-		 * @return dataset
-		 **/
-		public function queue_check($user_id) {
-			$query=$this->db->get_where("tl_user_queue",array("user_id"=>$user_id));
-			return $query->result();
-		}
-		
-		/**
-		 * function queue_size
-		 *
-		 * Checks if anything is in the action queue for the user and returns number of actions
-		 * 
-		 * @var $user_id Int
-		 * @return dataset CI db result
-		 **/
-		public function queue_size($user_id) {
-			$query=$this->db->get_where("tl_user_queue",array("user_id"=>$user_id));
-			return $query->num_rows();
-		}
-		
-		/**
-		 * function queue_pop
-		 *
-		 * Checks if anything is in the action queue for the user, and pops the result off the end
-		 * 
-		 * @var $user_id Int
-		 * @return dataset CI db result
-		 **/
-		public function queue_pop($user_id) {
-			$this->db->where("user_id",$user_id);
-			$this->db->order_by("timestamp","DESC");
-			$this->db->limit(1);
-			$query=$this->db->get("tl_user_queue");
-			if ($query->num_rows()==0) {
-				return false;
-			}
-			$row=$query->row();
-			$this->db->where("id",$row->id);
-			$this->db->delete("tl_user_queue");
-			return $row;
-		}
-		
-		/**
-		 * function queue_shift
-		 *
-		 * Checks if anything is in the action queue for the user, and pops the result off the beginning
-		 * 
-		 * @var $user_id Int
-		 * @return dataset CI db result, false if empty
-		 **/
-		public function queue_shift($user_id) {
-			$this->db->where("user_id",$user_id);
-			$this->db->order_by("timestamp","ASC");
-			$this->db->limit(1);
-			$query=$this->db->get("tl_user_queue");
-			if ($query->num_rows()==0) {
-				return false;
-			}
-			$row=$query->row();
-			$this->db->where("id",$row->id);
-			$this->db->delete("tl_user_queue");
-			return $row;
-		}
-		
-		/**
-		 * function queue_push
-		 *
-		 * Push an action on to the queue
-		 * 
-		 * @var $user_id Int
-		 * @var $all_users Bool false set to true to affect all users in the system
-		 * @return dataset CI db result
-		 **/
-		public function queue_push($data,$all_users=false) {
-			if (empty($data["unique_id"])) {
-				$uid=$data["action"].microtime();
-				$data["unique_id"]=$uid;
-			}
-			if (!$all_users) {
-				$this->db->insert("tl_user_queue",$data);
-				return $uid;
-			} else {
-				$data=array("user_id"=>0,"action"=>$this->db->escape($data["action"]),"data"=>$this->db->escape($data["data"]),"unique_id"=>$this->db->escape($uid));
-				$sql="INSERT INTO user_queue (user_id, action, data, unique_id) SELECT id, {$data["action"]}, {$data["data"]}, {$data["unique_id"]} FROM users";
-				$this->db->query($sql);
-				return $uid;
-			}
-		}
-		
-		public function queue_check_duplicate($uid) {
-			$query=$this->db->get_where("tl_user_queue",array("unique_id"=>$uid));
-			if ($query->num_rows()>0) {
-				return true;
-			}
-			return false;
+			return $user[0]->password;
 		}
 		
 		/**

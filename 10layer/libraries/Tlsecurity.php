@@ -101,12 +101,11 @@
 		
 		public function checkOtp($otp) {
 			$result=$this->ci->model_user->otpLogin($otp);
-			if ($result) {
-				redirect("/manage/users/my_account");
-			} else {
+			if (!$result) {
 				$this->logout();
 				redirect("/home");
 			}
+			return true;
 		}
 		
 		/**

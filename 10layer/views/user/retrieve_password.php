@@ -4,37 +4,6 @@
 	$headerdata["menu2_active"]="user/retrieve_password";
 	$this->load->view("/templates/header",$headerdata);
 ?>
-<script language="javascript">
-	$(function() {
-		$("input").keyup(function() {
-			var reqs=checkreqs();
-			if (!reqs) {
-				$("#submit").addClass("inactive");
-			} else {
-				$("#submit").removeClass("inactive");
-			}
-		});
-		$("#submit").click(function() {
-			if (checkreqs()) {
-				return true;
-			}
-			return false;
-		});
-		
-		
-	});
-	
-	function checkreqs() {
-		var reqs=true;
-		$(".required").each(function() {
-			var val=$(this).val();
-			if (val=="") {
-				reqs=false;
-			}
-		});
-		return reqs;
-	}
-</script>
 <?php
 	if ($error==1) {
 ?>
@@ -45,19 +14,20 @@
 <?php
 	if ($email_sent) {
 ?>
-	<div class="message">Your password has been sent to your email.</div>
+	<div class="alert alert-block">Your password has been sent to your email.</div>
 <?php
 	}
 ?>
-
-<div id="retrieve" class="boxed wide centered">
-	<div class="title">Retrieve Password</div>
-	Enter the email you use to sign in with to have a one-time login emailed to you
-	<form id="retrieveform" method="post">
+<div class="page-header">
+	<h1>Retrieve Password</h1>
+</div>
+<div id="retrieve" class="well">
+	<h3>Enter the email you use to sign in with to have a one-time login emailed to you</h3>
+	<form id="retrieveform" method="post" class="form-inline">
 		<input type="hidden" name="dologin" value="1" />
 		<label>Email</label>
-		<input type="text" name="email" class="required" value="" /><br />
-		<input type="submit" id="submit" name="submit" value="Retrieve Password" class="button" />
+		<input type="text" name="email" class="required" value="" />
+		<input type="submit" id="submit" name="submit" value="Retrieve Password" class="btn" />
 	</form>
 	<br clear="both" />
 </div>
