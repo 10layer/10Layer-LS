@@ -296,10 +296,19 @@
 			<div id="edit-content" class="span10" >
 				<h2>Create - <%= content_type %></h2>
 				
-				<% _.each(data.meta, function(field) { %>
-					<% if (!field.hidden) { %>
+				<% _.each(data.meta, function(field) {
+					if (!field.hidden) { 
+						try {
+					%>
 						<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
-					<% } %>
+					<%	} catch(err) {
+							$("#msgdialog-header").html("Error");
+							$("#msgdialog-body").html("<h4>A problem was detected with field " + field.name+"</h4><p>"+err+"</p>");
+							$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+							$("#msgdialog").modal();
+						}
+					} 
+					%>
 				<% }); %>
 			</div>
 			<br clear='both'>
