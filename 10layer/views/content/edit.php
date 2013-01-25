@@ -553,12 +553,23 @@
 				<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
 				<input type='hidden' name='action' value='submit' />
 				<input type='hidden' name='id' value='<%= urlid %>' />
-				<% _.each(data.meta, function(field) { 
+				<% _.each(data.meta, function(field) {
+					console.log(field);
 					field.value = data.content[field.name];
 				%>
-					<% if (!field.hidden) { %>
+					<% 
+					if (!field.hidden) { 
+						try {
+					%>
 						<%= _.template($('#edit-field-'+field.type).html(), { field: field, urlid: urlid, content_type: content_type  }) %>
-					<% } %>
+					<%	} catch(err) {
+							$("#msgdialog-header").html("Error");
+							$("#msgdialog-body").html("<h4>A problem was detected with field " + field.name+"</h4><p>"+err+"</p>");
+							$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+							$("#msgdialog").modal();
+						}
+					} 
+					%>
 				<% }); %>
 				</form>
 
