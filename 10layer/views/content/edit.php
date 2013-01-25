@@ -554,7 +554,6 @@
 				<input type='hidden' name='action' value='submit' />
 				<input type='hidden' name='id' value='<%= urlid %>' />
 				<% _.each(data.meta, function(field) {
-					console.log(field);
 					field.value = data.content[field.name];
 				%>
 					<% 
