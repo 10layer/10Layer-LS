@@ -67,6 +67,116 @@
 			flush(); 
 			readfile($filename);
 		}
+		
+		public function browse() {
+			$this->enforce_secure();
+			$limit = $this->input->get_post("limit");
+			if (empty($limit)) {
+				$limit = 50;
+			}
+			$offset = $this->input->get_post("offset");
+			$dir = "content";
+			//$filetypes = array("jpg", "jpeg", "png", "svg", "gif", "mp4", "m4v", "doc", "docx", "xls", "xlsx", "pdf");
+			$filetypes = array("jpg", "jpeg", "png", "svg", "gif");
+			$files = $this->findFiles($dir, $filetypes);
+			$this->data["content"]["count"] = sizeof($files);
+			usort($files, array($this, "file_mtime_sort"));
+			
+			$files = array_slice($files, $offset, $offset + $limit);
+			$this->data["content"]["files"]=$files;
+			$this->data["content"]["filetypes"]=$filetypes;
+			$this->returndata();
+		}
+		
+		protected function findFiles($directory, $extensions = array()) {
+			function glob_recursive($directory, &$directories = array()) {
+				foreach(glob($directory, GLOB_ONLYDIR | GLOB_NOSORT) as $folder) {
+					if (strpos($folder,"cache")===false) {
+						$directories[] = $folder;
+						glob_recursive("{$folder}/*", $directories);
+					}
+				}
+				
+			}
+			glob_recursive($directory, $directories);
+			$files = array ();
+			foreach($directories as $directory) {
+				foreach($extensions as $extension) {
+					foreach(glob("{$directory}/*.{$extension}") as $file) {
+						if (strpos($file,"cache")===false) {
+							$files[] = $file;
+						}
+					}
+				}
+			}
+			return $files;
+		}
+		
+		protected function file_mtime_sort($f1, $f2) {
+			if (filemtime($f1) == filemtime($f2)) {
+				return 0;
+			}
+			return (filemtime($f1) < filemtime($f2)) ? 1 : -1;
+		}
+		
+		public function image() {
+			$filename = $this->input->get_post("filename");
+			$width = $this->input->get_post("width");
+			$height = $this->input->get_post("height");
+			$render = $this->input->get_post("render");
+			$dir = "content";
+			$filetypes = array("jpg", "jpeg", "png", "svg", "gif", "mp4", "m4v", "doc", "docx", "xls", "xlsx", "pdf");
+			$file = $dir."/".$filename;
+			$parts = pathinfo($filename);
+
+			if (strpos($filename,"..")!==false) {
+				//This doesn't look good
+				$this->data["error"]=true;
+				$this->data["msg"]="Looks like you're trying to break out of the dir";
+				$this->returndata();
+				return true;
+			}
+			if (!file_exists($file)) {
+				//This doesn't look good
+				$this->data["error"]=true;
+				$this->data["msg"]="File not found: $file";
+				$this->returndata();
+				return true;
+			}
+			if (!in_array($parts["extension"], $filetypes)) {
+				$this->data["error"]=true;
+				$this->data["msg"]="Cannot access file of that type";
+				$this->returndata();
+				return true;
+			}
+			
+			$cache = "cache/content/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height.".png";
+			if (file_exists($cache)) {
+				if ($render) {
+					header("Content-type: image/png");
+					header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
+			        header('Content-Length: '.filesize($cache));
+		    	    readfile($cache);
+		    	    return true;
+				}
+			}
+			
+			if (!is_dir("cache/content/".$parts["dirname"])) {
+				$result=mkdir("cache/content/".$parts["dirname"], 0755, true);
+			}
+			exec("convert {$file} -background transparent -resize {$width}x{$height}^ -quality 80 -gravity center -extent {$width}x{$height} {$cache}", $result);
+			if ($render) {
+				header("Content-type: image/png");
+				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
+				header('Content-Length: '.filesize($cache));
+				readfile($cache);
+			    return true;
+			}
+		    $this->data["filename"]=$cache;
+			$this->returndata();
+		}
+		
+		
 	}
 
 /* End of file files.php */
