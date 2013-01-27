@@ -85,7 +85,7 @@
 				clearCKEditor();
 				var config = { 
 					toolbar: [
-						['Styles','Format','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize','-','Source']
+						['Format','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize','-','Source']
 					],
 					
 					filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
