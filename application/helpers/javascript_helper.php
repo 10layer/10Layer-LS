@@ -85,16 +85,15 @@
 				clearCKEditor();
 				var config = { 
 					toolbar: [
-						['Source','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize']
+						['Styles','Format','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize','-','Source']
 					],
-					skin: 'kama',
 					
 					filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
 					
 					filebrowserWindowWidth  : 1000,
 					filebrowserWindowHeight : 600,
 					on : { 'paste' : function(ev) {
-						ev.data.html=parsePaste(ev.data.html);
+						ev.data.dataValue=parsePaste(ev.data.dataValue);
 					} }
 					
 				};
@@ -103,6 +102,8 @@
 			}
 			
 			function parsePaste(data) {
+				data = data.trim();
+				
 				data=data.replace(/<meta(?:.|\s)*?>/g,"");
 				
 				data=data.replace(/<span(?:.|\s)*?>/g,"");
@@ -121,8 +122,11 @@
 				data=data.replace(/<br><br>/g,"<br>");
 				data=data.replace(/<br(?:.|\s)*?>/g,"<p>");
 				
+				data=data.replace(/style\s*=\s*("[^"]*"|'[^']*'|[^\s >]*)/g,"");
+				
 				data=data.replace(/<p>$$/g,"");
   				//console.log(data);
+  				
 				return data;
 			}
 			

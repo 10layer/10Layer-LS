@@ -87,7 +87,7 @@
 					toolbar: [
 						['Source','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize']
 					],
-					skin: 'kama',
+					//skin: 'kama',
 					
 					filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
 					
