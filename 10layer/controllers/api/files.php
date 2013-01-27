@@ -162,7 +162,7 @@
 			}
 			
 			if (!is_dir("content/cache/".$parts["dirname"])) {
-				$result=mkdir("cache/content/".$parts["dirname"], 0755, true);
+				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
 			}
 			exec("convert {$file} -background transparent -resize {$width}x{$height}^ -quality 80 -gravity center -extent {$width}x{$height} {$cache}", $result);
 			if ($render) {
