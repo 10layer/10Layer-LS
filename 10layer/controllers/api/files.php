@@ -150,7 +150,7 @@
 				return true;
 			}
 			
-			$cache = "cache/content/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height.".png";
 			if (file_exists($cache)) {
 				if ($render) {
 					header("Content-type: image/png");
@@ -161,7 +161,7 @@
 				}
 			}
 			
-			if (!is_dir("cache/content/".$parts["dirname"])) {
+			if (!is_dir("content/cache/".$parts["dirname"])) {
 				$result=mkdir("cache/content/".$parts["dirname"], 0755, true);
 			}
 			exec("convert {$file} -background transparent -resize {$width}x{$height}^ -quality 80 -gravity center -extent {$width}x{$height} {$cache}", $result);
