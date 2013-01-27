@@ -87,7 +87,7 @@
 					toolbar: [
 						['Format','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize','-','Source']
 					],
-					
+					height: 500,
 					filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
 					
 					filebrowserWindowWidth  : 1000,
