@@ -51,6 +51,7 @@
 			$this->_render=false;
 			$this->count();
 			$this->_render=true;
+			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
 			$this->returndata();
@@ -312,6 +313,26 @@
 				$this->mongo_db->where(array("_id"=>$id));
 				$this->data["criteria"]["id"]=$id;
 			}
+		}
+		
+		/**
+		 * published function.
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		protected function published() {
+			if (!$this->secure) {
+				$this->mongo_db->where(array("workflow_status"=>3));
+				return true;
+			}
+			$published=$this->input->get_post("published");
+			if (!empty($published)) {
+				$this->mongo_db->where(array("workflow_status"=>3));
+				$this->data["criteria"]["published"]=true;
+				return true;
+			}
+			$this->data["criteria"]["published"]=false;
 		}
 		
 		/**
