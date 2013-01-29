@@ -42,10 +42,10 @@
 				)
 			);
 			
-			$db['hostname'] = "localhost";
-			$db['username'] = "root";
-			$db['password'] = "##%Ad81@$";
-			$db['database'] = "mg";
+			$db['hostname'] = $this->input->get_post("db_hostname");
+			$db['username'] = $this->input->get_post("db_username");
+			$db['password'] = $this->input->get_post("db_password");
+			$db['database'] = $this->input->get_post("db_database");
 			$db['dbdriver'] = "mysqli";
 			$db['dbprefix'] = "";
 			$db['pconnect'] = FALSE;
@@ -88,10 +88,10 @@
 				)
 			);
 			
-			$db['hostname'] = "localhost";
-			$db['username'] = "10layer";
-			$db['password'] = "Honstj";
-			$db['database'] = "dailymaverick_import";
+			$db['hostname'] = $this->input->get_post("db_hostname");
+			$db['username'] = $this->input->get_post("db_username");
+			$db['password'] = $this->input->get_post("db_password");
+			$db['database'] = $this->input->get_post("db_database");
 			$db['dbdriver'] = "mysqli";
 			$db['dbprefix'] = "";
 			$db['pconnect'] = FALSE;
@@ -139,10 +139,10 @@
                                         "id"=>"authors.legacy_id")
 			);
 			
-			$db['hostname'] = "localhost";
-			$db['username'] = "root";
-			$db['password'] = "##%Ad81@$";
-			$db['database'] = "mg";
+			$db['hostname'] = $this->input->get_post("db_hostname");
+			$db['username'] = $this->input->get_post("db_username");
+			$db['password'] = $this->input->get_post("db_password");
+			$db['database'] = $this->input->get_post("db_database");
 			$db['dbdriver'] = "mysqli";
 			$db['dbprefix'] = "";
 			$db['pconnect'] = FALSE;
@@ -161,10 +161,10 @@
 		}
 		
 		public function photoimport() {
-			$db['hostname'] = "localhost";
-			$db['username'] = "10layer";
-			$db['password'] = "Honstj";
-			$db['database'] = "dailymaverick_import";
+			$db['hostname'] = $this->input->get_post("db_hostname");
+			$db['username'] = $this->input->get_post("db_username");
+			$db['password'] = $this->input->get_post("db_password");
+			$db['database'] = $this->input->get_post("db_database");
 			$db['dbdriver'] = "mysqli";
 			$db['dbprefix'] = "";
 			$db['pconnect'] = FALSE;
