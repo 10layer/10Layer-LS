@@ -135,10 +135,10 @@
 					$fsize = filesize($filename);
 					$tot = $tot + $fsize;
 					$percent = round($tot / $total_file_size, 3);
-					print "$percent (".round($tot/1024)." of ".round($total_file_size/1024).")<br />";
+					print "$percent (".number_format(round($tot/1024), 2)."KB of ".number_format(round($total_file_size/1024), 2).")<br />";
 					flush();
 					if ($count > $max) {
-						die();
+						//die();
 					}
 				} else {
 					print "Can't find $source or $filename already exists<br />\n";
