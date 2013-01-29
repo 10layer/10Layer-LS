@@ -36,6 +36,17 @@
 				print "Incorrect $date_field found: ".sizeof($incorrect)."<br />";
 			}
 		}
+		
+		public function remove_doubles() {
+			$items = $this->mongo_db->like("_id","-1", "i", true, false)->get("content");
+			foreach($items as $item) {
+				$possibles = $this->mongo_db->where(array("title"=>$item->title, "start_date"=>$item->start_date, "blurb"=>$item->blurb))->order_by(array("_id"))->get("content");
+				if (sizeof($possibles) > 1) {
+					print "Deleting {$item->_id}<br />";
+					$this->mongo_db->where(array("_id"=>$item->_id))->delete("content");
+				}
+			}
+		}
 	}
 
 /* End of file .php */
