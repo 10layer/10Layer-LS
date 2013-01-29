@@ -114,15 +114,19 @@
 			$x = 0;
 			foreach($files as $file) {
 				$date=$file->timestamp;
-				$dir = "/content/";
+				$dir = "content/";
 				$parts=date("Y", $date)."/".date("m", $date)."/".date("d", $date)."/";
-				
-				$filename = ".".$dir.$parts.$file->filename;
+				$safename = str_replace(" ", "-", $file->filename);
+				$safename = preg_replace("/[^A-Za-z0-9._-]/", "", $safename);
+				$filename = $dir.$parts.$safename;
 				$source = $file->filepath;
+				
+				print "$source -> $filename<br />\n";
+				
 				if (!file_exists($filename) && file_exists($source)) {
-					@mkdir(".".$dir.$parts, 0755, true);
-					if (!is_dir(".".$dir.$parts)) {
-						$this->show_error("."."$dir$parts is not a directory or doesn't exist");
+					@mkdir($dir.$parts, 0755, true);
+					if (!is_dir($dir.$parts)) {
+						$this->show_error("$dir$parts is not a directory or doesn't exist");
 					}
 					if (!file_exists($filename)) {
 						copy($source, $filename);
@@ -136,6 +140,8 @@
 					if ($count > $max) {
 						die();
 					}
+				} else {
+					print "Can't find $source or $filename already exists<br />\n";
 				}
 				$result=$this->mongo_db->get_where("content", array("nid"=>(Int) $file->nid));
 				if (!empty($result)) {
