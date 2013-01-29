@@ -80,8 +80,8 @@
 			$dbpassword = $this->input->get_post("password");
 			$dbserver = $this->input->get_post("server");
 			$dbdatabase = $this->input->get_post("database");
-			$website = $this->input->get_post("website");
-			$download = $this->input->get_post("download");
+			//$website = $this->input->get_post("website");
+			//$download = $this->input->get_post("download");
 			
 			if (empty($dbuser) || empty($dbpassword) || empty($dbserver) || empty($dbdatabase)) {
 				show_error("Fields required: user, password, server, database");
@@ -106,34 +106,27 @@
 				show_error("$dbdatabase does not appear to be a Drupal database");
 			}
 			
-			$files=$this->drupal->join("upload", "upload.fid=files.fid")->join("node", "upload.nid=node.nid")->join("node_revisions", "node_revisions.nid=upload.nid")->order_by("files.timestamp DESC")->get("files")->result();
+			$files=$this->drupal->join("upload", "upload.fid=files.fid")->join("node", "upload.nid=node.nid")->order_by("files.timestamp DESC")->get("files")->result();
 			$total_file_size = $this->drupal->select("SUM( filesize ) AS total_file_size")->get("files")->row()->total_file_size;
 			$tot = 0;
 			$max = 10;
 			$count = 0;
 			$x = 0;
-			foreach($files as $file) {	
+			foreach($files as $file) {
 				$date=$file->timestamp;
 				$dir = "/content/";
 				$parts=date("Y", $date)."/".date("m", $date)."/".date("d", $date)."/";
 				
 				$filename = ".".$dir.$parts.$file->filename;
-				$source = $website."/".dirname($file->filepath)."/".rawurlencode(basename($file->filename));
-				if ($download) {
+				$source = $file->filepath;
+				if (!file_exists($filename) && file_exists($source)) {
 					@mkdir(".".$dir.$parts, 0755, true);
 					if (!is_dir(".".$dir.$parts)) {
 						$this->show_error("."."$dir$parts is not a directory or doesn't exist");
 					}
 					if (!file_exists($filename)) {
-						$s=file_get_contents($source);
-						if (strlen($s) > 0) {
-							file_put_contents($filename, $s);				
-							print "$filename ";
-						} else {
-							print "<b>Error:</b> $filename ";
-						}
+						copy($source, $filename);
 						$count++;
-						
 					}
 					$fsize = filesize($filename);
 					$tot = $tot + $fsize;
@@ -144,24 +137,23 @@
 						die();
 					}
 				}
-				
-				$data = new stdClass();
-				$data->title = $file->title;
-				$data->content_type = "file";
-				$data->body = $file->body;
-				$data->file = $dir.$parts.$file->filename;
-				$data->blurb = trim(strip_tags($file->description));
-				$data->timestamp = (Integer) $file->created;
-				$data->last_modified = (Integer) $file->changed;
-				$data->start_date = (Integer) $file->created;
-				$data->nid = (Integer) $file->nid;
-				$data->fid = (Integer) $file->fid;
-				$data->imported = true;
-				$data->workflow_status = 3;
-				$data->last_editor = "Administrator";
-				$data->_id = $this->datatransformations->urlid($this, $data->title, false);
-				$this->mongo_db->insert("content", $data);
-				$x++;
+				$result=$this->mongo_db->get_where("content", array("nid"=>(Int) $file->nid));
+				if (!empty($result)) {
+					$item = $result[0];
+					if (empty($item->attachment)) {
+						$this->mongo_db->where(array("_id"=>$item->_id))->update("content", array("attachment"=>ltrim($filename, ".")));
+					} else {
+						$attachments = array();
+						if (is_array($item->attachment)) {
+							$attachments = $item->attachment;
+						}
+						if (!in_array(ltrim($filename, "."), $attachments)) {
+							$attachments[] = ltrim($filename, ".");
+						}
+						$this->mongo_db->where(array("_id"=>$item->_id))->update("content", array("attachment"=>$attachments));
+					}
+					$x++;
+				}
 			}
 			print "Inserted $x items";
 		}
