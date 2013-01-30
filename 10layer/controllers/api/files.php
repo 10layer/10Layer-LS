@@ -82,7 +82,7 @@
 			$this->data["content"]["count"] = sizeof($files);
 			usort($files, array($this, "file_mtime_sort"));
 			
-			$files = array_slice($files, $offset, $offset + $limit);
+			$files = array_slice($files, $offset, $limit);
 			$this->data["content"]["files"]=$files;
 			$this->data["content"]["filetypes"]=$filetypes;
 			$this->returndata();
