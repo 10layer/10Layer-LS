@@ -123,6 +123,19 @@
 			$filename = $this->input->get_post("filename");
 			$width = $this->input->get_post("width");
 			$height = $this->input->get_post("height");
+			$bounding = $this->input->get_post("bounding");
+			$op = "";
+			$opstr = "fill";
+			$extent = "";
+			if (empty($bounding)) {
+				$op = "^";
+				$opstr = "bound";
+				$extent = "-extent {$width}x{$height}";
+			}
+			$quality = $this->input->get_post("quality");
+			if (empty($quality)) {
+				$quality = 80;
+			}
 			$render = $this->input->get_post("render");
 			$dir = "content";
 			$filetypes = array("jpg", "jpeg", "png", "svg", "gif", "mp4", "m4v", "doc", "docx", "xls", "xlsx", "pdf");
@@ -150,7 +163,7 @@
 				return true;
 			}
 			
-			$cache = "content/cache/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height."-".$quality."-".$opstr.".png";
 			if (file_exists($cache)) {
 				if ($render) {
 					header("Content-type: image/png");
@@ -164,7 +177,7 @@
 			if (!is_dir("content/cache/".$parts["dirname"])) {
 				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert {$file} -background transparent -resize {$width}x{$height}^ -quality 80 -gravity center -extent {$width}x{$height} {$cache}", $result);
+			exec("convert {$file} -background transparent -resize {$width}x{$height}{$op} -quality 80 -gravity center $extent {$cache}", $result);
 			if ($render) {
 				header("Content-type: image/png");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
