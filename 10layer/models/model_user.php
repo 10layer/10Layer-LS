@@ -198,18 +198,18 @@
 			return $user[0]->status;
 		}
 		
-		public function getUserPermission($uid) {
+		/*public function getUserPermission($uid) {
 			$users=$this->mongo_db->where(array("_id"=>$uid))->get("users");
 			return $users[0]->permissions;
-		}
+		}*/
 		
-		public function getUserPermissions($uid) {
+		/*public function getUserPermissions($uid) {
 			$this->db->select("tl_permissions_users_link.permission_id")->from("tl_permissions_users_link")->where("user_id",$uid);
 			$this->db->select("tl_permissions.name");
 			$this->db->join("tl_permissions","tl_permissions_users_link.permission_id=tl_permissions.id");
 			$query=$this->db->get();
 			return $query->result();
-		}
+		}*/
 		
 		public function getUserRoles($uid) {
 			$this->db->select("tl_roles_users_link.role_id")->from("tl_roles_users_link")->where("user_id",$uid);
@@ -219,12 +219,12 @@
 			return $query->result();
 		}
 		
-		public function getUserPermissionTypes() {
+		/*public function getUserPermissionTypes() {
 			$query=$this->db->get("tl_permissions");
 			return $query->result();
-		}
+		}*/
 		
-		public function getUrlsByPermission($permission_id) {
+		/*public function getUrlsByPermission($permission_id) {
 			if (!is_array($permission_id)) {
 				$permission_id=array($permission_id);
 			}
@@ -268,7 +268,7 @@
 		
 		public function cleanPermissions() {
 			$this->db->truncate("tl_permissions_urls");
-		}
+		}*/
 		
 		public function getUserRoleTypes() {
 			$query=$this->db->get("tl_roles");

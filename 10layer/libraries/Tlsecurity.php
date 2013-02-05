@@ -158,7 +158,7 @@
 				return true;
 			}
 			//Exact match
-			$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url);
+			/*$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url);
 			if ($permission) {
 				$this->_permissionDeny();
 			}
@@ -174,9 +174,9 @@
 			$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url);
 			if ($permission) {
 				$this->_permissionDeny();
-			}
+			}*/
 			//Last check - look for inheretence
-			$permission_id=$this->ci->model_user->getUserPermission($this->ci->session->userdata("id"));
+			/*$permission_id=$this->ci->model_user->getUserPermission($this->ci->session->userdata("id"));
 			$allowedurls=$this->ci->model_user->getUrlsByPermission($permission_id);
 			foreach($allowedurls as $allowedurl) {
 				$pieces=$this->ci->uri->segment_array();
@@ -187,7 +187,7 @@
 						$this->_permissionDeny();
 					}
 				}
-			}
+			}*/
 			//You made it!
 			return true;
 		}

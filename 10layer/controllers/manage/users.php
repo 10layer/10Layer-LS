@@ -66,8 +66,8 @@ class Users extends CI_Controller {
 		$data["menu1_active"]="manage";
 		$data["menu2_active"]="manage/users/accounts";
 		$data["user"]=$this->model_user->get_by_urlid($urlid);
-		$data["permissions"]=$this->model_user->getUserPermissionTypes();
-		$data["roles"]=$this->model_user->getUserRoleTypes();
+		//$data["permissions"]=$this->model_user->getUserPermissionTypes();
+		//$data["roles"]=$this->model_user->getUserRoleTypes();
 		$data["statuses"]=$this->model_user->get_statuses();
 		$this->load->view('templates/header',$data);
 		$this->load->view("/manage/user_edit");
@@ -124,8 +124,8 @@ class Users extends CI_Controller {
 		}
 		$data["menu1_active"]="manage";
 		$data["menu2_active"]="manage/users/accounts";
-		$data["permissions"]=$this->model_user->getUserPermissionTypes();
-		$data["roles"]=$this->model_user->getUserRoleTypes();
+		//$data["permissions"]=$this->model_user->getUserPermissionTypes();
+		//$data["roles"]=$this->model_user->getUserRoleTypes();
 		$this->load->view('templates/header',$data);
 		$this->load->view("/manage/user/add");
 		$this->load->view("templates/footer");
