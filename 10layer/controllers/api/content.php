@@ -109,7 +109,7 @@
 		 * @return void
 		 */
 		public function save() {
-			if(empty($_POST) || empty($_GET)){
+			if(empty($_POST) && empty($_GET)){
 				$this->data["error"]=true;
 				$this->data["msg"][]="We did not receive data";
 				$this->returndata();
@@ -185,8 +185,6 @@
 					}
 				}
 			}
-
-
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
 				//Update
@@ -208,6 +206,141 @@
 			}
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
+			$this->returndata();
+		}
+		
+		/**
+		 * delete function.
+		 * 
+		 * Moves a document to "content_deleted" section. Requires "id".
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function delete() {
+			if(empty($_POST) && empty($_GET)){
+				$this->data["error"]=true;
+				$this->data["msg"][]="We did not receive data";
+				$this->returndata();
+				return false;
+			}
+			if (!$this->secure) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="You do not have permission to delete";
+				$this->returndata();
+				return false;
+			}
+			$id=$this->input->get_post("id");
+			if (empty($id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="ID must be set";
+				$this->returndata();
+				return false;
+			}
+			$result=array_pop($this->mongo_db->get_where("content", array("_id"=>$id)));
+			if (empty($result)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="ID $id not found";
+				$this->returndata();
+				return false;
+			}
+			if ($this->mongo_db->insert("content_deleted", $result)) {
+				$this->mongo_db->where(array("_id"=>$id))->delete("content");
+				$this->data["msg"]="Item $id deleted";
+			} else {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Error deleting $id";
+			}
+			$this->returndata();
+		}
+		
+		/**
+		 * undelete function.
+		 *
+		 * Moves a document from "content_deleted" collection back to "content" collection. Requires "id".
+		 * 
+		 * @access public
+		 * @return void
+		 */
+		public function undelete() {
+			if(empty($_POST) && empty($_GET)){
+				$this->data["error"]=true;
+				$this->data["msg"][]="We did not receive data";
+				$this->returndata();
+				return false;
+			}
+			if (!$this->secure) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="You do not have permission to undelete";
+				$this->returndata();
+				return false;
+			}
+			$id=$this->input->get_post("id");
+			if (empty($id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="ID must be set";
+				$this->returndata();
+				return false;
+			}
+			$result=array_pop($this->mongo_db->get_where("content_deleted", array("_id"=>$id)));
+			if (empty($result)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="ID $id not found";
+				$this->returndata();
+				return false;
+			}
+			if ($this->mongo_db->insert("content", $result)) {
+				$this->mongo_db->where(array("_id"=>$id))->delete("content_deleted");
+				$this->data["msg"]="Item $id undeleted";
+			} else {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Error undeleting $id";
+			}
+			$this->returndata();
+		}
+		
+		/**
+		 * multiple function.
+		 * 
+		 * Allows for multiple ops to be executed with one request, eg. delete a number of files.
+		 * Expects an array called items
+		 *
+		 * @access public
+		 * @param mixed $action
+		 * @return void
+		 */
+		public function multiple($action) {
+			if(empty($_POST) && empty($_GET)){
+				$this->data["error"]=true;
+				$this->data["msg"][]="We did not receive data";
+				$this->returndata();
+				return false;
+			}
+			if (!method_exists($this, $action)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Action $action not found";
+				$this->returndata();
+				return false;
+			}
+			$items = $this->input->get_post("items");
+			if (empty($items) || !is_array($items)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Items must be an array";
+				$this->returndata();
+				return false;
+			}
+			$api_key = $this->input->get_post("api_key");
+			$url = base_url()."api/content/$action?api_key=$api_key";
+			$this->data["content"]=array();
+			foreach($items as $item) {
+				$ch = curl_init(); 
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $item);
+				$output = curl_exec($ch); 
+				curl_close($ch);
+				$this->data["content"][] = $output;
+			}
 			$this->returndata();
 		}
 		

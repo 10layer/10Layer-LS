@@ -164,7 +164,6 @@
 			);
 		}
 		
-		
 		function update_autos() {
 			$(".ajax_autoload").each(function() {
 				var url=$(this).attr("url");
@@ -225,7 +224,6 @@
 				init_form();
 				$(".chzn-select").chosen();
 			});
-			
 		}
 		
 		$(document).on('click', '.the_action', function() {
@@ -234,15 +232,6 @@
 			save();
 			return false;
 		});
-		
-		// $(document).on('click', '#dodone_right', function() {
-		// 	action = $(this).attr('id');
-		// 	$(document.body).data('action',action);
-		// 	$(document.body).data('done_submit', true);
-		// 	save();
-		// 	return false;
-		// });
-		
 		
 		function save() {
 			for ( instance in CKEDITOR.instances )
@@ -294,9 +283,9 @@
 		}
 
 		function uploadComplete(data) {
-			setTimeout(hide_progress_bar, 5000);
+			setTimeout(hide_progress_bar, 1000);
 			//hide_progress_bar();
-			$(document.body).data("saving",false);
+			$(document.body).data("saving", false);
 			if (data.error) {
 				$("#msgdialog-header").html("Error");
 				var info = (data.info) ? data.info : '';
@@ -322,7 +311,6 @@
 				}
 
 				$(location).attr('href',url);
-
 			}
 		}
 		
@@ -392,7 +380,6 @@
 				
 				
 			});
-			
 			viewer.readAsDataURL(file);
 			
 		});
@@ -490,6 +477,63 @@
 			$(this).parent().parent().parent().remove();
 		});
 		
+		$(document).on("click", "#_delete", function(e) {
+			e.preventDefault();
+			$("#msgdialog-header").html("Confirm Delete");
+			$("#msgdialog-body").html("<p>Are you sure you want to delete this document?</p>");
+			$("#msgdialog-buttons").html('<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="btn_confirm_delete">Delete</button> <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>');
+			$("#msgdialog").modal();
+			return false;
+		});
+		
+		$(document).on("click", "#btn_confirm_delete", function(e) {
+			e.preventDefault();
+			$.getJSON("<?= base_url() ?>api/content/delete?jsoncallback=?", { id: $(document.body).data('urlid'), api_key: $(document.body).data('api_key') }, function(data) {
+				if (data.error) {
+					$("#msgdialog-header").html("Error");
+					$("#msgdialog-body").html("<h4>There was an error deleting this item</h4> <p>"+data.msg+"</p>");
+					$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Okay</button>');
+					$("#msgdialog").modal();
+				} else {
+					var url = '<?php echo base_url(); ?>edit/'+$(document.body).data('content_type');
+					$(location).attr('href',url);
+				}
+			});
+			return false;
+		});
+		
+		$(document).on("click", "#_delete_multiple", function(e) {
+			e.preventDefault();
+			var del_items = [];
+			$(".select_item:checked").each(function() {
+				del_items.push($(this).val());
+			});
+			if (del_items.length == 0) {
+				$("#msgdialog-header").html("Confirm Delete");
+				$("#msgdialog-body").html("<h4>No documents selected</h4> <p>Please select some documents by ticking the checkboxes</p>");
+				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Okay</button>');
+				$("#msgdialog").modal();
+				return false;
+			}
+			$("#msgdialog-header").html("Confirm Delete");
+			$("#msgdialog-body").html("<p>Are you sure you want to delete "+del_items.length+" document"+((del_items.length > 1) ? "s" : "")+"?</p>");
+			$("#msgdialog-buttons").html('<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="btn_confirm_multi_delete">Delete</button> <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>');
+			$("#msgdialog").modal();
+			return false;
+		});
+		
+		$(document).on("click", "#btn_confirm_multi_delete", function(e) {
+			var del_items = [];
+			$(".select_item:checked").each(function() {
+				del_items.push({ id: $(this).val() });
+			});
+			$.getJSON("<?= base_url() ?>api/content/multiple/delete?jsoncallback=?", { items: del_items, api_key: $(document.body).data('api_key') }, function(data) {
+				$(".select_item:checked").each(function() {
+					$(this).parent().parent().hide();
+				});
+			});
+		});
+		
 	}); //End of $(function)
 	
 	version_map=new Array( "", "New", "Edited", "Published" );
@@ -497,10 +541,19 @@
 </script>
 <script type="text/template" id="listing-template">
 	<div id="contentlist" class="boxed full">
-		<div id="listSearchContainer">
+		<div id='pagination' class='pagination' style="float: left; margin-right: 50px"></div>
+		<div id="listSearchContainer" style="float: left; margin-right: 50px; margin-top: 20px">
 			<%= _.template($('#listing-template-search').html(), { search: data.search, content_type: content_type }) %>
 		</div>
-		<div id='pagination' class='pagination'></div>
+		<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
+			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
+			<ul class="dropdown-menu">
+				<!--<li><a href="#" class="group_action" data-action="">Create</a></li>
+				<li><a href="#">Edit</a></li>
+				<li><a href="#">Publish</a></li>-->
+				<li><a href="#" id="_delete_multiple">Delete</a></li>
+			</ul>
+		</div>
 		<div id='content-table'>
 			<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
 		</div>
@@ -518,6 +571,7 @@
 	<table class='table table-bordered table-striped table-condensed'>
 	    <thead>
 	    <tr>
+	    	<th></th>
 	    	<th>Title</th>
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
@@ -528,10 +582,11 @@
 	    <tbody>
 		<% var x=0; _.each(content, function(item) {  %>
 	    <tr id="row_<%= item.id %>">
+	    	<td><input type="checkbox" class="select_item" name="select_item" value="<%= item._id %>"></td>
 	    	<td class='content-workflow-<%= item.workflow_status %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
-	    	<td><%= dateToString(item.last_modified) %></td>
+	    	<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
 	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-	    	<td><%= dateToString(item.start_date) %></td>
+	    	<td style="width: 100px"><%= dateToString(item.start_date) %></td>
 	    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
 	    </tr>
 		<% x++; }); %>
@@ -586,25 +641,19 @@
 			<div class="container">
 				<ul class="nav">
 
-					<li><button id="_done" class="the_action btn btn-mini btn-primary" id="dosubmit_right">Save and List</button></li>
+					<li><button id="_done" class="the_action btn btn-mini btn-primary">Save and List</button></li>
 					<li class='divider-vertical'></li>
-					<li><button id="_edit" class="the_action btn btn-mini btn-warning" id="dosubmit_right">Save and Edit</button></li>
+					<li><button id="_edit" class="the_action btn btn-mini btn-info">Save and Edit</button></li>
 					<li class='divider-vertical'></li>
-					<li><button id="_publish" class="the_action btn btn-mini btn-danger" id="dosubmit_right">Save and Publish</button></li>
-
-
-
+					<li><button id="_publish" class="the_action btn btn-mini btn-warning">Save and Publish</button></li>
+					<li class='divider-vertical'></li>
+					<li><button id="_delete" class="btn btn-mini btn-danger">Delete</button></li>
 					<li class="divider-vertical"></li>
 					<li style=" padding-top:10px; width:300px;">
 						<div id='progress_container' style='display:none;' class="progress progress-striped active">
 							<div id="upload_indicator" class="bar" style="width: 0%;"></div>
 						</div>
 					</li>
-
-					<!--<span id="workflows"></span>-->
-
-
-
 				</ul>
 			</div>
 		</div>
