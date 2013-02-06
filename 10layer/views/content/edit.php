@@ -464,13 +464,18 @@
 		
 		$(document).on("change", ".zone-field", function() {
 			var data={};
+			var urlid = "";
 			$(this).parent().find(".zone-field").each(function() {
 				var name = $(this).attr("name");
 				var val = $(this).val();
 				data[name]=val;
+				if (name == "zone_urlid") {
+					urlid = val;
+				}
 			});
 			datael=$(this).parent().find(".zone-data");
 			datael.val(JSON.stringify(data));
+			datael.attr("name", "section_zone["+urlid+"]");
 		});
 		
 		$(document).on("click", ".remove-zone", function() {

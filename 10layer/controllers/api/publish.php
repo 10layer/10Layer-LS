@@ -19,21 +19,34 @@
 		}
 		
 		public function save() {
+			$id = $this->input->get_post("_id");
+			if (empty($id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Var id required";
+				$this->returndata();
+				return false;
+			}
+			$zones = $this->input->get_post("zones");
+			if (empty($zones) || !is_array($zones)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="zones must be an array";
+				$this->returndata();
+				return false;
+			}
 			$this->enforce_secure();
 			$x = 0;
-			//foreach($this->vars->zones as $zone) {
-			$this->mongo_db->where(array("_id"=>$this->vars->_id))->delete("published");
-			for($x=0; $x<sizeof($this->vars->zones); $x++) {
-				for($y=0; $y<sizeof($this->vars->zones[$x]); $y++) {
-					$id=$this->vars->zones[$x][$y]->_id;
-					$item=$this->model_content->get($id);
-					$this->vars->zones[$x][$y]=$item[0];
+			$this->mongo_db->where(array("_id"=>$id))->delete("published");
+			$result = array("_id"=>$id);
+			foreach($zones as $key=>$zone) {
+				foreach($zone as $doc) {
+					$id=$doc["_id"];
+					$item=array_pop($this->model_content->get($id));
+					$result["zones"][$key][]=$item;
 				}
 			}
-			$this->mongo_db->insert("published", $this->vars);
+			$this->mongo_db->insert("published", $result);
 			$this->data["message"]="Section updated";
 			$this->returndata();
-			//}
 		}
 		
 		public function section($section_id) {
@@ -54,6 +67,20 @@
 				$this->data["content"] = $section->zones[$zone_id];
 			}
 			$this->returndata();
+		}
+		
+		public function document() {
+			$this->enforce_secure();
+			$section_id = $this->input->get_post("section_id");
+			if (empty($section_id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="Var section_id required";
+				$this->returndata();
+				return false;
+			}
+			$section=array_pop($this->mongo_db->get_where("content",array("_id"=>$section_id)));
+			
+			print_r($section);
 		}
 	}
 ?>

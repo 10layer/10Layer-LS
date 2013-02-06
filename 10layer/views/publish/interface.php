@@ -40,7 +40,7 @@
 			} else {
 				exclude=[];
 			}
-			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC" }, function(data) {
+			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", fields: ["title", "_id", "content_type", "start_date" ] }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -158,17 +158,25 @@
 		};
 		
 		self.save = function() {
-			$.ajax("/api/publish/save?api_key=<?= $this->config->item("api_key") ?>", {
-				data: ko.toJSON({ _id: "<?= $collection->_id ?>", zones: _.map(self.zones(), function(item) { return item.published() }) }),
-				type: "post", contentType: "application/json",
-				success: function(result) { 
+			var data = {};
+			data._id = "<?= $collection->_id ?>";
+			data.zones = {};
+			_.each(self.zones(), 
+				function(item) {
+					var key = item.id();
+					var tmp = {};
+					data.zones[key] = JSON.parse(ko.toJSON(item.published())); 
+				}
+			);
+			$.getJSON("/api/publish/save?api_key=<?= $this->config->item("api_key") ?>", data, 
+				function(result) { 
 					if (result.error) {
 						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
 					} else {
 						$("#save_success").slideDown(1000).delay(3000).slideUp(1000);
 					}
 				}
-			});
+			);
 		}		
 	}
 	
