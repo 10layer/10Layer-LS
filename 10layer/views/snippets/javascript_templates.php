@@ -926,7 +926,7 @@
 					<option value="<%= item._id %>" <%= ((zone.zone_content_types) && (zone.zone_content_types.indexOf(item._id)) >= 0) ? "selected='selected'" : '' %>><%= item.name %></option>
 				<% }); %>
 			</select>
-			<input type="hidden" class="zone-data" name="<%= fieldname %>[]" value='<%= JSON.stringify(zone) %>' />
+			<input type="hidden" class="zone-data" name="<%= fieldname %>[<%= zone.zone_urlid %>]" value='<%= JSON.stringify(zone) %>' />
 			<div style="margin-top: 20px"><a href="#" class="btn btn-warning btn-mini remove-zone">Remove zone</a></div>
 		</div>
 	</div>

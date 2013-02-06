@@ -47,6 +47,40 @@
 				}
 			}
 		}
+		
+		public function old_zones() {
+			$collections = $this->mongo_db->get_where("content_types", array("collection"=>true));
+			foreach($collections as $collection) {
+				$sections = $this->mongo_db->get_where("content", array("content_type"=>$collection->_id));
+				foreach($sections as $section) {
+					$zones = $section->zone;
+					$keys = array_keys($zones);
+					if ($keys[0] === 0) {
+						$newzones = array();
+						$newpublised = array();
+						$zonelist = array();
+						
+						print "Need to fix ".$section->_id."<br />\n";
+						$published = array_pop($this->mongo_db->get_where("published", array("_id"=>$section->_id)));
+						foreach($zones as $zone) {
+							if (!isset($zone["zone_urlid"]) || empty($zone["zone_urlid"])) {
+								$urlid = url_title($zone["zone_name"],"-", true);
+							} else {
+								$urlid = $zone["zone_urlid"];
+							}
+							$newzones[$urlid] = $zone;
+							$zonelist[] = $urlid;
+						}
+						
+						for($x=0; $x < sizeof($published->zones); $x++) {
+							$newpublished[$zonelist[$x]] = $published->zones[$x];
+						}
+						$this->mongo_db->where(array("_id"=>$section->_id))->update("content", array("zone"=>$newzones));
+						$this->mongo_db->where(array("_id"=>$section->_id))->update("published", array("zones"=>$newpublished));
+					}
+				}
+			}
+		}
 	}
 
 /* End of file .php */
