@@ -120,18 +120,6 @@
 	</div>
 </script>
 
-<script type='text/template' id='proto-field-checkbox'>
-	<!-- proto-field-checkbox -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Checkbox</label>
-		    <div class="controls">
-		    	<input type='checkbox' name='proto_field_checkbox' value='1' class='' />
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-date'>
 	<!-- edit-field-date -->
 	<div class='control-group'>
@@ -162,18 +150,6 @@
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (val) ? stringToDate(val) : '' %>' />
 			<input type='text' name='<%= field.contenttype %>_<%= field.name %>_datetime' value='<%= (val) ? dateToString(val) : '' %>' class='datetime_change datetime_date datepicker <%= field.class %>' data-date="<%= (val) ? dateToString(val) : '' %>" data-date-format="yyyy-mm-dd" />
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='proto-field-date'>
-	<!-- proto-field-date -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Date</label>
-		    <div class="controls">
-		    	<input type='text' name='proto_field_date' value='<%= sqlCurrentDate() %>' class='datepicker' data-date="" data-date-format="yyyy-mm-dd" />
-		    </div>
 		</div>
 	</div>
 </script>
@@ -235,20 +211,6 @@
 	</div>
 </script>
 
-<script type='text/template' id='proto-field-datetime'>
-	<!-- proto-field-datetime -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Date-Time</label>
-		    <div class="controls">
-		    	<input type='text' name='proto_field_datetime' value='<%= sqlCurrentDate() %>' class='datepicker' data-date="" data-date-format="yyyy-mm-dd" />
-		    	<input type='text' id='proto_field_datetime_datetime_hour' class='datetime_change datetime_hour' value="00" /> :
-			<input type='text' id='proto_field_datetime_datetime_minute' class='datetime_change datetime_minute' value="00" />
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-search'>
 	<!-- edit-field-search -->
 		<div class='control-group search'>
@@ -282,19 +244,6 @@
 	<%= _.template($('#edit-field-search').html(), {field: field} ) %>
 </script>
 
-<script type='text/template' id='proto-field-search'>
-	<!-- proto-field-search -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Deep Search</label>
-		    <div class="controls">
-		    	<input id="proto_deepsearch_view" type="text" class="span2 deepsearch_input" value="" />
-				<button class="btn deepsearch-search" type="button">Search</button>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-file'>
 	<!-- edit-field-file -->
 	<%= _.template($('#edit-field-image').html(), {field: field} ) %>
@@ -303,18 +252,6 @@
 <script type='text/template' id='create-field-file'>
 	<!-- create-field-file -->
 	<%= _.template($('#create-field-image').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='proto-field-file'>
-	<!-- proto-field-file -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>File</label>
-		    <div class="controls">
-		    	<input type="file" name="proto_file" class="file_upload" value="" />
-		    </div>
-		</div>
-	</div>
 </script>
 
 <script type='text/template' id='edit-field-hidden'>
@@ -327,25 +264,12 @@
 	<input type="hidden" name="<%= field.contenttype %>_<%= field.name %>" value="<%= nullStr(field.defaultValue) %>" />
 </script>
 
-<script type='text/template' id='proto-field-hidden'>
-	<!-- proto-field-file -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Hidden</label>
-		    <div class="controls">
-		    	<em>Hidden Field</em>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-image'>
 	<!-- edit-field-image -->
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" />
 			
 		<div class="row">
 			<div class="preview-image span3" >
@@ -353,36 +277,26 @@
 					<div class="bar" style="width: 0%;"></div>
 				</div>
 				<div class="alert" style="display: none"></div>
-				
-				<% 
-				if (field.value) {
-					if (isImage(field.value)) {
-				%>
-					<div class="image-crop" style="max-height: 220px; overflow: hidden">
-						<img src="<%= encodeURIName(field.value) %>" />
-					</div>
-					<div class="download"><a href="/api/files/download<%= encodeURIName(field.value) %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
-				<%
-					} else {
-				%>
-					<div class="image-crop" style="max-height: 220px; overflow: hidden">
-						<img src="" />
-					</div>
-					<div class="download"><a href="/api/files/download<%= encodeURIName(field.value) %>" target="_blank"><i class="icon-download"></i> Download <%= baseName(field.value) %></a></div>
-					
-				<%
-					}
-				} else {
-				%>
-					<div class="image-crop" style="max-height: 220px; overflow: hidden">
-						<img src="" />
-					</div>
-					<div class="download"></div>
-				<%
-				}
-				%>
 			</div>
 		</div>
+		<div class="row">
+			<div class="preview-image-items">
+			<%
+			if (field.multiple) {
+				_.each(field.value, function(item, index) { %>
+					<%= _.template($("#field-image-item").html(), {value: item, field: field, index: index }) %>	
+				<% });
+			} else {
+				if (field.value) {
+			%>
+				<%= _.template($("#field-image-item").html(), {field: field }) %>	
+			<%
+				}
+			}
+			%>
+			</div>
+		</div>
+		
 		<% if (field.linkformat && urlid) { %>
 			<label>Download link</label>
 			<div class='download_url'><input type='text' class='span8 select_on_click' readonly='readonly' value='<%= field.linkformat.replace('{filename}', (field.value) ? field.value : '') %>' /></div>
@@ -396,32 +310,52 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %>" value="<%= (field.value) ? field.value : '' %>" />
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" />
 			<div class="row">
-				<div class="preview-image span3" style="display: none">
+				<div class="preview-image span3" >
 					<div class="progress progress-striped active" style="display: none">
 						<div class="bar" style="width: 0%;"></div>
 					</div>
 					<div class="alert" style="display: none"></div>
-					<div class="image-crop" style="max-height: 220px; overflow: hidden">
-						<img src="<%= field.value %>" />
-					</div>
-					<div class="download"></div>
 				</div>
+			</div>
+			<div class="row">
+				<div class="preview-image-items"></div>
 			</div>
 		</div>
 	</div>
 </script>
 
-<script type='text/template' id='proto-field-image'>
-	<!-- proto-field-image -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Image</label>
-		    <div class="controls">
-		    	<input type="file" name="proto_image" class="file_upload" />
-		    </div>
+<script type='text/template' id='field-image-item'>
+	<%
+	if (typeof index !== "undefined") {
+		value = field.value[index];
+	}
+	if (typeof value === "undefined") {
+		if (_.isArray(field.value)) {
+			value = field.value[0];
+		} else {
+			value = field.value;
+		}
+	}
+	%>
+	<div class="row">
+		<input type="hidden" class="file_value" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple) ? '[]' : '' %>" value="<%= (value) ? value : '' %>" />
+		<div class="well span6">
+			<div class="row">
+				<div class="span6"><h4><%= baseName(value) %></h4></div>
+			</div>
+			<% if (isImage(value)) { %>
+			<div class="span3">
+				<img src="/api/files/image?filename=<%= encodeURIName(value).replace('/content/', '') %>&width=150&height=115&render=true" />
+			</div>
+			<% } %>
+			<div class="btn-group btn-group-vertical">
+				<a href="#" class="btn image-remove"><i class="icon-remove"></i> Remove</a>
+				<a href="#" class="btn image-link"><i class="icon-edit"></i> Link</a>
+				<a href="/api/files/download<%= encodeURIName(value) %>" target="_blank" class="btn"><i class="icon-download"></i> Download</a>
+			</div>
+			<div class="link-show span6 hide">Link <input type="text" name="link" value="<%= encodeURIName(value) %>" class='span5 select_on_click' readonly='readonly' /></div>
 		</div>
 	</div>
 </script>
@@ -519,23 +453,6 @@
 		</div>
 </script>
 
-<script type='text/template' id='proto-field-tree'>
-	<!-- proto-field-nested -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Nested Items</label>
-		    <div class="controls">
-		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_tree" id="proto_tree-hook">
-					<optgroup label="Nested Group 1"><option value="">Item 1</option></optgroup>
-					<optgroup label="Nested Group 2"><option value="">Item 2</option><option value="">Item 3</option></optgroup>
-					<optgroup label="Nested Group 3"><option value="">Item 4</option></optgroup>
-				</select>
-				<% $("#proto_tree-hook").trigger("liszt:updated"); %>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-password'>
 	<!-- edit-field-password -->
 	<div class='control-group'>
@@ -552,18 +469,6 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type='password' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' />
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='proto-field-password'>
-	<!-- proto-field-password -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Password</label>
-		    <div class="controls">
-		    	<input type='password' name='proto_password' value='' />
-		    </div>
 		</div>
 	</div>
 </script>
@@ -602,31 +507,6 @@
 	</div>
 </script>
 
-<script type='text/template' id='proto-field-radio'>
-	<!-- proto-field-radio -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Radio</label>
-		    <div class="controls">
-		    	<div class='radiogroup'>
-		    		<div class='radio'>
-						<input type='radio' name='proto_radio' value='' checked='checked' />
-						<div class='radio_label'>Option 1</div>
-					</div>
-					<div class='radio'>
-						<input type='radio' name='proto_radio' value='' />
-						<div class='radio_label'>Option 2</div>
-					</div>
-					<div class='radio'>
-						<input type='radio' name='proto_radio' value='' />
-						<div class='radio_label'>Option 3</div>
-					</div>
-		    	</div>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-readonly'>
 	<!-- edit-field-readonly -->
 	<div class='control-group'>
@@ -643,18 +523,6 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' readonly='readonly' />
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='proto-field-readonly'>
-	<!-- proto-field-readonly -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Read Only</label>
-		    <div class="controls">
-		    	<input type='text' name='proto_readonly' value='' readonly='readonly' />
-		    </div>
 		</div>
 	</div>
 </script>
@@ -683,23 +551,6 @@
 <script type='text/template' id='create-field-reverse'>
 	<!-- create-field-reverse -->
 	<%= _.template($('#edit-field-reverse').html(), {field: field} ) %>
-</script>
-
-<script type='text/template' id='proto-field-reverse'>
-	<!-- proto-field-reverse -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Reverse</label>
-		    <div class="controls">
-		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_tree" id="proto_tree-hook">
-					<option value="">Item 1</option>					
-					<option value="">Item 2</option><option value="">Item 3</option>
-					<option value="">Item 4</option>
-				</select>
-				<% $("#proto_tree-hook").trigger("liszt:updated"); %>
-		    </div>
-		</div>
-	</div>
 </script>
 
 <script type='text/template' id='edit-field-select'>
@@ -750,23 +601,6 @@
 	</div>
 </script>
 
-<script type='text/template' id='proto-field-select'>
-	<!-- proto-field-select -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Select</label>
-		    <div class="controls">
-		    	<select class="chzn-select" data-placeholder="Choose Nested Items" name="proto_select" id="proto_select-hook">
-					<option value="">Item 1</option>					
-					<option value="">Item 2</option><option value="">Item 3</option>
-					<option value="">Item 4</option>
-				</select>
-				<% $("#proto_select-hook").trigger("liszt:updated"); %>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-text'>
 	<!-- edit-field-text -->
 		<div class='control-group'>
@@ -783,18 +617,6 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type='text' name='<%= field.contenttype %>_<%= field.name %>' value='<%= nullStr(field.defaultValue) %>' class='<%= field.class %>' />
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='proto-field-text'>
-	<!-- proto-field-text -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Text</label>
-		    <div class="controls">
-		    	<input type='text' name='proto_text' value='' class='' />
-		    </div>
 		</div>
 	</div>
 </script>
@@ -819,18 +641,6 @@
 		</div>
 </script>
 
-<script type='text/template' id='proto-field-textarea'>
-	<!-- proto-field-textarea -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Text Area</label>
-		    <div class="controls">
-		    	<textarea name='proto_text' value='' class=''></textarea>
-		    </div>
-		</div>
-	</div>
-</script>
-
 <script type='text/template' id='edit-field-wysiwyg'>
 	<!-- edit-field-wysiwyg -->
 		<div class='control-group'>
@@ -849,18 +659,6 @@
 				<textarea name='<%= field.contenttype %>_<%= field.name %>' class='wysiwyg input-xlarge span6 <%= field.class %> <%= (field.showcount!==false) ? 'countchars' : '' %> <%= (_.isNumber(field.showcount)) ? 'countdown' : '' %>' <%= (_.isNumber(field.showcount)) ? 'max="'+field.showcount+'"' : '' %>><%= nullStr(field.defaultValue) %></textarea>
 			</div>
 		</div>
-</script>
-
-<script type='text/template' id='proto-field-wysiwyg'>
-	<!-- proto-field-wysiwyg -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>WYSIWYG</label>
-		    <div class="controls">
-		    	<textarea name='proto_text' value='' class=''></textarea>
-		    </div>
-		</div>
-	</div>
 </script>
 
 <script type='text/template' id='edit-field-zone'>
@@ -884,18 +682,6 @@
 				<a href="#" data-fieldname="<%= field.contenttype %>_<%= field.name %>" class="add-zone btn btn-primary" style="margin-top: 20px"><i class="icon-plus icon-white"></i> Add a zone</a>
 			</div>
 		</div>
-</script>
-
-<script type='text/template' id='proto-field-zone'>
-	<!-- proto-field-zone -->
-	<div class="proto well">
-		<div class='control-group'>
-		    <label class='control-label '>Zone</label>
-		    <div class="controls">
-		    	
-		    </div>
-		</div>
-	</div>
 </script>
 
 <script type='text/template' id='field-zone-item'>

@@ -190,6 +190,9 @@
 			var file=files[0]; //Only handle single upload at a time
 			var el=$(this);
 			var container=el.parent();
+			multiple = el.attr("data-multiple");
+			contenttype = el.attr("data-contenttype");
+			name = el.attr("data-name");
 			var fd = new FormData();
 			fd.append("data", file);
 			fd.append("filename", $(this).val());
@@ -220,11 +223,15 @@
 						return false;
 					}
 					container.find('.preview-image .progress').hide();
-					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').slideDown(500).delay(2000).slideUp(500);
+					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
 					fullname = data.content.full_name;
-					container.find('.file_value').val(fullname);
-					container.find('.file_upload').val('');
-					container.find('.download').html('<a href="/api/files/download'+data.content.full_name+'"><i class="icon-download"></i> Download '+baseName(data.content.full_name)+'</a>');
+					
+					if (multiple == 1) {
+						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+					} else {
+						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+					}
+					el.val(""); //Clear the file upload so we don't upload on form submission
 				},
 				error: function(xhr, s) {
 					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed: '+s).slideDown(500).delay(2000).slideUp(500);
