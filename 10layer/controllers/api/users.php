@@ -51,6 +51,7 @@
 		 * @return void
 		 */
 		public function save() {
+
 			if (isset($this->vars->users)) {
 				foreach($this->vars->users as $user) {
 					$this->_save($user);
@@ -88,6 +89,7 @@
 			    $this->show_error($this->validation->failed_messages);
 			} else {
 				if ($is_new) {
+					echo 'inserting...'; 
 					$this->model_user->insert((Array) $user);
 				} else {
 					$this->model_user->update($user->id, (Array) $user);

@@ -176,3 +176,61 @@ a{color:#f00}.nav .brand{padding:0 20px}.datetime_hour,.datetime_minute{width:20
 	margin-top:7px;
 }
 
+.grid_input{
+	width:150px;
+	border:1px solid #ccc;
+
+}
+
+.permission_config{
+	position: relative;
+}
+
+.drop_activator{
+	border:1px solid #ccc;
+	padding: 4px;
+	-moz-border-radius:3px;
+	border-radius: 3px;
+	width:150px;
+
+}
+
+.drop_activator:hover{
+	cursor: pointer;
+}
+
+.centralise{
+	text-align: center !important;
+}
+
+
+
+
+.permissions_container{
+	display:none;
+	width:125px;
+	position:absolute;
+	top:1px;
+	left:0;
+	z-index: 100;
+	border:1px solid #ccc;
+	background: #fff;
+	padding:5px;
+	-moz-border-radius:5px;
+	border-radius: 5px;
+	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, .25),inset 0 -1px 0 rgba(0, 0, 0, .1);
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,.25),inset 0 -1px 0 rgba(0,0,0,.1);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, .25),inset 0 -1px 0 rgba(0, 0, 0, .1);
+
+}
+
+.close_perms{
+	float: right;
+	line-height: 2px;
+	margin: 3px;
+}
+
+.close_perms:hover{
+	cursor: pointer;
+}
+
