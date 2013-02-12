@@ -120,6 +120,7 @@
 		}
 		
 		public function image() {
+			$this->load->helper("smarturl_helper");
 			$filename = $this->input->get_post("filename");
 			$width = $this->input->get_post("width");
 			$height = $this->input->get_post("height");
@@ -163,7 +164,7 @@
 				return true;
 			}
 			
-			$cache = "content/cache/".$parts["dirname"]."/".$parts["filename"]."-".$width."-".$height."-".$quality."-".$opstr.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.".png";
 			if (file_exists($cache)) {
 				if ($render) {
 					header("Content-type: image/png");
@@ -171,13 +172,17 @@
 			        header('Content-Length: '.filesize($cache));
 		    	    readfile($cache);
 		    	    return true;
+				} else {
+					$this->data["filename"]=$cache;
+					$this->returndata();
+					return true;
 				}
 			}
 			
 			if (!is_dir("content/cache/".$parts["dirname"])) {
 				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert {$file} -background transparent -resize {$width}x{$height}{$op} -quality 80 -gravity center $extent {$cache}", $result);
+			exec("convert '{$file}' -background transparent -resize {$width}x{$height}{$op} -quality 80 -gravity center $extent '{$cache}'", $result);
 			if ($render) {
 				header("Content-type: image/png");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
