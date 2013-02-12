@@ -65,6 +65,7 @@ function isImage(filename) {
 }
 
 function encodeURIName(str) {
+	str = String(str);
 	var parts = str.split('/');
 	var base = parts.pop();
     return parts.join('/') + '/' + encodeURIComponent(base);
