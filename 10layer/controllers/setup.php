@@ -39,7 +39,7 @@
 				if (!$this->validation->passed) {
 					$data["errors"]=$this->validation->failed_messages;
 				} else {
-					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>"Administrator", "date_created"=>date("c"), "status_id"=>"1", "otp"=>"", "status"=>"Active", "permissions"=>array("Administrator"), "roles"=>array()));
+					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>"Administrator", "date_created"=>date("c"), "isActive"=>true, "permission"=>"Administrator"));
 					redirect("/setup/users");
 				}
 			}
