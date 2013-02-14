@@ -15,20 +15,11 @@
 	var User = function(data) {
 		var self = this;
 		self.id = ko.observable(data._id);
-		self.hash = ko.computed(function() {
-			return "#"+self.id();
-		});
 		self.name = ko.observable(data.name);
 		self.email = ko.observable(data.email);
 		self.password = ko.observable(data.password);
 		self.permission = ko.observable(data.permission);
 		self.isActive = ko.observable(data.isActive);
-		//self.visible = false;
-		// self.status = ko.observable(data.status);
-		// self.statusIsActive = ko.computed({
-		// 	read: function() { return (self.status() == "Active") },
-		// 	write: function(data) { if (data) { self.status("Active"); } else { self.status("Suspended") }  }
-		// });
 		self.title = ko.computed(function() {
 			return (self.name().length > 0) ? self.name() : "New User";
 		});
@@ -62,13 +53,7 @@
 		}
 		
 		self.add = function() {
-			// var tmparr = self.users.removeAll();
-			// _.each(tmparr, function(item) {
-			// 	item.isActive = false;
-			// });
-			//self.users(tmparr);
 			var the_password = "<?= $this->tlsecurity->random_pass(8, 12) ?>";
-			console.log(the_password);
 			self.users.push(new User( { id: "new", name: "", email: "", password: the_password, permission: "Editor", isActive: true } ));
 			console.log(ko.toJSON(self.users));
 		};

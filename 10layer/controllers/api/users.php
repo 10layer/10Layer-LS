@@ -89,7 +89,6 @@
 			    $this->show_error($this->validation->failed_messages);
 			} else {
 				if ($is_new) {
-					echo 'inserting...'; 
 					$this->model_user->insert((Array) $user);
 				} else {
 					$this->model_user->update($user->id, (Array) $user);
