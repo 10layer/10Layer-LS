@@ -195,7 +195,11 @@
 		
 		public function get_user_status($uid) {
 			$user=$this->mongo_db->get_where("users",array("_id"=>$uid));
-			return $user[0]->status;
+			if($user[0]->isActive == 1){
+				return 'Active';
+			}else{
+				return 'Suspended';
+			}
 		}
 		
 		/*public function getUserPermission($uid) {
