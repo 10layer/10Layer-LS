@@ -44,7 +44,7 @@
 			$user=array_shift($this->mongo_db->get_where("users",array("otp"=>$otp))); //We need to limit this to avoid deleted users
 			if (!empty($user)) {
 				//$this->update($user->_id,array("otp"=>"","status_id"=>1));
-				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status_id"=>1, "permission"=>$user->permission));
+				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status_id"=>1, "permission"=>$user->permissions));
 				return true;
 			}
 			return false;
