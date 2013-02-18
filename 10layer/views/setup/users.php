@@ -12,29 +12,60 @@
 		$(this).next().show();
 	});
 
-	var User = function(data) {
+	// Class to represent a user in the users grid
+	var User = function(id, name, email, password, permission, activeness) {
 		var self = this;
-		self.id = ko.observable(data._id);
-		self.name = ko.observable(data.name);
-		self.email = ko.observable(data.email);
-		self.password = ko.observable(data.password);
-		self.permission = ko.observable(data.permission);
-		self.isActive = ko.observable(data.isActive);
+
+		//console.log(data);
+
+		self.id = ko.observable(id);
+		self.name = ko.observable(name);
+		self.email = ko.observable(email);
+		self.password = ko.observable(password);
+		self.permission = ko.observable(permission);
+		self.isActive = ko.observable(activeness);
 		self.title = ko.computed(function() {
-			return (self.name().length > 0) ? self.name() : "New User";
+			return (self.name.length > 0) ? self.name() : "New User";
 		});
+
+		
 	}
 
-	var Users = function() {
+	// Overall viewmodel for this screen, along with initial state
+	var UsersViewModel = function() {
 		var self = this;
 		self.users = ko.observableArray([]);
+		self.permissions = [
+			{permissionName:'Administrator', permissionValue:'Administrator'},
+			{permissionName:'Editor', permissionValue:'Editor'},
+			{permissionName:'Viewer', permissionValue:'Viewer'}
+		];
 
 		
 		$.getJSON("/api/users?api_key=<?= $this->config->item("api_key") ?>", function(data) {
-			mapped = _.map(data.content, function(item) { return new User(item) });
+			mapped = _.map(data.content, function(item) {
+				id = item._id;
+				name = item.name;
+				email = item.email;
+				password = item.password;
+				permission = self.permissions[self.getInitialPermissionIndex(item.permission)];//item.permission;
+				activeness = item.isActive; 
+				return new User(id, name,email, password, permission,activeness) 
+			});
 			self.users(mapped);
+			
 			//self.users()[0].visible(true);
 		});
+
+		self.getInitialPermissionIndex = function(permission){
+			index = null;
+			for(var i = 0; i < self.permissions.length; i++){
+				if(self.permissions[i].permissionValue == permission.permissionValue){
+					index = i;
+				}
+			}
+			return index;
+		}
 		
 		self.save = function() {
 			$.ajax("/api/users/save?api_key=<?= $this->config->item("api_key") ?>", {
@@ -54,13 +85,22 @@
 		
 		self.add = function() {
 			var the_password = "<?= $this->tlsecurity->random_pass(8, 12) ?>";
-			self.users.push(new User( { id: "new", name: "", email: "", password: the_password, permission: "Editor", isActive: true } ));
-			console.log(ko.toJSON(self.users));
+			item = { id: "new", name: "", email: "", password: the_password, permission: self.permissions[1], isActive: true }
+			id = item._id;
+			name = item.name;
+			email = item.email;
+			password = item.password;
+			permission = self.permissions[self.getInitialPermissionIndex(item.permission)];//item.permission;
+			activeness = item.isActive; 
+			user = new User(id, name,email, password, permission,activeness) ;
+
+			self.users.push(user);
+			//console.log(ko.toJSON(self.users));
 		};
 	}
 	
 	$(function() {
-		ko.applyBindings(new Users());
+		ko.applyBindings(new UsersViewModel());
 		
 		$(".alert").on('click', '.close', function(e) {
 			e.preventDefault();
@@ -123,17 +163,7 @@
 				<td><input type="text" name="email" placeholder="admin@10layer.com" class='grid_input' data-bind="value: email"></td>
 				<td><input type="password" name="password" placeholder="Leave blank to not change" class='grid_input' data-bind="value: password"></td>
 				<td>
-					<div class='permission_config'>
-						<label class='drop_activator'><span data-bind='text: permission'></span> <i class="icon-edit pull-right"></i> </label>
-						<div class='permissions_container'>
-							<span class='close_perms'>&times;</span>
-							<label class="radio"><input type="radio" name="permission" value="Administrator"  data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Administrator</label>
-					    	<label class="radio"><input type="radio" name="permission" value="Editor" data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Editor</label>
-					    	<label class="radio"><input type="radio" name="permission" value="Viewer" data-bind="checked: permission, attr: { name: 'permission_' + id() }"> Viewer</label>
-
-						</div>
-					</div>
-
+					<select data-bind="options: $root.permissions, value: permission, optionsText: 'permissionName'"></select>
 			    </td>
 				<td class='centralise'><input type="checkbox" name="status" value="" data-bind="checked: isActive" /></td>
 			</tr>
