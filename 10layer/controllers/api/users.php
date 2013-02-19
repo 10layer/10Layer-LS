@@ -64,26 +64,43 @@
 		
 		protected function _save($user) {
 			$this->load->library("validation");
+
 			if (empty($user->name)) {
 				return false;
 			}
+
 			if (empty($user->id)) {
 				$user->id=$this->datatransformations->urlid($this, $user->name, false, "users");
 			}
+
 			$query=$this->mongo_db->get_where("users", array("_id"=>$user->id));
+
 			$is_new = false;
+
+
 			if (empty($query)) {
 				$is_new = true;
 			}
+
 			$this->validation->validate("email", "Email", $user->email, array("required", "valid_email"));
 			if ($is_new) {
 				$this->validation->validate("email", "Email", $user->email, array("database_nodupe"=>"email in users"));
 			}
+
+			$this->validation->validate("name", "Name", $user->name, array("required"));
+
+			if ($is_new) {
+				$this->validation->validate("name", "Name", $user->name, array("database_nodupe"=>"Name in users"));
+			}
+
 			if (!empty($this->var->password) && !$is_new) {
 				$this->validation->validate("password", "Password", $user->password, array("required", "minlen"=>5, "password_strength"=>2));
 			}
+
+			if ($is_new) {
+				$this->validation->validate("password", "Password", $user->password, array("required", "minlen"=>5, "password_strength"=>2));
+			}
 			
-			$this->validation->validate("name", "Name", $user->name, array("required"));
 			$this->validation->validate("permission", "Permission", $user->permission, array("required"));
 			if (!$this->validation->passed) {
 			    $this->show_error($this->validation->failed_messages);
