@@ -239,7 +239,8 @@
 		{ _id: "select", name: "Select" },
 		{ _id: "text", name: "Text" },
 		{ _id: "textarea", name: "Text Area" },
-		{ _id: "zone", name: "Zone" }
+		{ _id: "zone", name: "Zone" },
+		{ _id: "zone_select", name: "Zone Select" }
 	];
 	
 	var empty_type_template = { 
@@ -305,7 +306,8 @@
 				"Edited",
 				"Published"
 			]
-		}], 
+		}
+		],
 		"name" : "New Content Type", 
 		"collection" : false, 
 		"order_by" : [ "last_modified desc" ] 

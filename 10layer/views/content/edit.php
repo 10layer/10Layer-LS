@@ -556,6 +556,14 @@
 			$(this).parent().parent().parent().remove();
 		});
 		
+		$(document).on('click', '.do_publish', function() {
+			var zone_urlid = $(this).attr("data-urlid");
+			var zone_title = $(this).html();
+			var section_id = $(this).attr("data-sectionid");
+			var section_title = $(this).attr("data-sectiontitle");
+			$("#published_list").append("<li><input type='hidden' name='autopublish_sections' value='"+section_id+"."+zone_urlid+"' /><a href='#'>"+section_title+" :: "+zone_title+"</li>");
+		});
+				
 	}); //End of $(function)
 	
 	version_map=new Array( "", "New", "Edited", "Published" );
@@ -655,7 +663,6 @@
 
 		<div class="over_lay slider span10"></div>
     </div>
-
 </div>
 
 	<div id='bottom_bar' class="navbar navbar-fixed-bottom">
