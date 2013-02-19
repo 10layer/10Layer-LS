@@ -718,6 +718,46 @@
 	</div>
 </script>
 
+<script type='text/template' id='edit-field-zone_select'>
+	<!-- edit-field-zone_select -->
+		<div class='control-group'>
+			<label class='<%= field.label_class %> control-label'><%= field.label %></label>
+			<div class="controls">
+				<select class='chzn-select' data-placeholder="Choose <%= field.label %>" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple) ? '[]' : '' %>" id='<%= field.name %>-hook' <%= (field.multiple) ? multiple="multiple" : "" %>>
+					<option value="0"></option>
+				</select>
+			</div>
+		</div>
+		<%
+		$.get("/api/publish/available_zones/"+field.contenttype, { api_key: $(document.body).data('api_key') }, function(data) {
+			_.each(data.content, function(section) {
+				var s = "";
+				s = "<optgroup label='"+section[0].section_name+"'>";
+				_.each(section, function(zone) {
+					var selected = "";
+					if (_.isArray(field.value)) {
+						if (field.value.indexOf(zone.section_id+"."+zone.zone_id) != -1) {
+							selected = "selected='selected'";
+						}
+					} else {
+						if (field.value == zone.section_id+"."+zone.zone_id) {
+							selected = "selected='selected'";
+						}
+					}
+					s+="<option value='"+zone.section_id+"."+zone.zone_id+"' "+selected+">"+zone.zone_name+"</option>";
+				});
+				s+= "</optgroup>";
+				$('#'+field.name+'-hook').append(s);
+			});
+			$("#"+field.name+"-hook").trigger("liszt:updated");
+		});
+		%>
+</script>
+
+<script type='text/template' id='create-field-zone_select'>
+	<!-- create-field-zone_select -->
+	<%= _.template($('#edit-field-zone_select').html(), {field: field} ) %>
+</script>
 
 <script type='text/template' id='button-new-template'>
 	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>

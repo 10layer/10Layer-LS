@@ -253,8 +253,6 @@
 				} else {
 					container.find('.preview-image img').hide();
 				}
-				
-				
 			});
 			
 			viewer.readAsDataURL(file);
@@ -323,40 +321,6 @@
 
 		<div class="over_lay slider span10"></div>
     </div>
-    <div class="span2">
-    	<div class="well">
-			<h4>Published to</h4>
-			<ul class="nav nav-stacked" id="published_list">
-			</ul>
-		</div>
-		<div class="well">
-			<h4>Publish to</h4>
-			<ul class="nav nav-stacked">
-<?php
-	$collections=$this->model_collections->get_all();
-	foreach($collections as $collection) {
-		$options=$this->model_collections->get_options($collection->_id);
-		foreach($options as $option) {
-		?>
-				<li class="publish_section dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown"><b class="caret"></b> <?= $option->title ?> </a>
-					<ul class="dropdown-menu">
-						<?php
-						foreach($option->zone as $zone) {
-						?>
-						<li ><a href="#" class="do_publish" data-sectionid="<?= $option->_id ?>" data-sectiontitle="<?= $option->title ?>" data-urlid="<?= isset($zone['zone_urlid']) ? $zone['zone_urlid'] : '' ?>"><?= $zone['zone_name'] ?></a></li>
-						<?php
-						}
-						?>
-					</ul>
-				</li>
-		<?php
-		}
-	}
-?>
-			</ul>
-		</div>
-	</div>
 </div>
 
 </form>
@@ -377,8 +341,6 @@
 				<li><button id="_edit" class="the_action btn btn-mini btn-warning" id="dosubmit_right">Save and Edit</button></li>
 				<li class='divider-vertical'></li>
 				<li><button id="_publish" class="the_action btn btn-mini btn-danger" id="dosubmit_right">Save and Publish</button></li>
-
-
 				<li class='divider-vertical'></li>
 				<li style=" padding-top:5px; width:300px;">
 					<div id='progress_container' style='display:none;' class="progress progress-striped active">
