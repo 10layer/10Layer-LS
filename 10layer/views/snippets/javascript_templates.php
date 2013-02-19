@@ -52,11 +52,12 @@
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls' style="position:relative;">
 				<div class="input-append" style="position:relative;">
+					<% console.log(field); %>
 					<% var multiple = (field.multiple==true) ? 'multiple' : ''; %>
 					<input multiple='<%= multiple %>' 
 						id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' 
 						type='text' 
-						contenttype='<%= field.contenttype %>' 
+						contenttype='<%= field.content_types %>' 
 						fieldname='<%= field.name %>' 
 						class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" 
 						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
