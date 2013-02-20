@@ -12,7 +12,9 @@
 						contenttype='<%= field.contenttype %>' 
 						fieldname='<%= field.name %>' 
 						class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" 
-						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+						value='' 
+						contenttypes='<%= field.content_types %>' />
+
 						
 					<% if ((field.external==1) && (field.hidenew==false)) { %>
 					<%= _.template($('#button-new-template').html(), { field: field }) %>
@@ -57,10 +59,13 @@
 					<input multiple='<%= multiple %>' 
 						id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' 
 						type='text' 
-						contenttype='<%= field.content_types %>' 
+						contenttype='<%= field.contenttype %>' 
 						fieldname='<%= field.name %>' 
 						class="autocomplete <%= (field.multiple==1) ? 'multiple' : '' %> <%= field.class %>" 
-						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed' contenttypes='"+field.contenttypes.join(",")+"'" : '' %> />
+						value='' <%= (field.contenttype=='mixed') ? "mixed='mixed" : '' %> 
+						contenttypes='<%= field.content_types %>' />
+						
+
 						
 					<% if ((field.external==1) && (field.hidenew==false)) { %>
 					<%= _.template($('#button-new-template').html(), { field: field }) %>

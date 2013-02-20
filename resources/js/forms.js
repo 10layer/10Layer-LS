@@ -541,10 +541,10 @@ function init_form() {
 				var multiple_status = self.attr('multiple');
 				var field_name = self.attr('fieldname');
 				var search=self.prev().val();
-				var content_type=self.prev().attr("contenttype");
+				//var containing_content_type=self.prev().attr("contenttype");
 				var optionel=self.parent().siblings('.options');
 				var resultel=self.parent().siblings('.result_container');
-				var content_type = self.attr("contenttype");
+				var search_content_type = self.attr("contenttypes");
 				var url="/api/content/listing/";
 				var search = self.val();
 				var indicator = self.parent().siblings('.indicator');
@@ -555,7 +555,7 @@ function init_form() {
 				}
 				indicator.show();
 				xhr_reqs.push(
-					$.getJSON("/api/content", { search: search, content_type: content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
+					$.getJSON("/api/content", { search: search, content_type: search_content_type, limit: 20, fields: ["_id", "title"], order_by: "last_modified" }, function(data) {
 						var pos = $.extend({}, searchel.offset(), {
 			        		height: origel.offsetHeight
 						});
@@ -588,8 +588,6 @@ function init_form() {
 							optionel.append(el);
 							indicator.hide();
 						});
-						console.log(optionel.html());
-
 
 
 					})
