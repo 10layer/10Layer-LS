@@ -217,19 +217,16 @@ class Mongo_db {
 	*
 	*	Get the documents where the value of a $field may be something else
 	*
-	*	@usage : $this->mongo_db->or_where(array( array('foo'=>'bar', 'bar'=>'foo' ))->get('foobar');
+	*	@usage : $this->mongo_db->or_where("foo", "bar")->get('foobar');
 	*/
 	
-	public function or_where($wheres = array())
-	{
-		if(count($wheres) > 0)
-		{
-			foreach($wheres as $wh => $val)
-			{
-				$this->wheres['$or'] = $wh;
-			}
+	public function or_where($field = false, $val = false) {
+		if (is_array($field) && empty($val)) {
+			$this->wheres['$or'] = $field;
+			return $this;
 		}
-		return($this);
+		$this->wheres['$or'][$field] = $val;
+		return $this;
 	}
 	
 	/**
