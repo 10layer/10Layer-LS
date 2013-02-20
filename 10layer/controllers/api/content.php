@@ -96,6 +96,19 @@
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
 			$content=$this->mongo_db->limit(1)->get("content");
+
+			
+			foreach($content[0] as $key => $value){
+				if(is_array($value)){
+					for($i = 0; $i < sizeof($value); $i++){
+						$value[$i] = $this->mongo_db->get_light($value[$i]);
+					}
+					$content[0]->$key = $value;
+				}
+			}
+
+			//print_r($content[0]); die();
+
 			if (isset($content[0])) {
 				$this->data["content"]=$content[0];
 			}
