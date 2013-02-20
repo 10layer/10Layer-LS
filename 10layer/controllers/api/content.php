@@ -49,11 +49,15 @@
 		 */
 		public function listing() {
 			$this->_render=false;
-			$this->count();
 			$this->_render=true;
 			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
+			if (!empty($this->data["criteria"]["limit"])) {
+				$this->count();
+			} else {
+				$this->data["count"]=sizeof($this->data["content"]);
+			}
 			$this->returndata();
 			return true;
 		}
@@ -459,6 +463,20 @@
 				$this->mongo_db->where(array("_id"=>$id));
 				$this->data["criteria"]["id"]=$id;
 			}
+		}
+		
+		/**
+		 * ids function.
+		 * 
+		 * Used for looking up multiple IDs in one shot
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function ids() {
+			$ids=$this->input->get_post("ids");
+			$this->mongo_db->where_in("_id", $ids);
+			$this->data["criteria"]["id"]=$ids;
 		}
 		
 		/**
