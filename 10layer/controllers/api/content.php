@@ -48,13 +48,14 @@
 		 * @return void
 		 */
 		public function listing() {
-			$this->_render=false;
-			$this->_render=true;
+			
 			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
 			if (!empty($this->data["criteria"]["limit"])) {
+				$this->_render=false;
 				$this->count();
+				$this->_render=true;
 			} else {
 				$this->data["count"]=sizeof($this->data["content"]);
 			}
@@ -99,22 +100,12 @@
 			$this->data["count"]=1;
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
-			$content=$this->mongo_db->limit(1)->get("content");
-
-			
-			foreach($content[0] as $key => $value){
-				if(is_array($value)){
-					for($i = 0; $i < sizeof($value); $i++){
-						$value[$i] = $this->mongo_db->get_light($value[$i]);
-					}
-					$content[0]->$key = $value;
-				}
-			}
-
-			//print_r($content[0]); die();
-
-			if (isset($content[0])) {
-				$this->data["content"]=$content[0];
+			$content=array_pop($this->mongo_db->limit(1)->get("content"));
+			if (isset($content)) {
+				$this->data["content"]=$content;
+			} else {
+				$this->data["error"]=true;
+				$this->data["msg"]="Content not found";
 			}
 			$this->returndata();
 		}
@@ -152,6 +143,10 @@
 					continue;
 				}
 				$fieldval=$this->input->post($field->contenttype."_".$field->name);
+				//If it's empty, try just the name
+				if (empty($fieldval)) {
+					$fieldval=$this->input->post($field->name);
+				}
 				//Check if it's JSON, if so extract
 				@$json = json_decode($fieldval);
 				if (!empty($json)) {
