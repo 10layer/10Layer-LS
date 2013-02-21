@@ -94,11 +94,19 @@
 			});
 			$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
+			console.log("Her");
 			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
+				console.log("here");
+				console.log(data);
 				$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: content_type, data:data}));
 				update_pagination(content_type, data.count, 0, 100 );
 				update_autos();
 				$("#list-search").data('searchstring', searchstring);
+			}).error(function(jqXHR, textStatus, errorThrown) {
+				$("#msgdialog-header").html("Error");
+				$("#msgdialog-body").html("<h4>"+textStatus+"</h4><p>"+jqXHR.responseText+"</p>");
+				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+				$("#msgdialog").modal();
 			});
 		}
 		
