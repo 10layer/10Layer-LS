@@ -102,7 +102,7 @@
 		<a style="margin-top:-4px;" class="close">&times;</a>
 		<span style="float:left;margin-right:3px;" class="label label-info"> <%= (title) ? title : '' %>  </span>
 		<%  var urlid = (item._id) ? item._id : ''; %>
-		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple') ? '[]' : '' %>" value="<%= (item._id) ? item._id : '' %>"  />
+		<input id="autocomplete_<%= field.name %>_<%= urlid %>" type="hidden" name="<%= field.contenttype %>_<%= field.name %><%= (field.multiple=='multiple' || field.multiple) ? '[]' : '' %>" value="<%= (item._id) ? item._id : '' %>"  />
 	</div>
 </script>
 

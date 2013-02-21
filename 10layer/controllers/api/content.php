@@ -109,6 +109,55 @@
 			}
 			$this->returndata();
 		}
+
+
+		/**
+		 * get_linked_object function.
+		 * 
+		 * Returns a single item with its linked items (urlid and title), a bit faster than listing because we
+		 * don't do a count.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function get_linked_object() {
+			$this->_check_callbacks();
+			$this->data["count"]=1;
+			$this->mongo_db->limit(1);
+			$this->data["criteria"]["limit"]=1;
+			$content=array_pop($this->mongo_db->limit(1)->get("content"));
+
+			$content_type=$this->get_content_type();
+			$fields=$this->get_field_data($content_type);
+
+			$observed = array();
+			//scan the fields...
+			foreach($fields as $field){
+				if($field->type == 'autocomplete' || $field->type == 'search'){
+					array_push($observed, $field);
+				}
+			}
+
+			foreach($observed as $the_field){
+				$field_name = $the_field->name;
+				$value = $content->$field_name;
+				if(is_array($value)){
+					for($i = 0; $i < sizeof($value); $i++){
+						$value[$i] = $this->mongo_db->get_light($value[$i]);
+					}
+					$content->$field_name = $value;
+				}
+			}
+				
+			if (isset($content)) {
+				$this->data["content"]=$content;
+			} else {
+				$this->data["error"]=true;
+				$this->data["msg"]="Content not found";
+			}
+			$this->returndata();
+		}
+
 		
 		/**
 		 * save function.
