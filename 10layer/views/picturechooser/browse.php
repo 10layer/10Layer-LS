@@ -1,4 +1,4 @@
-<script src="/resources/knockout/knockout-2.2.0.js"></script>
+<script src="/resources/knockout/knockout-2.2.1.js"></script>
 <script language="javascript">
 	var File = function(filename) {
 		var self = this;

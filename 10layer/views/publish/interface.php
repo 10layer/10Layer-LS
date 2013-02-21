@@ -1,7 +1,9 @@
 <link rel="stylesheet" href="/resources/daterangepicker/daterangepicker.css" type="text/css" media="screen, projection" charset="utf-8" />
 <script type="text/javascript" src="/resources/daterangepicker/daterangepicker.js"></script>
 <script type="text/javascript" src="/resources/daterangepicker/date.js"></script>
-<script src="/resources/knockout/knockout-2.2.0.js"></script>
+<script src="/resources/knockout/knockout-2.2.1.js"></script>
+<link rel="stylesheet" href="/resources/chosen/chosen.css">
+<script src="/resources/chosen/chosen.jquery.js"></script>
 <script type="text/javascript">
 
 	var Content = function(data) {
@@ -18,7 +20,11 @@
 	
 	var Zone = function(data, key) {
 		var self = this;
-		self.name = ko.observable(data.zone_name);
+		self.name = ko.observable((data.zone_name) ? data.zone_name : "");
+		self.auto = ko.observable(data.zone_auto);
+		self.max_items = ko.observable((data.zone_max_items) ? data.zone_max_items : 0);
+		self.min_items = ko.observable((data.zone_min_items) ? data.zone_min_items : 0);
+		self.urlid = ko.observable((data.zone_urlid) ? data.zone_urlid : "");
 		self.id = ko.observable(key);
 		self.content_types = ko.observableArray(data.zone_content_types);
 		self.isActive = ko.observable(false);
@@ -104,8 +110,15 @@
 	var Section = function() {
 		var self = this;
 		self.zones = ko.observableArray();
+		self.content_type_list = ko.observableArray();
+		self.newZone = ko.observable(new Zone({
+			name: "",
+			min_items: 0,
+			max_items: 0
+		}));
 		
 		$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
+			self.collection = data.content[0];
 			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
 			self.zones(mapped);
 			self.zones()[0].isActive(true);
@@ -126,6 +139,10 @@
 					$('.daterange span').html(start.toString('MMMM d, yyyy') + ' - ' + end.toString('MMMM d, yyyy')).trigger("change", [(Date.parse(start) / 1000), (Date.parse(end) / 1000)] );
 				}
 			);
+		});
+		
+		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
+			self.content_type_list(_.map(data.content, function(item) { return { _id: item._id, name: item.name  } }));
 		});
 		
 		self.clickZone = function() {
@@ -157,6 +174,58 @@
 			);
 		};
 		
+		self.clickZoneLeft = function() {
+			var pos = self.zones.indexOf(this);
+			if (pos <= 0) {
+				return
+			}
+			var tmp = self.zones();
+			self.zones.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
+			self.saveZones();
+		}
+		
+		self.clickZoneRight = function() {
+			var pos = self.zones.indexOf(this);
+			if (pos >= self.zones().length - 1) {
+				return;
+			}
+			var tmp = self.zones();
+			self.zones.splice(pos, 2, tmp[pos + 1], tmp[pos]);
+			self.saveZones();
+		}
+		
+		self.clickZoneSave = function() {
+			var pass = true;
+			var msg = [];
+			if (self.newZone().name().trim() == "") {
+				msg.push("Name cannot be empty");
+				pass = false;
+			}
+			if (self.newZone().urlid().trim() == "") {
+				msg.push("UrlID cannot be empty");
+				pass = false;
+			}
+			if (!_.isNumber(self.newZone().max_items())) {
+				msg.push("Max items must be numeric");
+				pass = false;
+			}
+			if (!_.isNumber(self.newZone().min_items())) {
+				msg.push("Min items must be numeric");
+				pass = false;
+			}
+			if (pass) {
+				$('#newModal').hide();
+				self.zones.push(self.newZone());
+				self.newZone(new Zone({}));
+			} else {
+				$("#newZoneErrors").html("");
+				_.each(msg, function(s) {
+					$("#newZoneErrors").append(s+"<br />");
+				});
+				$("#newZoneErrors").show();
+			}
+		}
+		
 		self.save = function() {
 			var data = {};
 			data._id = "<?= $collection->_id ?>";
@@ -177,11 +246,34 @@
 					}
 				}
 			);
-		}		
+		}
+		
+		self.saveZones = function() {
+			var zones = JSON.parse(ko.toJSON(self.zones()));
+			var newzones = {};
+			_.each(zones, function(zone) {
+				var obj = {
+					zone_name: zone.name,
+					zone_urlid: zone.urlid,
+					zone_auto: zone.auto,
+					zone_max_items: zone.max_items,
+					zone_min_items: zone.min_items,
+					zone_content_types: zone.content_types
+				};
+				newzones[zone.urlid] = obj;
+			});
+			self.collection.zone = newzones;
+			self.collection.id = self.collection._id;
+			$.post("/api/content/save?api_key=<?= $this->config->item("api_key") ?>", self.collection);
+		}	
 	}
 	
 	$(function() {
 		ko.applyBindings(new Section());
+		$(".chzn-select").chosen();
+		$('#newModal').on('show', function () {
+			$("#select_content_types").chosen().trigger("liszt:updated");
+		});
 	});
 </script>
 <script type="text/javascript">
@@ -208,8 +300,25 @@ var zone_id = '';
 	<div class="span10">
 		<div class="row">
 			<div class="span10">
-				<ul class="nav nav-tabs" data-bind="foreach: zones">
-					<li data-bind="css: { active: isActive }"><a href="#" data-bind="text: name, click: $parent.clickZone"></a></li>
+				<ul class="nav nav-tabs">
+					<!-- ko foreach: zones -->
+					<li data-bind="css: { active: isActive }">
+						<a href="#">
+							<span data-bind="text: name, click: $parent.clickZone"></span>
+							<!-- ko if: $index() > 0 -->
+							<i data-bind="click: $parent.clickZoneLeft" class="icon-arrow-left"></i>
+							<!-- /ko -->
+							<!-- ko if: $index() < $parent.zones().length -1  -->
+							<i data-bind="click: $parent.clickZoneRight" class="icon-arrow-right"></i>
+							<!-- /ko -->
+						</a>
+					</li>
+					<!-- /ko -->
+					<li>
+						<a href="#newModal" data-toggle="modal">
+							<i class="icon-plus"></i>
+						</a>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -265,5 +374,50 @@ var zone_id = '';
 			<!-- /ko -->
 		</div>
 	</div> <!-- End main body -->
-	
+</div>
+
+<div id="newModal" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Add a Zone</h3>
+	</div>
+	<div class="modal-body">
+		<div class="alert alert-error hide" id="newZoneErrors"></div>
+		<form data-bind="with: newZone" class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Zone Name</label>
+				<div class="controls">
+					<input type="text" name="zone_name" data-bind="value: name" required />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Zone UrlID</label>
+				<div class="controls">
+					<input type="text" name="zone_urlid" data-bind="value: urlid" required />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Content Types</label>
+				<div class="controls">
+					<select id="select_content_types" class="chzn-select" multiple="multiple" name="zone_content_types[]" data-bind="options: $parent.content_type_list, optionsText: 'name', optionsValue: '_id', selectedOptions: content_types"></select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Minimum Items</label>
+				<div class="controls">
+					<input type="text" name="zone_min_items" data-bind="value: min_items" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Maximum Items</label>
+				<div class="controls">
+					<input type="text" name="zone_max_items" data-bind="value: max_items" />
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+		<a href="#" class="btn btn-primary" data-bind="click: clickZoneSave">Save changes</a>
+	</div>
 </div>

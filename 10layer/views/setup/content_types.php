@@ -1,7 +1,7 @@
 <?php
 	$this->load->view("/templates/header",array("menu1"=>"default"));
 ?>
-<script src="/resources/knockout/knockout-2.2.0.js"></script>
+<script src="/resources/knockout/knockout-2.2.1.js"></script>
 <script>
 
 	var Transformation = function(data) {
