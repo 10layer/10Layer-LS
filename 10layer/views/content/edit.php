@@ -227,7 +227,7 @@
 			});
 			$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
-			$.getJSON("<?= base_url() ?>api/content/get?jsoncallback=?", { api_key: $(document.body).data('api_key'), id: urlid, meta: true }, function(data) {
+			$.getJSON("<?= base_url() ?>api/content/get_linked_object?jsoncallback=?", { api_key: $(document.body).data('api_key'), id: urlid, meta: true }, function(data) {
 				$('#dyncontent').html(_.template($("#edit-template").html(), {data:data, content_type: content_type, urlid: urlid }));
 				init_form();
 				$(".chzn-select").chosen();

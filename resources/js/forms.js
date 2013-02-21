@@ -98,17 +98,6 @@ $(function() {
 	});
 
 
-
-	// $(document).on('click', '.dosubmit_popup', function() {
-	// 	var content_type = $(this).attr('contenttype');
-	// 	// var fieldname = $(this).attr('fieldname');
-	// 	// var form = $(this).parent(); //    $('#form_create_'+content_type);
-	// 	// _insert(form, content_type);
-	// 	conosole.log('yeah');
-	// 	return false;
-	// });
-
-
 	$(".result_container div a.close").live('click', function(){
 		$(this).parent().remove();
 	});
@@ -190,55 +179,6 @@ $(function() {
     	}
 	});
 	
-	$(".deepsearch_input").live("keypress",function(e) { 
-    	if (e.which == 13) { 
-      		return false; 
-    	} 
-  	});
-  	
-  	$(".deepsearch_input").live("keypress",function(e) {
-  		if (e.which == 13) { 
-			var resultdiv=$(this).next().next();
-			var selected_container = resultdiv.next();
-			var selected_items = selected_container.children('div');
-			var items = new Array();
-			var content_type=$(this).attr("contenttype");
-			selected_items.each(function(index) {
-				items[index] = $(this).children(":first").val();
-			});
-		
-			var val = $(this).val();
-      		$.getJSON("/list/"+content_type+"/deepsearch?term="+escape(val), {"selected[]":items}, function(result) {
-				resultdiv.html("");
-				for(x=0; x<result.length; x++) {
-					resultdiv.append("<div class='deepsearch_item' id='"+result[x].id+"'>"+result[x].value+" ("+result[x].start_date+")</div>");
-				}
-			});	
-    	}		
-	});
-	
-	$(".deepsearch_item").live("click", function(){
-		var selected_set = $(this).parent().next();
-		var used_element = $(this).parent().prev().prev();
-		var label = $(this).html();
-		var id = this.id;
-		var newdisp="<div class='deepsearch_selected_item'>"+"<input type='hidden' value='"+id+"' name='"+used_element.attr("tablename")+"_"+used_element.attr("fieldname")+"[]' value='' /><span class='label'>"+
-		label+"</span></div>";
-		selected_set.append(newdisp);
-		$(this).remove();
-		return false;
-	});
-		
-	$(".deepsearch_selected_item").live("click", function(){
-		var search_result_set = $(this).parent().prev();
-		var label = $(this).text();
-		var id = $(this).children(":first").val();
-		var newdisp="<button class='autocomplete_item'>"+label+"</button>";
-		var newdisp="<div class='deepsearch_item' id='"+id+"'>"+label+"</div>";
-		search_result_set.append(newdisp);
-		$(this).remove();
-		return false;
-	});
 	
 	$("#workflow_next").live("click", function() {
 		$.getJSON("/workflow/change/advance/"+content_type+"/"+urlid, function() {
@@ -413,6 +353,9 @@ $(function() {
 	
 	
 	$(document).on('click', '.deepsearch-search', function() {
+
+		var multiple_status = $(this).prev().attr('multiple');
+		var field_name = $(this).prev().attr('fieldname');
 		var searchel=$(this).prev();
 		var origel = this;
 		var search=$(this).prev().val();
@@ -432,7 +375,7 @@ $(function() {
 				var pos = $.extend({}, searchel.offset(), {
 	        		height: origel.offsetHeight
 				});
-				console.log(pos);
+	
 				optionel.css({
 					top: pos.top + pos.height
 					, left: pos.left
@@ -441,18 +384,19 @@ $(function() {
 				optionel.show();
 				
 				optionel.html('');
+
 				_.each(data.content, function(item) {
 					var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
 						e.stopPropagation();
 						e.preventDefault();
 						optionel.hide();
-						var newel= _.template($('#field-autocomplete-item').html(), { title: item._id, field: { contenttype: content_type, name: "", value: "" } });
-						resultel.append(newel);
+						resultel.append(create_autocomplete_item(item, content_type, multiple_status, field_name));
 						searchel.val("");
 					});
-					indicator.html('Search');
 					optionel.append(el);
+					indicator.html('Search');
 				});
+
 			})
 		);
 
@@ -549,6 +493,8 @@ function init_form() {
 				var search = self.val();
 				var indicator = self.parent().siblings('.indicator');
 
+				
+
 		        while(xhr_reqs.length>0) {
 					jqXHR=xhr_reqs.pop();
 					jqXHR.abort();
@@ -577,6 +523,8 @@ function init_form() {
 						
 						
 						optionel.html('');
+
+					
 						_.each(data.content, function(item) {
 							var el=$('<li><a href="#">'+item.title+'</a></li>').click(function(e) {
 								e.stopPropagation();
@@ -599,7 +547,7 @@ function init_form() {
 			
 		});
 
-	});
+	})
 
 		
 	/*$(".autocomplete").each(function() {
