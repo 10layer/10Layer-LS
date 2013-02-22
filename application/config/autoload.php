@@ -64,7 +64,7 @@ $autoload['libraries'] = array('mongo_db','session', 'autoloader', 'exists', 'da
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url','string','javascript');
+$autoload['helper'] = array('url','string','javascript', 'apikey');
 
 
 /*
