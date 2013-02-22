@@ -133,19 +133,17 @@
 			$observed = array();
 			//scan the fields...
 			foreach($fields as $field){
-				if($field->type == 'autocomplete' || $field->type == 'search'){
-					array_push($observed, $field);
+				if(isset($field->content_types) AND !is_array($field->content_types)){
+						array_push($observed, $field);
 				}
 			}
 
 			foreach($observed as $the_field){
 				$field_name = $the_field->name;
 				$value = $content->$field_name;
+
 				if(is_array($value)){
-					for($i = 0; $i < sizeof($value); $i++){
-						$value[$i] = $this->mongo_db->get_light($value[$i]);
-					}
-					$content->$field_name = $value;
+					$content->$field_name = $this->mongo_db->where_in("_id", $value)->get('content');
 				}
 			}
 				
