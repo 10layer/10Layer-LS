@@ -121,6 +121,20 @@
 		 * @return void
 		 */
 		public function get_linked_object() {
+			function array_values_recursive($ary) {
+				$lst = array();
+				foreach( array_keys($ary) as $k ){
+					$v = $ary[$k];
+					if (is_scalar($v)) {
+						$lst[] = $v;
+					} elseif (is_array($v)) {
+						$lst = array_merge( $lst,
+						array_values_recursive($v)
+						);
+					}
+				}
+				return $lst;
+			}
 			$this->_check_callbacks();
 			$this->data["count"]=1;
 			$this->mongo_db->limit(1);
@@ -134,16 +148,17 @@
 			//scan the fields...
 			foreach($fields as $field){
 				if(isset($field->content_types) AND !is_array($field->content_types)){
-						array_push($observed, $field);
+					array_push($observed, $field);
 				}
 			}
-
 			foreach($observed as $the_field){
 				$field_name = $the_field->name;
 				$value = $content->$field_name;
-
 				if(is_array($value)){
-					$content->$field_name = $this->mongo_db->where_in("_id", $value)->get('content');
+					$vals = array_values_recursive($value);
+					$content->$field_name = $this->mongo_db->where_in("_id", $vals)->get('content');
+				} else {
+					$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
 				}
 			}
 				
