@@ -74,3 +74,13 @@ function encodeURIName(str) {
 function capitaliseFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+function randomPass(letterCount) {
+	if (!letterCount) { letterCount = 12; }
+	var s = "";
+	for (var x = 0; x < letterCount; x++) {
+		var rand = (parseInt(Math.random() * 1000) % 94) + 33; //Random number between 33 and 127
+		s += String.fromCharCode(rand);
+	}
+	return s;
+}
