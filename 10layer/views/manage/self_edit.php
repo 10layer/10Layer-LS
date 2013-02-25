@@ -5,8 +5,7 @@
 <div id="create-content" class="boxed wide">
 	<form id="user-form" method="post">
 		<input type="hidden" id="doupdate" name="doupdate" value="1" />
-		<input type="hidden" id="id" name="id" value="<?= $user->id ?>" />
-		<input type="hidden" name="urlid" id="urlid" value="<?= $user->urlid ?>" />
+		<input type="hidden" id="id" name="_id" value="<?= $user->_id ?>" />
 		
 		<label class="bigger">Name</label>
 		<input type="text" name="name" id="title" class="required bigger" value="<?= $user->name ?>" /><br />
