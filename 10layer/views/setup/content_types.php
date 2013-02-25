@@ -176,7 +176,7 @@
 		self.transformations = ko.observableArray(transformation_template);
 		
 		
-		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
+		$.getJSON("/api/content_types?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
 			self.contentTypes(self.mappedContentTypes);
 			self.content_type_urlid("<?= $content_type_urlid ?>");
@@ -209,7 +209,7 @@
 		}
 		
 		self.save = function() {
-			$.ajax("/api/content_types/save?api_key=<?= $this->config->item("api_key") ?>", {
+			$.ajax("/api/content_types/save?api_key=<?= $this->session->userdata("api_key") ?>", {
 				data: ko.toJSON({ content_types: self.contentTypes() }),
 				type: "post", contentType: "application/json",
 				success: function(result) { 

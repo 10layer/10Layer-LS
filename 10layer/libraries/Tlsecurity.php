@@ -240,6 +240,36 @@
 			return $password;
 		}
 		
+		public function get_api_keys() {
+			$api_keys = $this->ci->mongo_db->get("api_keys");
+			if (empty($api_keys)) {
+				$api_keys = $this->_gen_api_keys();
+			}
+			return $api_keys;
+		}
+		
+		public function api_key_role($api_key) {
+			$api_keys = $this->ci->mongo_db->get_where("api_keys", array("api_key"=>$api_key));
+			if (empty($api_keys)) {
+				return false;
+			}
+			$api_key = array_pop($api_keys);
+			return $api_key->role;
+		}
+		
+		protected function _gen_api_keys() {
+			$this->ci->load->helper('string');
+			$this->ci->mongo_db->delete("api_keys");
+			$roles = array("viewer", "editor", "administrator");
+			foreach($roles as $role) {
+				$api_key = new stdClass();
+				$api_key->api_key = random_string("unique");
+				$api_key->role = $role;
+				$this->ci->mongo_db->insert("api_keys", $api_key);
+			}
+			return $this->ci->mongo_db->get("api_keys");
+		}
+		
 	}
 
 ?>

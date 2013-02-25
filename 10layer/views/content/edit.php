@@ -20,7 +20,7 @@
 
 	$(function() {
 		
-		$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
+		$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
 		
 		//Router
 		var app = Davis(function() {
@@ -250,7 +250,7 @@
 				$(document.body).data('saving', true);
 				var formData = new FormData($('#contentform')[0]);
 				$.ajax({
-					url: "<?= base_url() ?>api/content/save?api_key=<?= $this->config->item('api_key') ?>&id="+urlid,  //server script to process data
+					url: "<?= base_url() ?>api/content/save?api_key=<?= $this->session->userdata('api_key') ?>&id="+urlid,  //server script to process data
 					type: 'POST',
 					xhr: function() {  // custom xhr
 					    myXhr = $.ajaxSettings.xhr();
@@ -335,7 +335,7 @@
 			fd.append("data", file);
 			fd.append("filename", $(this).val());
 			$.ajax({
-				url: "<?= base_url() ?>api/files/upload?api_key=<?= $this->config->item('api_key') ?>&filename="+file.name,  //server script to process data
+				url: "<?= base_url() ?>api/files/upload?api_key=<?= $this->session->userdata('api_key') ?>&filename="+file.name,  //server script to process data
 				type: 'POST',
 				xhr: function() {  // custom xhr
 					myXhr = $.ajaxSettings.xhr();
