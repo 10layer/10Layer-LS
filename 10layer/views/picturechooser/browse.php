@@ -37,7 +37,7 @@
 			return pages;
 		});
 		
-		$.getJSON("/api/files/browse?limit="+self.perpage()+"&offset=0&api_key=<?= $this->config->item("api_key") ?>", function(data) {
+		$.getJSON("/api/files/browse?limit="+self.perpage()+"&offset=0&api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 			self.filetypes(data.content.filetypes);
 			self.filetypes.unshift("all");
 			self.files(_.map(data.content.files, function(file) { return new File(file) }));
@@ -53,7 +53,7 @@
 			var page = this.page - 1;
 			var offset = page * self.perpage();
 			self.pageindex(page);
-			$.getJSON("/api/files/browse?limit="+self.perpage()+"&offset="+offset+"&api_key=<?= $this->config->item("api_key") ?>", function(data) {
+			$.getJSON("/api/files/browse?limit="+self.perpage()+"&offset="+offset+"&api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 				self.files(_.map(data.content.files, function(file) { return new File(file) }));
 			});
 		}

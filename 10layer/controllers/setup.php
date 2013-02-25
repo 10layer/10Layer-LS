@@ -82,7 +82,10 @@
 			$this->load->view("setup/users");
 		}
 		
-		
+		public function api_keys() {
+			print "API keys";
+			print_r($this->tlsecurity->get_api_keys());
+		}
 		
 		protected function json_check($filename="") {
 			switch (json_last_error()) {

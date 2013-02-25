@@ -12,7 +12,6 @@
 	 */
 	class Model_User extends CI_Model {
 		
-		
 		public function __construct() {
 			parent::__construct();
 		}
@@ -29,8 +28,9 @@
 			if (!empty($user)) {
 				$user=$user[0];
 				$status = ($user->isActive) ? 'Active' : 'Suspended';
-				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$status));
-				
+				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$status, "role"=>$user->permission));
+				$api_key = array_pop($this->mongo_db->get_where("api_keys", array("role"=>$user->permission)));
+				$this->session->set_userdata("api_key", $api_key->api_key);
 				return true;
 			}
 			return false;

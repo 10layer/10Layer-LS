@@ -6,7 +6,7 @@ $(function(){
 		filter();
 	});
 	
-	$(document.body).data('api_key', '<?= $this->config->item('api_key') ?>');
+	$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
 	$('#dyncontent').html("Loading...");
 	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
 		$('#dyncontent').html(_.template($("#listing-template").html(), { data:data}));

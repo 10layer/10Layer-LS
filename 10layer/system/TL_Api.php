@@ -66,14 +66,15 @@
 			if (empty($api_key)) {
 				return false;
 			}
-			$comp_api_key=$this->config->item('api_key');
-			if (empty($comp_api_key)) {
+			$role=$this->tlsecurity->api_key_role($api_key);
+			if (empty($role)) {
 				return false;
 			}
-			if ($comp_api_key==$api_key) {
-				return true;
+			
+			if ($role == "viewer") { //Viewer shouldn't be able to do anything that requires security
+				return false;
 			}
-			return false;
+			return true;
 		}
 		
 		/**

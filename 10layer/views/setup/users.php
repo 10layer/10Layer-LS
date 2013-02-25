@@ -19,12 +19,16 @@
 		self.id = ko.observable(id);
 		self.name = ko.observable(name);
 		self.email = ko.observable(email);
-		self.password = ko.observable(password);
+		self.password = ko.observable();
 		self.permission = ko.observable(permission);
 		self.isActive = ko.observable(activeness);
 		self.title = ko.computed(function() {
 			return (self.name.length > 0) ? self.name() : "New User";
 		});
+		
+		self.changePassword = function(obj, event) {
+			self.password(event.target.value);
+		}
 	}
 
 	// Overall viewmodel for this screen, along with initial state
@@ -32,19 +36,19 @@
 		var self = this;
 		self.users = ko.observableArray([]);
 		self.permissions = [
-			{permissionName:'Administrator', permissionValue:'Administrator'},
-			{permissionName:'Editor', permissionValue:'Editor'},
-			{permissionName:'Viewer', permissionValue:'Viewer'}
+			{ name: "Administrator", value: "administrator" }, 
+			{ name: "Editor", value: "editor" }, 
+			{ name: "Viewer", value: "viewer" }
 		];
 		self.randomPassword = ko.observable(randomPass());
 
-		$.getJSON("/api/users?api_key=<?= $this->config->item("api_key") ?>", function(data) {
+		$.getJSON("/api/users?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 			mapped = _.map(data.content, function(item) {
 				id = item._id;
 				name = item.name;
 				email = item.email;
 				password = item.password;
-				permission = self.permissions[self.getInitialPermissionIndex(item.permission)];//item.permission;
+				permission = item.permission;
 				activeness = item.isActive; 
 				return new User(id, name,email, password, permission,activeness) 
 			});
@@ -62,12 +66,11 @@
 		}
 		
 		self.save = function() {
-			$.ajax("/api/users/save?api_key=<?= $this->config->item("api_key") ?>", {
+			$.ajax("/api/users/save?api_key=<?= $this->session->userdata("api_key") ?>", {
 				data: ko.toJSON({ users: self.users }),
 				type: "post", contentType: "application/json",
 				success: function(result) { 
 					if (result.error) {
-						console.log(result.message.join("<br />"));
 						$("#fail_message").html(result.message.join("<br />"));
 						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
 					} else {
@@ -83,9 +86,9 @@
 			name = item.name;
 			email = item.email;
 			password = item.password;
-			permission = self.permissions[self.getInitialPermissionIndex(item.permission)];//item.permission;
+			permission = item.permission;
 			activeness = item.isActive; 
-			user = new User(id, name,email, password, permission,activeness) ;
+			user = new User(id, name,email, password, permission, activeness) ;
 			self.users.push(user);
 		};
 		
@@ -150,9 +153,9 @@
 			<tr>
 				<td><input type="text" name="name" placeholder="Joe Soap" class='grid_input' data-bind="value: name" autocomplete="off"></td>
 				<td><input type="text" name="email" placeholder="admin@10layer.com" class='grid_input' data-bind="value: email" autocomplete="off"></td>
-				<td><input type="password" name="password" placeholder="Leave blank to not change" class='grid_input' data-bind="value: password" autocomplete="off"></td>
+				<td><input type="password" name="password" placeholder="Leave blank to not change" class='grid_input' data-bind="event: { change: changePassword }" autocomplete="off"></td>
 				<td>
-					<select data-bind="options: $root.permissions, value: permission, optionsText: 'permissionName'"></select>
+					<select data-bind="options: $root.permissions, value: permission, optionsText: 'name', optionsValue: 'value' "></select>
 			    </td>
 				<td class='centralise'><input type="checkbox" name="status" value="" data-bind="checked: isActive" /></td>
 			</tr>

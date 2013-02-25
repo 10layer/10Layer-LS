@@ -46,7 +46,7 @@
 			} else {
 				exclude=[];
 			}
-			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", fields: ["title", "_id", "content_type", "start_date" ] }, function(data) {
+			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", fields: ["title", "_id", "content_type", "start_date" ] }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -100,7 +100,7 @@
 			_.each(self.published(), function(item) {
 				exclude.push(item._id());
 			});
-			$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
+			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata"api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -117,7 +117,7 @@
 			max_items: 0
 		}));
 		
-		$.getJSON("/api/content/listing?api_key=<?= $this->config->item("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
+		$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
 			self.collection = data.content[0];
 			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
 			self.zones(mapped);
@@ -141,7 +141,7 @@
 			);
 		});
 		
-		$.getJSON("/api/content_types?api_key=<?= $this->config->item("api_key") ?>", function(data) {
+		$.getJSON("/api/content_types?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 			self.content_type_list(_.map(data.content, function(item) { return { _id: item._id, name: item.name  } }));
 		});
 		
@@ -237,7 +237,7 @@
 					data.zones[key] = JSON.parse(ko.toJSON(item.published())); 
 				}
 			);
-			$.getJSON("/api/publish/save?api_key=<?= $this->config->item("api_key") ?>", data, 
+			$.getJSON("/api/publish/save?api_key=<?= $this->session->userdata("api_key") ?>", data, 
 				function(result) { 
 					if (result.error) {
 						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
@@ -264,7 +264,7 @@
 			});
 			self.collection.zone = newzones;
 			self.collection.id = self.collection._id;
-			$.post("/api/content/save?api_key=<?= $this->config->item("api_key") ?>", self.collection);
+			$.post("/api/content/save?api_key=<?= $this->session->userdata("api_key") ?>", self.collection);
 		}	
 	}
 	
