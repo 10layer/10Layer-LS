@@ -21,8 +21,6 @@
 		
 		public function admin() {
 
-			
-
 			$this->load->model("model_user");
 			$data=array();
 			$email=$this->input->post("email");
@@ -49,6 +47,7 @@
 					*/
 					$keys = $this->tlsecurity->get_api_keys();
 					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>"Administrator", "date_created"=>date("c"), "isActive"=>true, "permission"=>"administrator"));
+					$this->model_user->login($email,$password);
 					redirect("/setup/users");
 				}
 			}
