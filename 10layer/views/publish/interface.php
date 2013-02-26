@@ -287,6 +287,7 @@
 			}
 			if (pass) {
 				$('#editModal').modal("hide");
+				self.editZone().update();
 				self.zones.replace(self.zones()[editId], self.editZone());
 			} else {
 				$("#editZoneErrors").html("");
