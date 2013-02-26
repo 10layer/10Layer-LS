@@ -20,6 +20,9 @@
 		}
 		
 		public function admin() {
+
+			
+
 			$this->load->model("model_user");
 			$data=array();
 			$email=$this->input->post("email");
@@ -39,7 +42,13 @@
 				if (!$this->validation->passed) {
 					$data["errors"]=$this->validation->failed_messages;
 				} else {
-					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>"Administrator", "date_created"=>date("c"), "isActive"=>true, "permission"=>"Administrator"));
+
+					/*
+						we need to create api_keys before everything (role based API keys) 
+						This will change when we have user based API keys
+					*/
+					$keys = $this->tlsecurity->get_api_keys();
+					$this->model_user->insert(array("password"=>$password, "email"=>$email, "name"=>"Administrator", "date_created"=>date("c"), "isActive"=>true, "permission"=>"administrator"));
 					redirect("/setup/users");
 				}
 			}
@@ -83,6 +92,7 @@
 		}
 		
 		public function api_keys() {
+
 			print "API keys";
 			print_r($this->tlsecurity->get_api_keys());
 		}
