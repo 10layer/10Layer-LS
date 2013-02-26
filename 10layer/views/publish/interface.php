@@ -100,7 +100,7 @@
 			_.each(self.published(), function(item) {
 				exclude.push(item._id());
 			});
-			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata"api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
+			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", search: self.searchStr, start_date: self.startDate, end_date: self.endDate }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
