@@ -29,7 +29,7 @@
 			$zones = $this->input->get_post("zones");
 			if (empty($zones) || !is_array($zones)) {
 				$this->data["error"]=true;
-				$this->data["msg"][]="zones must be an array";
+				$this->data["msg"][]="Zones must be an array";
 				$this->returndata();
 				return false;
 			}
