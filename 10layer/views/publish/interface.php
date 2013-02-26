@@ -22,8 +22,8 @@
 		var self = this;
 		self.name = ko.observable((data.zone_name) ? data.zone_name : "");
 		self.auto = ko.observable(data.zone_auto);
-		self.max_items = ko.observable((data.zone_max_items) ? data.zone_max_items : 0);
-		self.min_items = ko.observable((data.zone_min_items) ? data.zone_min_items : 0);
+		self.max_items = ko.observable((data.zone_max_items) ? parseInt(data.zone_max_items) : 0);
+		self.min_items = ko.observable((data.zone_min_items) ? parseInt(data.zone_min_items) : 0);
 		self.urlid = ko.observable((data.zone_urlid) ? data.zone_urlid : "");
 		self.id = ko.observable(key);
 		self.content_types = ko.observableArray(data.zone_content_types);
@@ -105,6 +105,7 @@
 				self.content(mapped);
 			});
 		}
+		
 	}
 	
 	var Section = function() {
@@ -112,6 +113,11 @@
 		self.zones = ko.observableArray();
 		self.content_type_list = ko.observableArray();
 		self.newZone = ko.observable(new Zone({
+			name: "",
+			min_items: 0,
+			max_items: 0
+		}));
+		self.editZone = ko.observable(new Zone({
 			name: "",
 			min_items: 0,
 			max_items: 0
@@ -181,7 +187,6 @@
 			}
 			var tmp = self.zones();
 			self.zones.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
-			self.saveZones();
 		}
 		
 		self.clickZoneRight = function() {
@@ -191,7 +196,6 @@
 			}
 			var tmp = self.zones();
 			self.zones.splice(pos, 2, tmp[pos + 1], tmp[pos]);
-			self.saveZones();
 		}
 		
 		self.clickZoneSave = function() {
@@ -214,7 +218,8 @@
 				pass = false;
 			}
 			if (pass) {
-				$('#newModal').hide();
+				$('#newModal').modal("hide");
+				self.newZone().update();
 				self.zones.push(self.newZone());
 				self.newZone(new Zone({}));
 			} else {
@@ -226,13 +231,26 @@
 			}
 		}
 		
+		self.clickZoneDelete = function() {
+			self.zones.splice(editId, 1);
+			$('#editModal').modal("hide");
+		}
+		
+		var editId = -1;
+		self.clickZoneEdit = function(obj) {
+			editId = self.zones.indexOf(this);
+			self.editZone(this);
+			$("#editModal").modal("show");
+		}
+		
 		self.save = function() {
+			self.saveZones();
 			var data = {};
 			data._id = "<?= $collection->_id ?>";
 			data.zones = {};
 			_.each(self.zones(), 
 				function(item) {
-					var key = item.id();
+					var key = item.urlid();
 					var tmp = {};
 					data.zones[key] = JSON.parse(ko.toJSON(item.published())); 
 				}
@@ -246,6 +264,37 @@
 					}
 				}
 			);
+		}
+		
+		self.clickZoneEditSave = function() {
+			var pass = true;
+			var msg = [];
+			if (self.editZone().name().trim() == "") {
+				msg.push("Name cannot be empty");
+				pass = false;
+			}
+			if (self.editZone().urlid().trim() == "") {
+				msg.push("UrlID cannot be empty");
+				pass = false;
+			}
+			if (!_.isNumber(self.editZone().max_items())) {
+				msg.push("Max items must be numeric");
+				pass = false;
+			}
+			if (!_.isNumber(self.editZone().min_items())) {
+				msg.push("Min items must be numeric");
+				pass = false;
+			}
+			if (pass) {
+				$('#editModal').modal("hide");
+				self.zones.replace(self.zones()[editId], self.editZone());
+			} else {
+				$("#editZoneErrors").html("");
+				_.each(msg, function(s) {
+					$("#editZoneErrors").append(s+"<br />");
+				});
+				$("#editZoneErrors").show();
+			}
 		}
 		
 		self.saveZones = function() {
@@ -273,6 +322,9 @@
 		$(".chzn-select").chosen();
 		$('#newModal').on('show', function () {
 			$("#select_content_types").chosen().trigger("liszt:updated");
+		});
+		$('#editModal').on('show', function () {
+			$("#select_content_types_edit").chosen().trigger("liszt:updated");
 		});
 	});
 </script>
@@ -311,6 +363,7 @@ var zone_id = '';
 							<!-- ko if: $index() < $parent.zones().length -1  -->
 							<i data-bind="click: $parent.clickZoneRight" class="icon-arrow-right"></i>
 							<!-- /ko -->
+							<i data-bind="click: $parent.clickZoneEdit" class="icon-edit"></i>
 						</a>
 					</li>
 					<!-- /ko -->
@@ -419,5 +472,52 @@ var zone_id = '';
 	<div class="modal-footer">
 		<a href="#" class="btn" data-dismiss="modal">Close</a>
 		<a href="#" class="btn btn-primary" data-bind="click: clickZoneSave">Save changes</a>
+	</div>
+</div>
+
+<div id="editModal" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>Edit a Zone</h3>
+	</div>
+	<div class="modal-body">
+		<div class="alert alert-error hide" id="editZoneErrors"></div>
+		<form data-bind="with: editZone" class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Zone Name</label>
+				<div class="controls">
+					<input type="text" name="zone_name" data-bind="value: name" required />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Zone UrlID</label>
+				<div class="controls">
+					<input type="text" name="zone_urlid" data-bind="value: urlid" required />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Content Types</label>
+				<div class="controls">
+					<select id="select_content_types_edit" class="chzn-select" multiple="multiple" name="zone_content_types[]" data-bind="options: $parent.content_type_list, optionsText: 'name', optionsValue: '_id', selectedOptions: content_types"></select>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Minimum Items</label>
+				<div class="controls">
+					<input type="text" name="zone_min_items" data-bind="value: min_items" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Maximum Items</label>
+				<div class="controls">
+					<input type="text" name="zone_max_items" data-bind="value: max_items" />
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal">Close</a>
+		<a href="#" class="btn btn-warning" data-bind="click: clickZoneDelete">Delete zone</a>
+		<a href="#" class="btn btn-primary" data-bind="click: clickZoneEditSave">Save changes</a>
 	</div>
 </div>
