@@ -1,20 +1,5 @@
 <?php
 	//This config should be overwritten with /application/config/10layer.php (at least the bits you want to change)
-
-	//You can change this if you need to
-	$config['live_base_url']	= 'http'.((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : '').'://'.$_SERVER['HTTP_HOST'].str_replace('//','/',dirname($_SERVER['SCRIPT_NAME']).'/');
-
-	$config["stomp_server"]=$_SERVER['HTTP_HOST'];
-	$config["stomp_port"]="61613";
-	$config["stomp_protocol"]="tcp";
-	
-	//Make sure the server knows its own name in /etc/hosts
-	$config["comet_server"]=$_SERVER['HTTP_HOST'];
-	$config["comet_port"]="8000";
-	
-
-	$config["xmpp_server"]=$_SERVER['HTTP_HOST'];
-	$config["xmpp_port"]=5222;
 	
 	$config["google_analytics_email"]="";
 	$config["google_analytics_password"]="";
