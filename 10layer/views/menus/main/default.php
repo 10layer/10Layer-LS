@@ -76,7 +76,7 @@
 		//print_r($tmp);
 	?>
 		<li class="dropdown-submenu">
-			<?= anchor("/publish/".$collection->_id, $collection->name.'s') ?>
+			<a href="#"><?= $collection->name.'s' ?></a>
 			<ul class="dropdown-menu">
 			<?php
 			foreach($options as $option) {
@@ -96,10 +96,10 @@
 <li class="menuitem dropdown">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
 	<ul class="dropdown-menu">
-		<li class="menuitem"><a href="<?= base_url() ?>setup/healthchecks">Health Check</a></li>
+		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/healthchecks">Health Check</a></li>-->
 		<li class="menuitem"><a href="<?= base_url() ?>setup/users">Users</a></li>
 		<li class="menuitem"><a href="<?= base_url() ?>setup/content_types">Content Types</a></li>
-		<li class="menuitem"><a href="<?= base_url() ?>setup/security">Security</a></li>
+		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/security">Security</a></li>-->
 	</ul>
 </li>
 <li class="menuitem"><?= anchor("user/logout","Logout") ?></li>
