@@ -48,7 +48,7 @@
 	{
 		"name" : "start_date",
 		"type" : "date",
-		"value" : "Today"
+		"defaultValue" : "today"
 	},
 	{
 		"name" : "workflow_status",
@@ -80,7 +80,7 @@
 	},
 	{
 		"name" : "body",
-		"type" : "textarea",
+		"type" : "wysiwyg",
 		"rules" : [
 			{
 				"fn": "required"
@@ -112,19 +112,6 @@
 		"name" : "author",
 		"label" : "Authors",
 		"type" : "autocomplete",
-		"rules" : [
-			{
-				"fn": "required"
-			},
-			{
-				"fn": "min_count",
-				"params": [ 1 ]
-			},
-			{
-				"fn": "max_count",
-				"params": [ 5 ]
-			}
-		],
 		"contenttype" : "author",
 		"multiple" : true
 	},
@@ -136,12 +123,6 @@
 	},
 	{
 		"name" : "section",
-		"type" : "tree",
-		"contenttype" : "section",
-		"rules" : [
-			{
-				"fn": "required"
-			}
-		]
+		"type" : "tree"
 	}
 ], "name" : "Article", "collection" : false, "order_by" : [ "last_modified desc" ] }
