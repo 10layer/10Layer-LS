@@ -16,7 +16,8 @@
 						contenttypes='<%= field.content_types %>' />
 
 						
-					<% if ((field.external==1) && (field.hidenew==false)) { %>
+					<% //if ((field.external==1) && (field.hidenew==false)) 
+					   if (field.hidenew==false){ %>
 					<%= _.template($('#button-new-template').html(), { field: field }) %>
 					<%
 						}
@@ -55,6 +56,9 @@
 			<div class='controls' style="position:relative;">
 				<div class="input-append" style="position:relative;">
 					<% var multiple = (field.multiple==true) ? 'multiple' : ''; %>
+
+					<% console.log(field); %>
+
 					<input multiple='<%= multiple %>' 
 						id='autocomplete_view_<%= field.contenttype %>_<%= field.name %>' 
 						type='text' 
@@ -66,7 +70,8 @@
 						
 
 						
-					<% if ((field.external==1) && (field.hidenew==false)) { %>
+					<% //if ((field.external==1) && (field.hidenew==false)) 
+					   if (field.hidenew==false){ %>
 					<%= _.template($('#button-new-template').html(), { field: field }) %>
 					<%
 						}
@@ -765,7 +770,7 @@
 </script>
 
 <script type='text/template' id='button-new-template'>
-	<button id="new_<%= field.contenttype %>_<%= field.name %>" contenttype="<%= field.contenttype %>" fieldname="<%= field.name %>" contenttype="<%= field.contenttype %>" class="btn_new btn">New <%= field.label %></button>
+	<button id="new_<%= field.content_types %>_<%= field.name %>" contenttype="<%= field.content_types %>" fieldname="<%= field.name %>" contenttype="<%= field.content_types %>" class="btn_new btn">New <%= field.label %></button>
 	<span style='display:none;margin-left:10px;' class='label label-success'>Loading...</span>
 	<div class='popup' id='new_dialog_<%= field.contenttype %>_<%= field.name %>'></div>
 </script>
@@ -775,6 +780,7 @@
 		<div>
 			<div id="edit-content" class="span10" >
 				<h3>Create - <%= content_type %></h3>
+				sdasdas
 				<span id='element_pointer' pointer='<%= element_pointer %>'></span>
 				<form id='contentform' class='form-horizontal span12' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>'>
 				<input type='hidden' name='action' value='submit' />
@@ -804,3 +810,118 @@
 	</div>
 
 </script>
+
+<script type='text/template' id='modal_window'>
+
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="msgdialog-header"><%= data.msg %></h3>
+	</div>
+	<div class="modal-body" id="msgdialog-body">
+	<%
+		var info = (data.info) ? data.info : '';
+		if (_.isArray(info)) {
+			var tmp='';
+			for(var x=0; x<info.length; x++) {
+				tmp+="<li>"+info[x]+"</li>";
+			}
+		}
+		info="<ul>"+tmp+"</li>";
+	%>
+	<%= info %>
+	</div>
+	<div class="modal-footer">
+		<div id="msgdialog-buttons" class="btn-group">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		</div>
+	</div>
+
+</script>
+
+<script type='text/template' id='create-template'>
+<div class='create_form_container'>
+	<form id='create_form' class="anchor_form form-horizontal" method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<?= $this->session->userdata('api_key') ?>'>
+		<h2>Create - <%= content_type %></h2>
+		<input type='hidden' name='action' value='submit' />
+		<% _.each(data.meta, function(field) {
+			if (!field.hidden) { 
+				try {
+			%>
+				<%= _.template($('#create-field-'+field.type).html(), { field: field, urlid: false, content_type: content_type  }) %>
+			<%	} catch(err) {
+					$("#msgdialog-header").html("Error");
+					$("#msgdialog-body").html("<h4>A problem was detected with field " + field.name+"</h4><p>"+err+"</p>");
+					$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+					$("#msgdialog").modal();
+				}
+			} 
+			%>
+		<% }); %>
+	</form>
+	<div class="over_lay"></div>
+</div>
+
+</script>
+
+
+
+<script type='text/template' id='edit-template'>
+<div class='edit_form_container'>
+	<h2>Edit</h2>
+	<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='anchor_form form-horizontal '>
+	<input type='hidden' name='action' value='submit' />
+	<input type='hidden' name='id' value='<%= urlid %>' />
+	<% _.each(data.meta, function(field) {
+		field.value = data.content[field.name];
+	%>
+		<% 
+		if (!field.hidden) { 
+			try {
+		%>
+			<%= _.template($('#edit-field-'+field.type).html(), { field: field, urlid: urlid, content_type: content_type  }) %>
+		<%	} catch(err) {
+				$("#msgdialog-header").html("Error");
+				$("#msgdialog-body").html("<h4>A problem was detected with field " + field.name+"</h4><p>"+err+"</p>");
+				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
+				$("#msgdialog").modal();
+			}
+		} 
+		%>
+	<% }); %>
+	</form>
+	<div class="over_lay"></div>
+</div>
+
+<div id='bottom_bar' class="navbar navbar-fixed-bottom">
+	<div class="navbar-inner">
+		<div class="container">
+			<ul class="nav pull-right">
+				<li><button id="_create" class="the_action btn btn-mini btn-primary " >Save and Create another</button></li>
+				<li class='divider-vertical'></li>
+				<li><button id="_edit" class="the_action btn btn-mini btn-warning" >Save and Edit</button></li>
+				<li class='divider-vertical'></li>
+				<li><button id="_publish" class="the_action btn btn-mini btn-danger" >Save and Publish</button></li>
+				<li class='divider-vertical'></li>
+				<li style=" padding-top:5px; width:300px;">
+					<div id='progress_container' style='display:none;' class="progress progress-striped active">
+						<div id="upload_indicator" class="bar" style="width: 0%;"></div>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
