@@ -538,6 +538,8 @@
 		
 		/**
 		 * published function.
+		 *
+		 * Only return published items
 		 * 
 		 * @access protected
 		 * @return void
@@ -634,6 +636,14 @@
 			$this->data["meta"]=$fields;
 		}
 		
+		/**
+		 * start_date function.
+		 * 
+		 * Ensure that "start_date" is greater than value. Value must be a Unix timestamp.
+		 *
+		 * @access protected
+		 * @return void
+		 */
 		protected function start_date() {
 			$start_date=$this->vars["start_date"];
 			if (!empty($start_date)) {
@@ -642,6 +652,14 @@
 			}
 		}
 		
+		/**
+		 * end_date function.
+		 * 
+		 * Ensure that "start_date" is less than value. Value must be a Unix timestamp.
+		 *
+		 * @access protected
+		 * @return void
+		 */
 		protected function end_date() {
 			$end_date=$this->vars["end_date"];
 			if (!empty($end_date)) {
@@ -653,6 +671,8 @@
 		/**
 		 * get_content_type function.
 		 * 
+		 * Returns the content type of an item by id
+		 *
 		 * @access protected
 		 * @return String content_type
 		 */

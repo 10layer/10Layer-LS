@@ -363,7 +363,10 @@
 			<div class="btn-group btn-group-vertical">
 				<a href="#" class="btn image-remove"><i class="icon-remove"></i> Remove</a>
 				<a href="#" class="btn image-link"><i class="icon-edit"></i> Link</a>
-				<a href="/api/files/download<%= encodeURIName(value) %>" target="_blank" class="btn"><i class="icon-download"></i> Download</a>
+				<% 
+					var d = value.replace("/content/", "").replace(/\//g, "-");
+				%>
+				<a href="/api/files/download<%= encodeURIName(d) %>?api_key=<%= $(document.body).data('api_key') %>" target="_blank" class="btn"><i class="icon-download"></i> Download</a>
 			</div>
 			<div class="link-show span6 hide">Link <input type="text" name="link" value="<%= encodeURIName(value) %>" class='span5 select_on_click' readonly='readonly' /></div>
 		</div>
