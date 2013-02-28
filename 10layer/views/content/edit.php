@@ -225,7 +225,7 @@
 			$(".menuitem").each(function() {
 				$(this).removeClass('selected');
 			});
-			$('#menuitem_'+content_type).addClass('selected');
+			//$('#menuitem_'+content_type).addClass('selected');
 			$('#dyncontent').html("Loading...");
 			$.getJSON("<?= base_url() ?>api/content/get_linked_object?jsoncallback=?", { api_key: $(document.body).data('api_key'), id: urlid, meta: true }, function(data) {
 				$('#dyncontent').html(_.template($("#edit-template").html(), {data:data, content_type: content_type, urlid: urlid }));
@@ -309,16 +309,20 @@
 			} else {
 
 				var url = '<?php echo base_url(); ?>';    
-				if($(document.body).data("action") == '_done'){
-					url += 'edit/'+$(document.body).data('content_type');
+				if($(document.body).data("action") == '_create'){
+					url += 'create/'+$(document.body).data('content_type');
 				}
 
-
-				if($(document.body).data("action") == '_edit'){
+				if($(document.body).data("action") == '_reuse'){
 					return false;
 				}
 
+				if($(document.body).data("action") == '_edit'){
+					url += 'edit/'+$(document.body).data('content_type')+"/"+data.criteria.id;
+				}
+				//console.log(data);
 				$(location).attr('href',url);
+
 			}
 		}
 		
@@ -429,47 +433,7 @@
 		$(document.body).data('done_submit',false);
 		$(document.body).data("saving",false);
 		
-		$("#createdialog").delegate("#createform-popup","submit",function() {
-		//Handles the submit for a new item
-			$("#createdialog #createform-popup").ajaxSubmit({
-				dataType: "json",
-				iframe: true,
-				
-				beforeSubmit: function(a,f,o) {
-					o.dataType = "json";
-				},
-				success: function(data) {
-					if (data.error) {
-						allow_done=false;
-						$("#msgdialog-header").html("Error");
-						$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+data.info+"</p>");
-						$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-						$("#msgdialog").modal();
-					} else {
-						allow_done=true;
-						$("#msgdialog").html("<div class='ui-state-highlight' style='padding: 5px'><p><span class='ui-icon ui-icon-info' style='float: left; margin-right: .3em;'></span><strong>Saved</strong></p></div>");
-						var title=data.data.title;
-						var id=data.data.id;
-						var fieldname=$("#createdialog").data("fieldname");
-						var newoption="<option value='"+id+"'>"+title+"</option>";
-						$("."+fieldname).prepend(newoption);
-						$("."+fieldname).val(id);
-						$("#createdialog").dialog("close");
-						$("#msgdialog").dialog({
-						    modal: true,
-						    buttons: {
-						    	Ok: function() {
-						    		$(this).dialog("close");
-						    	}
-						    }
-						});
-						
-					}
-					
-				}
-			});
-			return false;
-		});
+		
 		
 		$(document).on("click", ".add-zone", function(e) {
 			e.preventDefault();
@@ -634,70 +598,8 @@
 
 
 
-<script type='text/template' id='edit-template'>
 
-<div class="row" >
 
-	<div style='margin-left:0;' class='main_form_container span10'>
-		<div class='root'>
-			
-			<div id="edit-content" class="span10" >
-				<h2>Edit</h2>
-				<form id='contentform' method='post' enctype='multipart/form-data' action='<?= base_url() ?>api/content/save?api_key=<%= $(document.body).data('api_key') %>&id=<%= urlid %>' class='form-horizontal span12'>
-				<input type='hidden' name='action' value='submit' />
-				<input type='hidden' name='id' value='<%= urlid %>' />
-				<% _.each(data.meta, function(field) {
-					field.value = data.content[field.name];
-				%>
-					<% 
-					if (!field.hidden) { 
-						try {
-					%>
-						<%= _.template($('#edit-field-'+field.type).html(), { field: field, urlid: urlid, content_type: content_type  }) %>
-					<%	} catch(err) {
-							$("#msgdialog-header").html("Error");
-							$("#msgdialog-body").html("<h4>A problem was detected with field " + field.name+"</h4><p>"+err+"</p>");
-							$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-							$("#msgdialog").modal();
-						}
-					} 
-					%>
-				<% }); %>
-				</form>
-
-			</div>
-			<br clear='both'>
-		</div>
-
-		<div class="over_lay slider span10"></div>
-    </div>
-</div>
-
-	<div id='bottom_bar' class="navbar navbar-fixed-bottom">
-		<div class="navbar-inner">
-			<div class="container">
-				<ul class="nav">
-
-					<li><button id="_done" class="the_action btn btn-mini btn-primary">Save and List</button></li>
-					<li class='divider-vertical'></li>
-					<li><button id="_edit" class="the_action btn btn-mini btn-info">Save and Edit</button></li>
-					<li class='divider-vertical'></li>
-					<li><button id="_publish" class="the_action btn btn-mini btn-warning">Save and Publish</button></li>
-					<li class='divider-vertical'></li>
-					<li><button id="_delete" class="btn btn-mini btn-danger">Delete</button></li>
-					<li class="divider-vertical"></li>
-					<li style=" padding-top:10px; width:300px;">
-						<div id='progress_container' style='display:none;' class="progress progress-striped active">
-							<div id="upload_indicator" class="bar" style="width: 0%;"></div>
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-		
-	</div>
-</div>
-</script>
 
 <script type='text/template' id='create-popup-template'>
 	<div id="create-content" class="boxed wide">
@@ -762,8 +664,7 @@
 	</div>
 </div>
 
-<div id="dyncontent">
-</div>
+<div id="dyncontent"></div>
 <div id="createdialog"></div>
 
 <?php
