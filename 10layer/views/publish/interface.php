@@ -255,7 +255,7 @@
 					data.zones[key] = JSON.parse(ko.toJSON(item.published())); 
 				}
 			);
-			$.getJSON("/api/publish/save?api_key=<?= $this->session->userdata("api_key") ?>", data, 
+			$.post("/api/publish/save?api_key=<?= $this->session->userdata("api_key") ?>", data, 
 				function(result) { 
 					if (result.error) {
 						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
