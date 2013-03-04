@@ -50,11 +50,18 @@
 			$this->returndata();
 		}
 		
-		public function download() {
-			$dir = "/content/";
-			$uria = $this->uri->rsegment_array();
-			$uria = array_slice($uria, 2);
-			$filename = "./".rawurldecode(implode("/", $uria));
+		/**
+		 * download function.
+		 * 
+		 * Downloads a file. Filename must be in the format yyyy-mm-dd-filename if it is in ./content/yyyy/mm/dd/filename
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function download($orig) {
+			$this->enforce_secure();
+			$substr = substr($orig, 0, 11);
+			$filename = "./content/".str_replace("-", "/", $substr).rawurldecode(substr($orig, 11));
 			if (!is_file($filename)) {
 				show_404();
 			}
@@ -64,7 +71,7 @@
 			header('Content-Transfer-Encoding: binary'); 
 			header('Content-Length: '.filesize($filename));
 			ob_clean(); 
-			flush(); 
+			flush();
 			readfile($filename);
 		}
 		
@@ -182,7 +189,7 @@
 			if (!is_dir("content/cache/".$parts["dirname"])) {
 				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert '{$file}' -background transparent -resize {$width}x{$height}{$op} -quality 80 -gravity center $extent '{$cache}'", $result);
+			exec("convert '".escapeshellarg($file)."' -background transparent -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} -quality 80 -gravity center $extent '{$cache}'", $result);
 			if ($render) {
 				header("Content-type: image/png");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
