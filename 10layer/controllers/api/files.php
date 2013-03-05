@@ -164,7 +164,7 @@
 				$this->returndata();
 				return true;
 			}
-			if (!in_array($parts["extension"], $filetypes)) {
+			if (!in_array(strtolower($parts["extension"]), $filetypes)) {
 				$this->data["error"]=true;
 				$this->data["msg"]="Cannot access file of that type";
 				$this->returndata();
