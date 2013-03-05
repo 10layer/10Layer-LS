@@ -1,4 +1,5 @@
 Copyright 2013 10Layer Software Development Pty (Ltd)
+
 info@10layer.com
 
 Mozilla Public License Version 2.0
