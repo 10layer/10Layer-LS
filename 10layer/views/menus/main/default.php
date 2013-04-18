@@ -57,7 +57,7 @@
 	$collections=$this->model_collections->get_all();
 	foreach($collections as $collection) {
 		$options=$this->model_collections->get_options($collection->_id);
-		
+
 		// //Here we check if we have nested collections
 		// $tmp=array();
 		// foreach($options as $option) {
@@ -97,6 +97,8 @@
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
 	<ul class="dropdown-menu">
 		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/healthchecks">Health Check</a></li>-->
+		<li class="menuitem"><a href="<?= base_url() ?>setup/urlids">Manage Url IDs</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>setup/redirects">Manage Redirects</a></li>
 		<li class="menuitem"><a href="<?= base_url() ?>setup/users">Users</a></li>
 		<li class="menuitem"><a href="<?= base_url() ?>setup/content_types">Content Types</a></li>
 		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/security">Security</a></li>-->

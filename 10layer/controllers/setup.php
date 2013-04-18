@@ -3,14 +3,14 @@
 	 * Setup class
 	 *
 	 * Sets 10Layer up on a new server
-	 * 
+	 *
 	 * @extends Controller
 	 */
 	class Setup extends CI_Controller {
 
 		/**
 		 * __construct function.
-		 * 
+		 *
 		 * @access public
 		 * @return void
 		 */
@@ -18,7 +18,7 @@
 			parent::__construct();
 			$this->load->library("validation");
 		}
-		
+
 		public function admin() {
 
 			$this->load->model("model_user");
@@ -42,7 +42,7 @@
 				} else {
 
 					/*
-						we need to create api_keys before everything (role based API keys) 
+						we need to create api_keys before everything (role based API keys)
 						This will change when we have user based API keys
 					*/
 					$keys = $this->tlsecurity->get_api_keys();
@@ -54,7 +54,7 @@
 			$data["wizard"]=true;
 			$this->load->view("setup/admin", $data);
 		}
-		
+
 		public function content_types($content_type_urlid=false) {
 			$this->load->model("model_content");
 			$content_types=$this->model_content->get_content_types();
@@ -85,17 +85,32 @@
 			//print_r($content_types);
 			$this->load->view("setup/content_types", $data);
 		}
-		
+
 		public function users() {
 			$this->load->view("setup/users");
 		}
-		
+
 		public function api_keys() {
 
 			print "API keys";
 			print_r($this->tlsecurity->get_api_keys());
 		}
-		
+
+
+		public function redirects(){
+
+		}
+
+		public function urlids(){
+
+			$data["menu1_active"]="home";
+			$this->load->view('templates/header',$data);
+			$this->load->view('setup/manage_urlids',$data);
+			$this->load->view("templates/footer");
+		}
+
+
+
 		protected function json_check($filename="") {
 			switch (json_last_error()) {
 				case JSON_ERROR_NONE:
