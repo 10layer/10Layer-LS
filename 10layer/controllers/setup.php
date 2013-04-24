@@ -98,7 +98,10 @@
 
 
 		public function redirects(){
-
+			$data["menu1_active"]="home";
+			$this->load->view('templates/header',$data);
+			$this->load->view('setup/manage_redirects',$data);
+			$this->load->view("templates/footer");
 		}
 
 		public function urlids(){

@@ -342,7 +342,7 @@
 
 			if(empty($_POST) && empty($_GET)){
 				$this->data["error"]=true;
-				$this->data["msg"][]="We did not receive data";
+				$this->data["msg"]="We did not receive data";
 				$this->returndata();
 				return false;
 			}
@@ -353,19 +353,42 @@
 				return false;
 			}
 
-			$id=$this->input->get_post("id");
-			//find the record we are dealing with
-			$content=array_pop($this->mongo_db->where(array("_id"=>$id))->limit(1)->get("content"));
+			$new_value = $this->input->get_post("new_val");
 
-			//change its id
-			$content->_id = $this->input->get_post("new_val");
 
-			//print_r($content); die();
-			//delete the old one since we are not allowed to change the _id
-			$this->mongo_db->where(array("_id"=>$id))->delete("content");
-			//re-insert a new one
-			$result=$this->mongo_db->insert('content', $content);
-			echo $content->_id;
+
+
+			$this->load->library('Validation');
+			$validator = new Validation();
+
+			if($validator->alpha_numeric_dash_space($new_value)){
+				$this->load->library('Datatransformations');
+				$transformer = new Datatransformations();
+				$urlid = $transformer->urlid($this,$new_value,false);
+
+				$id=$this->input->get_post("id");
+				//find the record we are dealing with
+				$content=array_pop($this->mongo_db->where(array("_id"=>$id))->limit(1)->get("content"));
+
+				//change its id
+				$content->_id = $this->input->get_post("new_val");
+
+				//print_r($content); die();
+				//delete the old one since we are not allowed to change the _id
+				$this->mongo_db->where(array("_id"=>$id))->delete("content");
+				//re-insert a new one
+				$this->mongo_db->insert('content', $content);
+
+				$this->data["error"]=false;
+				$this->data["msg"]="Urlid successfully updated";
+				$this->returndata();
+
+			}else{
+				$this->data["error"]=true;
+				$this->data["msg"]="You have included invalid characters in your urlid";
+				$this->returndata();
+			}
+
 
 		}
 

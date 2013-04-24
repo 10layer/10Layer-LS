@@ -54,7 +54,8 @@ $(function(){
 
 	$(document).on('click', '.urlid_changer', function(){
 		var id = $(this).attr('id');
-		$(this).parent().html(_.template($('#change_urlid').html(), { id: id }));
+		var content_type = $(this).attr('content_type');
+		$(this).parent().html(_.template($('#change_urlid').html(), { id: id, contenttype:content_type }));
 	});
 
 	$(document).on('click', '#cancel_urlid', function(){
@@ -65,11 +66,18 @@ $(function(){
 	$(document).on('click', '#save_urlid', function(){
 		var pointer = $(this);
 		var id = $(this).prev().attr('id');
+		var contenttype = $(this).prev().attr('contenttype');
 		var new_value = $(this).prev().val();
-		var params = {id: id, new_val: new_value, api_key: $(document.body).data('api_key') };
+		var params = {id: id, new_val: new_value,contenttype:contenttype, api_key: $(document.body).data('api_key') };
 		if(id != new_value){
-			$.get("<?= base_url() ?>api/content/update_urlid?jsoncallback=?", params, function(data){
-				pointer.parent().parent().html(_.template($('#restore_urlid').html(), { id: new_value }));
+			$.getJSON("<?= base_url() ?>api/content/update_urlid?jsoncallback=?", params, function(data){
+
+				if(!data.error){
+					pointer.parent().parent().html(_.template($('#restore_urlid').html(), { id: new_value })).append(_.template($('#message').html(), { message: data.msg, the_class:'success' }) );
+				}else{
+					pointer.parent().parent().append(_.template($('#message').html(), { message: data.msg, the_class:'error' }) );
+				}
+
 			});
 		}else{
 			pointer.parent().parent().html(_.template($('#restore_urlid').html(), { id: new_value }));
@@ -85,10 +93,17 @@ $(function(){
 
 <script type="text/template" id="change_urlid">
 	<div class="input-append">
-	  <input class="span3" id="<%= id %>" type="text" value='<%= id %>'>
+	  <input contenttype='<%= contenttype %>' class="span3" id="<%= id %>" type="text" value='<%= id %>'>
 	  <button id='save_urlid' class="btn" type="button">Save</button>
 	  <button id='cancel_urlid' class="btn" type="button">Cancel</button>
 	</div>
+</script>
+
+<script type="text/template" id="message">
+<div class="alert alert-<%= the_class %> fade in">
+	<button type="button" class="close" data-dismiss="alert">×</button>
+	<%= message %>
+</div>
 </script>
 
 <script type="text/template" id="restore_urlid">
@@ -121,7 +136,7 @@ $(function(){
 		<% var x=0; _.each(content, function(item) {  %>
 		    <tr id="row_<%= item.id %>">
 		    	<td ><%= item.title %></td>
-		    	<td class='content-workflow-<%= item.major_version %>'><a id='<%= item._id %>' class='urlid_changer'><%= item._id %></a></td>
+		    	<td class='content-workflow-<%= item.major_version %>'><a content_type='<%= item.content_type %>' id='<%= item._id %>' class='urlid_changer'><%= item._id %></a></td>
 		    	<td><%= dateToString(item.last_modified) %></td>
 		    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
 		    	<td><%= item.content_type %></td>

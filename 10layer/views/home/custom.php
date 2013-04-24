@@ -5,7 +5,7 @@ $(function(){
 	$(".chzn-select").chosen().change(function(){
 		filter();
 	});
-	
+
 	$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
 	$('#dyncontent').html("Loading...");
 	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
@@ -67,7 +67,7 @@ $(function(){
 	    <tr>
 	    	<th width='500px'>Title</th>
 	    	<th>Last Edit</th>
-	    	<th>Edited by</th> 
+	    	<th>Edited by</th>
 	    	<th>Start Date</th>
 	    	<th>Content Type</th>
 	    	<th>Workflow</th>
@@ -79,7 +79,7 @@ $(function(){
 		    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= item.content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 		    	<td><%= dateToString(item.last_modified) %></td>
 		    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-		    	
+
 		    	<td><%= dateToString(item.start_date) %></td>
 		    	<td><%= item.content_type %></td>
 		    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
@@ -90,7 +90,7 @@ $(function(){
 </script>
 
 <div id="filter_pane">
-	
+
 	<div id="quick_search_container" >
 		<h5>Quick Search / Filters </h5>
 		<div style="float:left; margin-right:10px; margin-top:4px;">
@@ -132,10 +132,10 @@ $(function(){
 		  <input type="text" id='search_query' class="">
 		  <a id="quick_search_button" class="btn">Quick Search</a>
 		 </div>
-		
+
 	</div>
 
 </div>
 <div id="dyncontent">
-	
+
 </div>
