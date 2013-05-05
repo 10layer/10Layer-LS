@@ -572,7 +572,6 @@
 				$this->mongo_db->like("title", $search);
 				$this->data["criteria"]["search"]=$search;
 			}
-
 		}
 		
 		/**
@@ -589,6 +588,26 @@
 				$fields=array($fields);
 			}
 			$this->mongo_db->select($fields);
+		}
+		
+		/**
+		 * last_editor function.
+		 * 
+		 * Show only items edited last by last_editor
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function last_editor() {
+			$last_editor = $this->input->get_post("last_editor");
+			$this->mongo_db->where(array("last_editor"=>$last_editor));
+			$this->data["criteria"]["last_editor"] = $last_editor;
+		}
+		
+		protected function workflow() {
+			$workflow_status = (Int) $this->input->get_post("workflow");
+			$this->mongo_db->where(array("workflow_status"=>$workflow_status));
+			$this->data["criteria"]["workflow_status"] = $workflow_status;
 		}
 		
 		/**
