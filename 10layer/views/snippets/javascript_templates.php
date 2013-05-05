@@ -566,7 +566,7 @@
 		<div class='control-group'>
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls'>
-				<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %>'>
+				<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %><%= (field.multiple) ? "[]" : "" %>' <%= (field.multiple) ? "multiple='multiple'" : "" %>>
 				<option value="0"></option>
 				<% 
 				var keyadjust=0;
@@ -579,7 +579,28 @@
 				});
 				%>
 				<% _.each(field.options, function(option, key) { %>
-					<option value='<%= ( key + keyadjust) %>' <%= (field.value==( key + keyadjust)) ? 'selected="selected"' : '' %> ><%= option %></option>
+					<option value='<%= ( key + keyadjust) %>' 
+					<%
+						if (_.isArray(field.value)) {
+							var selected = false;
+							_.each(field.value, function(item) {
+								if (item._id) {
+									if (item._id == key) {
+										selected = true;
+									}
+								} else {
+									if (item == key) {
+										selected = true;
+									}
+								}
+							});
+						} else {
+							if (field.value == (key + keyadjust)) {
+								selected = true;
+							}
+						}
+					%>
+					<%= (selected) ? 'selected="selected"' : '' %> ><%= option %></option>
 				<% }); %>
 				</select>
 			</div>
@@ -588,25 +609,7 @@
 
 <script type='text/template' id='create-field-select'>
 	<!-- create-field-select -->
-	<div class='control-group'>
-	    <label class='control-label <%= field.label_class %>'><%= field.label %></label>
-	    <div class='controls'>
-	    	<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %>'>
-	    	<option value="0"></option>
-	    	<% 
-	    	var keyadjust=0;
-	    	_.each(field.options, function(val, key) {
-	    		if (key==0) {
-	    			keyadjust=1;
-	    		}
-	    	});
-	    	%>
-	    	<% _.each(field.options, function(option, key) { %>
-	    		<option value='<%= ( key + keyadjust) %>' <%= (field.defaultValue==( key + keyadjust) || (field.defaultValue==option) ) ? 'selected="selected"' : '' %> ><%= option %></option>
-	    	<% }); %>
-	    	</select>
-	    </div>
-	</div>
+	<%= _.template($('#edit-field-select').html(), {field: field} ) %>
 </script>
 
 <script type='text/template' id='edit-field-text'>
