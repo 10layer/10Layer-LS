@@ -259,6 +259,9 @@
 					}
 				}
 			}
+			if (!is_numeric($data->workflow_status)) {
+				$data->workflow_status = 1;
+			}
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
 				//Update
