@@ -5,7 +5,7 @@ $(function(){
 	$(".chzn-select").chosen().change(function(){
 		filter();
 	});
-
+	
 	$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
 	$('#dyncontent').html("Loading...");
 	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
@@ -27,28 +27,33 @@ $(function(){
 		$("#quick_search_button").text('searching...');
 		var edited_by = $("#edited_by").val();
 		var content_types = $("#content_types").val();
-		var workflows = $("#workflows").val();
+		var workflow = $("#workflows").val();
 		var search_string = $('#search_query').val();
 		var params = {order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }
-		if(search_string != ''){
+		if(search_string != '' && search_string){
 			params.search = search_string;
 		}
-		if(content_types != ''){
+		if(content_types != '' && content_types){
 			params.content_type = content_types;
 		}
-		if(workflows != ''){
-			params.workflow = workflows;
+		if(workflow != '' && workflow){
+			params.workflow = workflow;
 		}
-		if(edited_by != ''){
+		if(edited_by != '' && edited_by){
 			params.last_editor = edited_by;
 		}
-
-
 		$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", params, function(data) {
 			$('#dyncontent').html(_.template($("#listing-template").html(), {data:data}));
 			$("#quick_search_button").text('Quick Search');
 		});
 	}
+	
+	$(document).on("click", ".reset", function() {
+		var el = $(this).next();
+		el.val('').trigger("liszt:updated");
+		
+		filter();
+	});
 });
 
 </script>
@@ -67,7 +72,7 @@ $(function(){
 	    <tr>
 	    	<th width='500px'>Title</th>
 	    	<th>Last Edit</th>
-	    	<th>Edited by</th>
+	    	<th>Edited by</th> 
 	    	<th>Start Date</th>
 	    	<th>Content Type</th>
 	    	<th>Workflow</th>
@@ -79,7 +84,7 @@ $(function(){
 		    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= item.content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 		    	<td><%= dateToString(item.last_modified) %></td>
 		    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-
+		    	
 		    	<td><%= dateToString(item.start_date) %></td>
 		    	<td><%= item.content_type %></td>
 		    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
@@ -90,11 +95,12 @@ $(function(){
 </script>
 
 <div id="filter_pane">
-
+	
 	<div id="quick_search_container" >
 		<h5>Quick Search / Filters </h5>
 		<div style="float:left; margin-right:10px; margin-top:4px;">
-			<select id='edited_by' class="chzn-select" data-placeholder="Edited by..." name="edited_by" id="" style='width:200px;display:none;'>
+			<a href="#" class="close reset" style="float: right">&times;</a>
+			<select id='edited_by' class="chzn-select" data-placeholder="Edited by" name="edited_by" id="" style='width:200px;display:none;'>
 				<option value=''></option>
 				<?php
 					$this->load->model('model_user');
@@ -106,8 +112,9 @@ $(function(){
 			</select>
 		</div>
 
-		<div <div style="float:left; margin-right:10px; margin-top:4px;">
-			<select id='content_types' class="chzn-select" data-placeholder="Content Types..." name="tag_workflow_status" id="" style='width:200px;display:none;'>
+		<div style="float:left; margin-right:10px; margin-top:4px;">
+			<a href="#" class="close reset" style="float: right">&times;</a>
+			<select id='content_types' class="chzn-select" data-placeholder="Content type" name="tag_workflow_status" id="" style='width:200px;display:none;'>
 				<option value=''></option>
 				<?php
 					$this->load->model('model_content');
@@ -117,25 +124,28 @@ $(function(){
 					}
 				?>
 			</select>
+			
 		</div>
 
 		<div <div style="float:left; margin-right:10px; margin-top:4px;">
-			<select id='workflows' class="chzn-select" data-placeholder="Choose Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
+			<a href="#" class="close reset" style="float: right">&times;</a>
+			<select id='workflows' class="chzn-select" data-placeholder="Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
 				<option value=''></option>
-				<option>New</option>
-				<option>Edited</option>
-				<option>Published</option>
+				<option value="1">New</option>
+				<option value="2">Edited</option>
+				<option value="3">Published</option>
 			</select>
 		</div>
 
 		<div class="input-append" style="float:right;">
-		  <input type="text" id='search_query' class="">
-		  <a id="quick_search_button" class="btn">Quick Search</a>
+			<a href="#" class="close reset" style="float: right">&times;</a>
+			<input type="text" id='search_query' class="">
+			<a id="quick_search_button" class="btn">Quick Search</a>
 		 </div>
-
+		
 	</div>
 
 </div>
 <div id="dyncontent">
-
+	
 </div>

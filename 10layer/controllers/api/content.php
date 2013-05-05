@@ -1,16 +1,16 @@
 <?php
 	require_once('10layer/system/TL_Api.php');
-
+	
 	/**
 	 * Content class
-	 *
+	 * 
 	 * @extends CI_Controller
 	 */
 	class Content extends TL_Api {
-
+		
 		/**
 		 * __construct function.
-		 *
+		 * 
 		 * @access public
 		 * @return void
 		 */
@@ -23,10 +23,10 @@
 				return true;
 			}
 		}
-
+		
 		/**
 		 * index function.
-		 *
+		 * 
 		 * Shortcut to "listing", so you don't need to call the listing
 		 * method in your url.
 		 *
@@ -36,19 +36,19 @@
 		public function index() {
 			$this->listing();
 		}
-
+		
 		/**
 		 * listing function.
-		 *
-		 * Used to return a list, but can also return a single item,
-		 * although in that case "get" would be faster. Includes a
+		 * 
+		 * Used to return a list, but can also return a single item, 
+		 * although in that case "get" would be faster. Includes a 
 		 * total count.
 		 *
 		 * @access public
 		 * @return void
 		 */
 		public function listing() {
-
+			
 			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
@@ -62,12 +62,12 @@
 			$this->returndata();
 			return true;
 		}
-
+		
 		/**
 		 * count function.
-		 *
+		 * 
 		 * Returns a count matching the criteria
-		 *
+		 * 
 		 * @access public
 		 * @return void
 		 */
@@ -85,10 +85,10 @@
 			$this->returndata();
 			return true;
 		}
-
+		
 		/**
 		 * get function.
-		 *
+		 * 
 		 * Returns a single item, a bit faster than listing because we
 		 * don't do a count.
 		 *
@@ -113,7 +113,7 @@
 
 		/**
 		 * get_linked_object function.
-		 *
+		 * 
 		 * Returns a single item with its linked items (urlid and title), a bit faster than listing because we
 		 * don't do a count.
 		 *
@@ -161,7 +161,7 @@
 					$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
 				}
 			}
-
+				
 			if (isset($content)) {
 				$this->data["content"]=$content;
 			} else {
@@ -171,10 +171,10 @@
 			$this->returndata();
 		}
 
-
+		
 		/**
 		 * save function.
-		 *
+		 * 
 		 * @access public
 		 * @return void
 		 */
@@ -282,10 +282,10 @@
 			$this->data["msg"]="Saved $content_type";
 			$this->returndata();
 		}
-
+		
 		/**
 		 * delete function.
-		 *
+		 * 
 		 * Moves a document to "content_deleted" section. Requires "id".
 		 *
 		 * @access public
@@ -327,79 +327,12 @@
 			}
 			$this->returndata();
 		}
-
-
-
-		/**
-		 * Update_urlid function.
-		 * Use this to change the urlid
-		 * Return Success or failure
-		 *
-		 * @access public
-		 * @return void
-		 */
-		public function update_urlid() {
-
-			if(empty($_POST) && empty($_GET)){
-				$this->data["error"]=true;
-				$this->data["msg"]="We did not receive data";
-				$this->returndata();
-				return false;
-			}
-			if (!$this->secure) {
-				$this->data["error"]=true;
-				$this->data["msg"][]="You do not have permission to save";
-				$this->returndata();
-				return false;
-			}
-
-			$new_value = $this->input->get_post("new_val");
-
-
-
-
-			$this->load->library('Validation');
-			$validator = new Validation();
-
-			if($validator->alpha_numeric_dash_space($new_value)){
-				$this->load->library('Datatransformations');
-				$transformer = new Datatransformations();
-				$urlid = $transformer->urlid($this,$new_value,false);
-
-				$id=$this->input->get_post("id");
-				//find the record we are dealing with
-				$content=array_pop($this->mongo_db->where(array("_id"=>$id))->limit(1)->get("content"));
-
-				//change its id
-				$content->_id = $this->input->get_post("new_val");
-
-				//print_r($content); die();
-				//delete the old one since we are not allowed to change the _id
-				$this->mongo_db->where(array("_id"=>$id))->delete("content");
-				//re-insert a new one
-				$this->mongo_db->insert('content', $content);
-
-				$this->data["error"]=false;
-				$this->data["msg"]="Urlid successfully updated";
-				$this->returndata();
-
-			}else{
-				$this->data["error"]=true;
-				$this->data["msg"]="You have included invalid characters in your urlid";
-				$this->returndata();
-			}
-
-
-		}
-
-
-
-
+		
 		/**
 		 * undelete function.
 		 *
 		 * Moves a document from "content_deleted" collection back to "content" collection. Requires "id".
-		 *
+		 * 
 		 * @access public
 		 * @return void
 		 */
@@ -439,10 +372,10 @@
 			}
 			$this->returndata();
 		}
-
+		
 		/**
 		 * multiple function.
-		 *
+		 * 
 		 * Allows for multiple ops to be executed with one request, eg. delete a number of files.
 		 * Expects an array called items
 		 *
@@ -474,20 +407,20 @@
 			$url = base_url()."api/content/$action?api_key=$api_key";
 			$this->data["content"]=array();
 			foreach($items as $item) {
-				$ch = curl_init();
+				$ch = curl_init(); 
 				curl_setopt($ch, CURLOPT_URL, $url);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $item);
-				$output = curl_exec($ch);
+				$output = curl_exec($ch); 
 				curl_close($ch);
 				$this->data["content"][] = $output;
 			}
 			$this->returndata();
 		}
-
+		
 		/**
 		 * blank function.
-		 *
+		 * 
 		 * Used to return data without doing a MongoDB lookup, for instance to get the meta data for a content type
 		 * @access public
 		 * @return void
@@ -499,12 +432,12 @@
 			$this->data["content"]=false;
 			$this->returndata();
 		}
-
+		
 		//Callbacks
-
+		
 		/**
 		 * content_type function.
-		 *
+		 * 
 		 * Only return content of a certain type. Send an array to return from multiple content types.
 		 *
 		 * @access protected
@@ -521,10 +454,10 @@
 				$this->data["criteria"]["content_type"]=$content_type;
 			}
 		}
-
+		
 		/**
 		 * limit function.
-		 *
+		 * 
 		 * Limit results. Usually a good idea.
 		 *
 		 * @access protected
@@ -537,10 +470,10 @@
 				$this->data["criteria"]["limit"]=$limit;
 			}
 		}
-
+		
 		/**
 		 * offset function.
-		 *
+		 * 
 		 * Listing offset
 		 *
 		 * @access protected
@@ -553,10 +486,10 @@
 				$this->data["criteria"]["offset"]=$offset;
 			}
 		}
-
+		
 		/**
 		 * order_by function.
-		 *
+		 * 
 		 * Order by - can be an array, and can have DESC to order descending
 		 *
 		 * @access protected
@@ -572,10 +505,10 @@
 				$this->data["criteria"]["order_by"]=$order_by;
 			}
 		}
-
+		
 		/**
 		 * id function.
-		 *
+		 * 
 		 * Return content matching ID
 		 *
 		 * @access protected
@@ -588,10 +521,10 @@
 				$this->data["criteria"]["id"]=$id;
 			}
 		}
-
+		
 		/**
 		 * ids function.
-		 *
+		 * 
 		 * Used for looking up multiple IDs in one shot
 		 *
 		 * @access protected
@@ -602,12 +535,12 @@
 			$this->mongo_db->where_in("_id", $ids);
 			$this->data["criteria"]["id"]=$ids;
 		}
-
+		
 		/**
 		 * published function.
 		 *
 		 * Only return published items
-		 *
+		 * 
 		 * @access protected
 		 * @return void
 		 */
@@ -624,10 +557,10 @@
 			}
 			$this->data["criteria"]["published"]=false;
 		}
-
+		
 		/**
 		 * search function.
-		 *
+		 * 
 		 * Searches title for a search string
 		 *
 		 * @access protected
@@ -639,12 +572,11 @@
 				$this->mongo_db->like("title", $search);
 				$this->data["criteria"]["search"]=$search;
 			}
-
 		}
-
+		
 		/**
 		 * fields function.
-		 *
+		 * 
 		 * Send a list of fields to limit amount of data returned
 		 *
 		 * @access protected
@@ -657,12 +589,32 @@
 			}
 			$this->mongo_db->select($fields);
 		}
-
+		
+		/**
+		 * last_editor function.
+		 * 
+		 * Show only items edited last by last_editor
+		 *
+		 * @access protected
+		 * @return void
+		 */
+		protected function last_editor() {
+			$last_editor = $this->input->get_post("last_editor");
+			$this->mongo_db->where(array("last_editor"=>$last_editor));
+			$this->data["criteria"]["last_editor"] = $last_editor;
+		}
+		
+		protected function workflow() {
+			$workflow_status = (Int) $this->input->get_post("workflow");
+			$this->mongo_db->where(array("workflow_status"=>$workflow_status));
+			$this->data["criteria"]["workflow_status"] = $workflow_status;
+		}
+		
 		/**
 		 * exclude function.
 		 *
 		 * Exclude items with _id from the results
-		 *
+		 * 
 		 * @access protected
 		 * @return void
 		 */
@@ -676,10 +628,10 @@
 				$this->data["criteria"]["exclude"]=$exclude;
 			}
 		}
-
+		
 		/**
 		 * meta function.
-		 *
+		 * 
 		 * Return meta data about the fields
 		 *
 		 * @access protected
@@ -702,10 +654,10 @@
 			}
 			$this->data["meta"]=$fields;
 		}
-
+		
 		/**
 		 * start_date function.
-		 *
+		 * 
 		 * Ensure that "start_date" is greater than value. Value must be a Unix timestamp.
 		 *
 		 * @access protected
@@ -718,10 +670,10 @@
 				$this->data["criteria"]["start_date"]=date("c", $start_date);
 			}
 		}
-
+		
 		/**
 		 * end_date function.
-		 *
+		 * 
 		 * Ensure that "start_date" is less than value. Value must be a Unix timestamp.
 		 *
 		 * @access protected
@@ -734,10 +686,10 @@
 				$this->data["criteria"]["end_date"]=date("c", $end_date);
 			}
 		}
-
+		
 		/**
 		 * get_content_type function.
-		 *
+		 * 
 		 * Returns the content type of an item by id
 		 *
 		 * @access protected
@@ -762,10 +714,10 @@
 			}
 			return $content_type;
 		}
-
+		
 		/**
 		 * get_field_data function.
-		 *
+		 * 
 		 * @access protected
 		 * @param String $content_type
 		 * @return array
@@ -779,10 +731,10 @@
 				return false;
 			}
 		}
-
+		
 		/**
 		 * _check_callbacks function.
-		 *
+		 * 
 		 * @access private
 		 * @return void
 		 */
@@ -802,11 +754,11 @@
 							$this->mongo_db->where(array($key=>$val));
 						}
 						$this->data["criteria"]["where_$key"]=$val;
-					}
+					} 
 				}
 			}
 		}
-
+		
 	}
 
 /* End of file content.php */
