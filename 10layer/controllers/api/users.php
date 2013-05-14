@@ -113,6 +113,50 @@
 				return true;
 			}
 		}
+
+		public function api_keys() {
+			$this->data["content"] = $this->tlsecurity->get_api_keys();
+			$this->returndata();
+		}
+
+		public function generate_api_key() {
+			$this->data["content"] = generate_api_key();
+			$this->returndata();
+		}
+
+		public function save_api_key() {
+			if (empty($this->vars->api_key)) {
+				$this->data["error"] = true;
+				$this->data["message"][] = "API Key cannot be empty";
+				$this->returndata();
+				return;
+			}
+			if (!empty($this->vars->_id)) { //Update
+				$id = $this->vars->_id;
+				if (isset($this->vars->_id->{'$id'})) {
+					$id = $this->vars->_id->{'$id'};
+				}
+				$key = array_pop($this->mongo_db->get_where("api_keys", array("_id" => new MongoId($id))));
+				if (!empty($key)) {
+					$data = $this->vars;
+					unset($data->_id);
+					$this->mongo_db->where(array("_id" => new MongoId($id)))->update("api_keys", (Array) $data);
+
+				}
+			} else { //Insert
+				$data = $this->vars;
+				$test = $this->mongo_db->get_where("api_keys", array("api_key" => $data->api_key));
+				if (!empty($test)) {
+					$this->data["error"] = true;
+					$this->data["message"][] = "API Key already exists";
+					$this->returndata();
+					return;
+				}
+				unset($data->_id);
+				$this->mongo_db->insert("api_keys", (Array) $data);
+			}
+			$this->returndata();
+		}
 		
 	}
 
