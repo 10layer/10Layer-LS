@@ -20,7 +20,6 @@
 		}
 		
 		public function admin() {
-
 			$this->load->model("model_user");
 			$data=array();
 			$email=$this->input->post("email");
@@ -91,9 +90,8 @@
 		}
 		
 		public function api_keys() {
-
-			print "API keys";
-			print_r($this->tlsecurity->get_api_keys());
+			$api_keys = $this->tlsecurity->get_api_keys();
+			$this->load->view("setup/api_keys", array("api_keys" => $api_keys));
 		}
 		
 		protected function json_check($filename="") {
