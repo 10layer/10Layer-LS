@@ -29,7 +29,10 @@
 		self.type = ko.observable(data.type);
 		self.defaultValue = ko.observable(data.defaultValue);
 		self.content_types = ko.observable(data.content_types);
-		self.options = ko.observable(data.options);
+		if (!_.isArray(data.options)) {
+			data.options = [data.options];
+		}
+		self.options = ko.observableArray(data.options);
 		self.external = ko.observable(data.external);
 		self.filetypes = ko.observable(data.filetypes);
 		self.directory = ko.observable(data.directory);
@@ -91,6 +94,18 @@
 		
 		self.clickRulesAdd = function(data) {
 			self.rules.push(new Transformation(data));
+		}
+
+		self.changeOptions = function(data, e) {
+			var val = e.target.value;
+			self.options.replace(data, val);
+			self.options.remove("");
+		}
+
+		self.newOptions = function(data, e) {
+			var val = e.target.value;
+			self.options.push(val);
+			e.target.value = "";
 		}
 	}
 	
@@ -518,7 +533,7 @@
 			</fieldset>
 			<legend>Fields</legend>
 			<div data-bind="foreach: fields">
-				<div class="span3">
+				<div class="span9">
 				<fieldset>
 					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
 						<!-- ko if: isRemovable -->
@@ -579,8 +594,10 @@
 						<div><strong>OR</strong></div>
 						
 						<label>Set pre-defined Options</label>
-						<input type="text" name="options" value="" data-bind="value: options" />
-						
+						<div data-bind="foreach:options">
+							<input type="text" name="options[]" value="" data-bind="value: $data, event: { change: $parent.changeOptions }" /><br />
+						</div>
+						<input type="text" name="options[]" value="" data-bind="value: '', event: { change: newOptions }" />
 						<div><strong>OR</strong></div>
 						
 						<label>Import from a file or network</label>
