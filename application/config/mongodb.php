@@ -15,8 +15,5 @@ $config['mongo_password'] = "";
 
 // Persistant connections
 $config['mongo_persist'] = TRUE;
-<<<<<<< HEAD
+
 $config['mongo_persist_key'] = 'ci_mongo_persist';
-=======
-$config['mongo_persist_key'] = 'ci_mongo_persist';
->>>>>>> 3ce843f72624626b321f5a0fec9332a8b7c161d4
