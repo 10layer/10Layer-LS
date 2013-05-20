@@ -250,7 +250,11 @@
 			$data->last_modified=time();
 			$content_title = $data->title;
 			$user=$this->model_user->get_by_id($this->session->userdata("id"));
-			$data->last_editor=$user->name;
+			if (empty($user)) {
+				$data->last_editor = $this->input->get_post("api_key");
+			} else {
+				$data->last_editor=$user->name;
+			}
 			$this->load->helper('data');
 			foreach($data as $key => $value){
 				if(is_array($data->$key)){
