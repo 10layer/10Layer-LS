@@ -50,11 +50,17 @@
 		}
 		
 		public function section($section_id) {
-			$result=$this->mongo_db->where(array("_id"=>$section_id))->get("published");
+			$result=array_pop($this->mongo_db->where(array("_id"=>$section_id))->get("published"));
 			if (empty($result)) {
 				$this->show_error("No results found for $section_id");
 			}
-			$this->data["content"]=$result[0];
+			$tmp = array();
+			//print_r($result);
+			foreach($result->zones as $key=>$val) {
+				$tmp[$key] = $this->is_published($val);
+			}
+			$result->zones = $tmp;
+			$this->data["content"]=$result;
 			$this->returndata();
 		}
 		
@@ -162,6 +168,35 @@
 			$published->zones[$zone_id] = $newzone;
 			$this->mongo_db->where(array("_id"=>$section_id))->update("published", array("zones"=>$published->zones));
 			print_r($published);
+		}
+
+		/**
+		 * is_published function.
+		 *
+		 * Only return published items
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		protected function is_published($items) {
+			$published=$this->input->get_post("published");
+			if (!$this->secure) {
+				$published = true;
+			}
+			
+			if (!empty($published)) {
+				for($x=0; $x< sizeof($items); $x++) {
+					if (!isset($items[$x]->workflow_status)) {
+						unset($items[$x]);
+					} else {
+						if  ($items[$x]->workflow_status != 3) {
+							unset($items[$x]);
+						}
+					}
+				}
+			}
+			$this->data["criteria"]["published"]=false;
+			return $items;
 		}
 	}
 ?>
