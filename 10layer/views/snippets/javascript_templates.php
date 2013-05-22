@@ -490,7 +490,7 @@
 			<div class='radiogroup'>
 			<% _.each(field.options, function(option, key) { %>
 				<div class='radio'>
-					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' value='<%= key %>' <%= (field.value==key) ? 'checked="checked"' : '' %> />
+					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' <%= (field.value === option) ? 'checked="checked"' : '' %> />
 					<div class='radio_label'><%= option %></div>
 				</div>
 			<% }); %>
