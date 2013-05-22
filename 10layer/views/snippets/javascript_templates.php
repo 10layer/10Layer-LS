@@ -333,10 +333,11 @@
 
 <script type='text/template' id='field-image-item'>
 	<%
+	value = false;
 	if (typeof index !== "undefined") {
 		value = field.value[index];
 	}
-	if (typeof value === "undefined") {
+	if (value === false) {
 		if (_.isArray(field.value)) {
 			value = field.value[0];
 		} else {
