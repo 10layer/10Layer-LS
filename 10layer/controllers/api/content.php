@@ -97,6 +97,7 @@
 		 */
 		public function get() {
 			$this->_check_callbacks();
+			$this->published();
 			$this->data["count"]=1;
 			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
