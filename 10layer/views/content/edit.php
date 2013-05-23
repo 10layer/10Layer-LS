@@ -624,7 +624,7 @@
 	    	<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
 	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
 	    	<td style="width: 100px"><%= dateToString(item.start_date) %></td>
-	    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
+	    	<td class='content-workflow-<%= item.workflow_status %>'><%= item.workflow_status %></td>
 	    </tr>
 		<% x++; }); %>
 	    </tbody>

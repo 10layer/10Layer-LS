@@ -186,10 +186,11 @@
 			
 			if (!empty($published)) {
 				for($x=0; $x< sizeof($items); $x++) {
-					if (!isset($items[$x]->workflow_status)) {
+					$item = (Array) $items[$x];
+					if (!isset($item["workflow_status"])) {
 						unset($items[$x]);
 					} else {
-						if  ($items[$x]->workflow_status != 3) {
+						if  ($item["workflow_status"] != "Published") {
 							unset($items[$x]);
 						}
 					}

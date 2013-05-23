@@ -264,8 +264,8 @@
 					}
 				}
 			}
-			if (!is_numeric($data->workflow_status)) {
-				$data->workflow_status = 1;
+			if (empty($data->workflow_status)) {
+				$data->workflow_status = "New";
 			}
 			$id=$this->input->get_post("id");
 			if (!empty($id)) {
@@ -554,12 +554,12 @@
 		 */
 		protected function published() {
 			if (!$this->secure) {
-				$this->mongo_db->where(array("workflow_status"=>3));
+				$this->mongo_db->where(array("workflow_status"=>"Published"));
 				return true;
 			}
 			$published=$this->input->get_post("published");
 			if (!empty($published)) {
-				$this->mongo_db->where(array("workflow_status"=>3));
+				$this->mongo_db->where(array("workflow_status"=>"Published"));
 				$this->data["criteria"]["published"]=true;
 				return true;
 			}
@@ -612,7 +612,7 @@
 			$this->data["criteria"]["last_editor"] = $last_editor;
 		}
 		
-		protected function workflow() {
+		protected function workflow() { //This won't work anymore because workflow is no longer int
 			$workflow_status = (Int) $this->input->get_post("workflow");
 			$this->mongo_db->where(array("workflow_status"=>$workflow_status));
 			$this->data["criteria"]["workflow_status"] = $workflow_status;

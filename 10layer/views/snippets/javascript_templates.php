@@ -569,16 +569,6 @@
 			<div class='controls'>
 				<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %><%= (field.multiple) ? "[]" : "" %>' <%= (field.multiple) ? "multiple='multiple'" : "" %>>
 				<option value=""></option>
-				<% 
-				var keyadjust=0;
-				_.each(field.options, function(val, key) {
-					if (!_.isNumber(key)) {
-						keyadjust = "";
-					} else if (key==0) {
-						keyadjust=1;
-					}
-				});
-				%>
 				<% _.each(field.options, function(option, key) { %>
 					<option value='<%= option %>' 
 					<%
@@ -600,6 +590,7 @@
 								selected = true;
 							}
 						}
+						console.log(field.value, option);
 					%>
 					<%= (selected) ? 'selected="selected"' : '' %> ><%= option %></option>
 				<% }); %>
