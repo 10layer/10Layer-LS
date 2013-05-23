@@ -490,7 +490,7 @@
 			<div class='radiogroup'>
 			<% _.each(field.options, function(option, key) { %>
 				<div class='radio'>
-					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' <%= (field.value === option) ? 'checked="checked"' : '' %> />
+					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' value='<%= option %>' <%= (field.value === option) ? 'checked="checked"' : '' %> />
 					<div class='radio_label'><%= option %></div>
 				</div>
 			<% }); %>
@@ -507,7 +507,7 @@
 			<div class='radiogroup'>
 			<% _.each(field.options, function(option, key) { %>
 				<div class='radio'>
-					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' value='<%= key %>' <%= (field.defaultValue==key) ? 'checked="checked"' : '' %> />
+					<input type='radio' name='<%= field.contenttype %>_<%= field.name %>' value='<%= option %>' <%= (field.defaultValue==option) ? 'checked="checked"' : '' %> />
 					<div class='radio_label'><%= option %></div>
 				</div>
 			<% }); %>
@@ -542,7 +542,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
 			<select class='chzn-select' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %>' id='<%= field.name %>-hook'>
-				<option value="0"></option>
+				<option value=""></option>
 			<%
 				$.get('/api/content/listing', { api_key: $(document.body).data('api_key'), content_type: field.contenttype }, function(data) {
 					_.each(data.content, function(item) {
@@ -568,7 +568,7 @@
 			<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 			<div class='controls'>
 				<select class='chzn-select <%= field.class %>' data-placeholder="Choose <%= field.label %>" name='<%= field.contenttype %>_<%= field.name %><%= (field.multiple) ? "[]" : "" %>' <%= (field.multiple) ? "multiple='multiple'" : "" %>>
-				<option value="0"></option>
+				<option value=""></option>
 				<% 
 				var keyadjust=0;
 				_.each(field.options, function(val, key) {
@@ -580,23 +580,23 @@
 				});
 				%>
 				<% _.each(field.options, function(option, key) { %>
-					<option value='<%= ( key + keyadjust) %>' 
+					<option value='<%= option %>' 
 					<%
 						if (_.isArray(field.value)) {
 							var selected = false;
 							_.each(field.value, function(item) {
 								if (item._id) {
-									if (item._id == key) {
+									if (item._id == option) {
 										selected = true;
 									}
 								} else {
-									if (item == key) {
+									if (item == option) {
 										selected = true;
 									}
 								}
 							});
 						} else {
-							if (field.value == (key + keyadjust)) {
+							if (field.value == option) {
 								selected = true;
 							}
 						}
