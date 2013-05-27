@@ -49,7 +49,9 @@
 				} else {
 					$rulevalue = $val; //Old style
 				}
-				if (strpos($rulevalue,"=")!==false) {
+				if (isset($val["params"])) {
+					$tmparr[$rulevalue] = $val["params"];
+				} elseif (strpos($rulevalue,"=")!==false) {
 					$tmp=explode("=",$rulevalue);
 					$tmparr[$tmp[0]]=$tmp[1];
 				} elseif(!is_numeric($key)) {
@@ -135,6 +137,33 @@
 			} else {
 				return true;
 			}
+		}
+
+		/**
+		 * max_words function.
+		 * 
+		 * @access public
+		 * @param string $value
+		 * @param int $var
+		 * @return boolean
+		 */
+		public function max_words($value, $var){
+			if (!is_string($value)) {
+				return false;
+			}
+			return (str_word_count($value) <= $var);
+		}
+
+		/**
+		 * min_words function.
+		 * 
+		 * @access public
+		 * @param string $value
+		 * @param int $var
+		 * @return boolean
+		 */
+		public function min_words($value, $var){
+			return (str_word_count($value) > $var);
 		}
 		
 		/**
@@ -252,6 +281,9 @@
 	 	* @return	bool
 	 	*/
 		public function valid_ip($ip,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return $this->CI->input->valid_ip($ip);
 		}
 	
@@ -263,6 +295,9 @@
 	 	* @return	bool
 	 	*/		
 		public function alpha($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([a-z])+$/i", $str)) ? FALSE : TRUE;
 		}
 	
@@ -274,6 +309,9 @@
 	 	* @return	bool
 	 	*/	
 		public function alpha_numeric($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([a-z0-9])+$/i", $str)) ? FALSE : TRUE;
 		}
 	
@@ -285,6 +323,9 @@
 	 	* @return	bool
 	 	*/	
 		public function alpha_numeric_dash($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([-a-z0-9_-])+$/i", $str)) ? FALSE : TRUE;
 		}
 		
@@ -296,6 +337,9 @@
 	 	* @return	bool
 	 	*/	
 		public function alpha_dash($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([-a-z_-])+$/i", $str)) ? FALSE : TRUE;
 		}
 		
@@ -307,6 +351,9 @@
 	 	* @return	bool
 	 	*/	
 		public function alpha_numeric_dash_space($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([a-z0-9_-\s])+$/i", $str)) ? FALSE : TRUE;
 		}
 		
@@ -318,6 +365,9 @@
 	 	* @return	bool
 	 	*/	
 		public function alpha_dash_space($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return ( ! preg_match("/^([a-z_-\s])+$/i", $str)) ? FALSE : TRUE;
 		}
 	
@@ -329,6 +379,9 @@
 	 	* @return	bool
 	 	*/	
 		public function numeric($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return (bool)preg_match( '/^[\-+]?[0-9]*\.?[0-9]+$/', $str);
 		}
 
@@ -340,6 +393,9 @@
      	* @return    bool
      	*/
     	public function is_numeric($str,$var=false) {
+    		if (empty($value)) {
+				return true;
+			}
 	        return ( ! is_numeric($str)) ? FALSE : TRUE;
     	}
 	
@@ -351,6 +407,9 @@
 		 * @return	bool
 		 */	
 		public function integer($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return (bool)preg_match( '/^[\-+]?[0-9]+$/', $str);
 		}
 		
@@ -361,7 +420,10 @@
     	 * @param	string
     	 * @return	bool
     	 */
-    	public function is_natural($str,$var=false) {   
+    	public function is_natural($str,$var=false) {
+    		if (empty($value)) {
+				return true;
+			}
    			return (bool)preg_match( '/^[0-9]+$/', $str);
     	}
 		
@@ -373,6 +435,9 @@
     	 * @return	bool
     	 */
 		public function is_natural_no_zero($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
     		if ( ! preg_match( '/^[0-9]+$/', $str)) {
     			return FALSE;
     		}
@@ -393,10 +458,16 @@
 		 * @return	bool
 		 */
 		public function valid_base64($str,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return (bool) ! preg_match('/[^a-zA-Z0-9\/\+=]/', $str);
 		}
 		
 		public function valid_url($url,$var=false) {
+			if (empty($value)) {
+				return true;
+			}
 			return (preg_match('|^http(s)?://[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $url));
 		}
 		
@@ -449,6 +520,10 @@
 				case "min_count": $s="$name field must have at least $var item(s)";
 					break;
 				case "max_count": $s="$name field must have $var or less item(s)";
+					break;
+				case "max_words": $s="$name must have $var or less words";
+					break;
+				case "min_words": $s="$name must have $var or more words";
 					break;
 				case "minlen": $s="$name must be at least $var characters long";
 					break;
