@@ -18,6 +18,7 @@
 		self.fn = ko.observable(data.fn);
 		self.hint = ko.observable(data.hint);
 		self.vars = ko.observable(data.var);
+		self.params = ko.observable(data.params);
 		self.var_check = ko.observable(data.var_check);
 	}
 	
@@ -231,7 +232,7 @@
 					if (result.error) {
 						$("#save_fail").show();
 					} else {
-						$("#save_success").show();
+						$("#save_success").show().delay(5000).fadeOut();
 					}
 				}
 			});
@@ -394,6 +395,16 @@
 			var_check: function(x) { return _.isNumeric(x); }
 		},
 		{
+			fn: "max_words",
+			hint: "Maximum number of words",
+			var_check: function(x) { return _.isNumeric(x); }
+		},
+		{
+			fn: "min_words",
+			hint: "Minimum number of words",
+			var_check: function(x) { return _.isNumeric(x); }
+		},
+		{
 			fn: "password_strength",
 			hint: "Password strength",
 			var_check: function(x) { return _.isNumeric(x); }
@@ -540,7 +551,7 @@
 						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
 						<!-- /ko -->
 						<span data-bind="text: name"></span> 
-						<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-left'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-right'></i></a></span>
+						<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-up'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-down'></i></a></span>
 					</legend>
 					<div class='field-details' style='display: none'>
 						<label>Name</label>
@@ -567,7 +578,7 @@
 						</div>
 						<dl data-bind="foreach: rules">
 							<div>
-							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickRulesUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickRulesDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickRulesRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span></dt>
+							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickRulesUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickRulesDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickRulesRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
 							<dd data-bind="text: hint"></dd>
 							</div>
 						</dl>
