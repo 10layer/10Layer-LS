@@ -127,7 +127,9 @@
 			self.collection = data.content[0];
 			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
 			self.zones(mapped);
-			self.zones()[0].isActive(true);
+			if (self.zones().length) {
+				self.zones()[0].isActive(true);
+			}
 			$(".daterange").daterangepicker(
 				{
 					ranges: {
