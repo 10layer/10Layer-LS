@@ -590,7 +590,7 @@
 								selected = true;
 							}
 						}
-						console.log(field.value, option);
+						//console.log(field.value, option);
 					%>
 					<%= (selected) ? 'selected="selected"' : '' %> ><%= option %></option>
 				<% }); %>
