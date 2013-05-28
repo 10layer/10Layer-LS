@@ -362,11 +362,10 @@
 					container.find('.preview-image .progress').hide();
 					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
 					fullname = data.content.full_name;
-					
 					if (multiple == 1) {
-						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
 					} else {
-						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
 					}
 					el.val(""); //Clear the file upload so we don't upload on form submission
 				},

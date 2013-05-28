@@ -227,9 +227,9 @@
 					fullname = data.content.full_name;
 					
 					if (multiple == 1) {
-						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
 					} else {
-						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { name: name, contenttype: contenttype, multiple: multiple } } ));
+						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
 					}
 					el.val(""); //Clear the file upload so we don't upload on form submission
 				},
