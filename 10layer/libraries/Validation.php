@@ -38,6 +38,7 @@
 			if (!is_array($ruleset)) {
 				show_error("Ruleset must be array");
 			}
+			//print_r(array("fieldname" => $fieldname, "name" => $name, "value" => $value, "ruleset" => $ruleset));
 			$tmparr=array();
 			foreach($ruleset as $key=>$val) {
 				if (is_array($val)) {
@@ -49,19 +50,26 @@
 				} else {
 					$rulevalue = $val; //Old style
 				}
-				if (isset($val["params"])) {
+
+				if (is_array($val) && array_key_exists("params", $val)) {
 					$tmparr[$rulevalue] = $val["params"];
+					//print "1";
 				} elseif (strpos($rulevalue,"=")!==false) {
 					$tmp=explode("=",$rulevalue);
 					$tmparr[$tmp[0]]=$tmp[1];
+					//print "2";
 				} elseif(!is_numeric($key)) {
 					$tmparr[$key]=$rulevalue;
+					//print "3";
 				} else {
 					$tmparr[$rulevalue]=true;
+					//print "4";
 				}
+				//print_r($tmparr);
 			}
 			$ruleset=$tmparr;
 			foreach($ruleset as $key=>$rulevalue) {
+				//print_r(array("key" => $key, "value" => $rulevalue));
 				$result=$this->$key($value,$rulevalue);
 				if (!$result) {
 					$this->passed=false;
