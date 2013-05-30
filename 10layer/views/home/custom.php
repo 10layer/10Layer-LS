@@ -79,7 +79,7 @@ $(function(){
 	    </tr>
 	    </thead>
 	    <tbody>
-		<% var x=0; _.each(content, function(item) {  %>
+		<% var x=0; _.each(content, function(item) { %>
 		    <tr id="row_<%= item.id %>">
 		    	<td class='content-workflow-<%= item.major_version %>'><a href='/edit/<%= item.content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 		    	<td><%= dateToString(item.last_modified) %></td>
@@ -87,7 +87,7 @@ $(function(){
 		    	
 		    	<td><%= dateToString(item.start_date) %></td>
 		    	<td><%= item.content_type %></td>
-		    	<td class='content-workflow-<%= item.workflow_status %>'><%= version_map[item.workflow_status] %></td>
+		    	<td class='content-workflow-<%= item.workflow_status %>'><%= item.workflow_status %></td>
 		    </tr>
 		<% x++; }); %>
 	    </tbody>
@@ -131,9 +131,9 @@ $(function(){
 			<a href="#" class="close reset" style="float: right">&times;</a>
 			<select id='workflows' class="chzn-select" data-placeholder="Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
 				<option value=''></option>
-				<option value="1">New</option>
-				<option value="2">Edited</option>
-				<option value="3">Published</option>
+				<option value="New">New</option>
+				<option value="Edited">Edited</option>
+				<option value="Published">Published</option>
 			</select>
 		</div>
 
