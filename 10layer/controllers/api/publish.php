@@ -37,13 +37,16 @@
 			$x = 0;
 			$this->mongo_db->where(array("_id"=>$id))->delete("published");
 			$result = array("_id"=>$id);
+			$manifest = array();
 			foreach($zones as $key=>$zone) {
 				foreach($zone as $doc) {
 					$id=$doc["_id"];
 					$item=array_pop($this->model_content->get($id));
 					$result["zones"][$key][]=$item;
+					$manifest[] = array("_id" => $id, "zone" => $key);
 				}
 			}
+			$result["manifest"] = $manifest;
 			$this->mongo_db->insert("published", $result);
 			$this->data["message"]="Section updated";
 			$this->returndata();

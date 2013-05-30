@@ -272,6 +272,23 @@
 				//Update
 				$this->id();
 				$result=$this->mongo_db->upsert('content', $data);
+				//Update any instances where we've already published
+				$published = $this->mongo_db->get_where("published", array("manifest._id"=>$id));
+				foreach($published as $section) {
+					//Find the relevant zones
+					$section_id = $section->_id;
+					unset($section->_id);
+					foreach($section->zones as $zonekey=>$zone) {
+						for($x = 0; $x < sizeof($zone); $x++) {
+							if ($zone[$x]["_id"] == $id) {
+								$zone[$x] = $data;
+								$zone[$x]->_id = $id;
+								$section->zones["$zonekey"] = $zone;
+								$update_result = $this->mongo_db->where(array("_id"=>$section_id))->upsert('published', $section);
+							}
+						}
+					}
+				}
 			} else {
 				$data->content_type=$content_type;
 				$data->timestamp=time();
