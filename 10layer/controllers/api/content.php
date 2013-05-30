@@ -48,7 +48,6 @@
 		 * @return void
 		 */
 		public function listing() {
-			
 			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
@@ -629,8 +628,8 @@
 			$this->data["criteria"]["last_editor"] = $last_editor;
 		}
 		
-		protected function workflow() { //This won't work anymore because workflow is no longer int
-			$workflow_status = (Int) $this->input->get_post("workflow");
+		protected function workflow() {
+			$workflow_status = $this->input->get_post("workflow");
 			$this->mongo_db->where(array("workflow_status"=>$workflow_status));
 			$this->data["criteria"]["workflow_status"] = $workflow_status;
 		}
