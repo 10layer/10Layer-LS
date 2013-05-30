@@ -132,9 +132,16 @@
 			$width = $this->input->get_post("width");
 			$height = $this->input->get_post("height");
 			$bounding = $this->input->get_post("bounding");
+			$greyscale = $this->input->get_post("greyscale");
 			$op = "";
 			$opstr = "fill";
 			$extent = "";
+			$grey = "";
+			$greystr = "";
+			if (!empty($greyscale)) {
+				$grey = "-colorspace gray";
+				$greystr = "-greyscale";
+			}
 			if (empty($bounding)) {
 				$op = "^";
 				$opstr = "bound";
@@ -171,7 +178,7 @@
 				return true;
 			}
 			
-			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".png";
 			if (file_exists($cache)) {
 				if ($render) {
 					header("Content-type: image/png");
@@ -189,7 +196,7 @@
 			if (!is_dir("content/cache/".$parts["dirname"])) {
 				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert '".escapeshellarg($file)."' -background transparent -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} -quality 80 -gravity center $extent '{$cache}'", $result);
+			exec("convert '".escapeshellarg($file)."' -auto-level -background transparent -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
 			if ($render) {
 				header("Content-type: image/png");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
