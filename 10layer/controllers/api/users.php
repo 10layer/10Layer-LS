@@ -51,13 +51,14 @@
 		 * @return void
 		 */
 		public function save() {
-
 			if (isset($this->vars->users)) {
 				foreach($this->vars->users as $user) {
 					$this->_save($user);
+					//$this->data["content"]["id"][] = $id;
 				}
 			} else {
-				$this->_save($this->vars->user);
+				$id = $this->_save($this->vars->user);
+				$this->data["content"]["id"][] = $id;
 			}
 			$this->returndata();
 		}
@@ -106,11 +107,14 @@
 			    $this->show_error($this->validation->failed_messages);
 			} else {
 				if ($is_new) {
-					$this->model_user->insert((Array) $user);
+					if (isset($user->id)) {
+						unset($user->id);
+					}
+					return $this->model_user->insert((Array) $user);
+
 				} else {
-					$this->model_user->update($user->id, (Array) $user);
+					return $this->model_user->update($user->id, (Array) $user);
 				}
-				return true;
 			}
 		}
 
