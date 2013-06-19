@@ -501,14 +501,9 @@
 </div>
 <form method="post">
 <div class="row">
-	<div class="span2">
-		<ul class="nav nav-pills nav-stacked">
-			<li><a href="/setup/admin">Administrator</a></li>
-			<li><a href="/setup/users">Users</a></li>
-			<li class="active"><a href="/setup/content_types">Content Types</a></li>
-			<li><a href="/setup/security">Security</a></li>
-		</ul>
-	</div>
+	<?php
+	$this->load->view("setup/menu");
+	?>
 	<div class="span10">
 		<div class="row">
 			<div class="span6">
