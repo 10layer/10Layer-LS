@@ -22,10 +22,6 @@
 		self.password = ko.observable();
 		self.permission = ko.observable(permission);
 		self.isActive = ko.observable(activeness);
-		self.title = ko.computed(function() {
-			return (self.name.length > 0) ? self.name() : "New User";
-		});
-		
 		self.changePassword = function(obj, event) {
 			self.password(event.target.value);
 		}
@@ -35,13 +31,14 @@
 	var UsersViewModel = function() {
 		var self = this;
 		self.users = ko.observableArray([]);
+		
 		self.permissions = [
 			{ name: "Administrator", value: "administrator" }, 
 			{ name: "Editor", value: "editor" }, 
 			{ name: "Viewer", value: "viewer" }
 		];
+		self.new_user = ko.observable(new User("", "", "", "", self.permissions[1], true));
 		self.randomPassword = ko.observable(randomPass());
-
 		$.getJSON("/api/users?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
 			mapped = _.map(data.content, function(item) {
 				id = item._id;
@@ -81,7 +78,10 @@
 		}
 		
 		self.add = function() {
-			item = { id: "new", name: "", email: "", password: "", permission: self.permissions[1], isActive: true }
+			self.new_user().name("");
+			self.new_user().email("");
+			$('#new_user').modal('show');
+			/*item = { id: "new", name: "", email: "", password: "", permission: self.permissions[1], isActive: true }
 			id = item._id;
 			name = item.name;
 			email = item.email;
@@ -89,8 +89,28 @@
 			permission = item.permission;
 			activeness = item.isActive; 
 			user = new User(id, name,email, password, permission, activeness) ;
-			self.users.push(user);
+			self.users.push(user);*/
 		};
+
+		self.clickAddSave = function() {
+			
+			$('#new_user').modal('hide');
+			$.ajax("/api/users/save?api_key=<?= $this->session->userdata("api_key") ?>", {
+				data: ko.toJSON({ user: self.new_user }),
+				type: "post", contentType: "application/json",
+				success: function(result) {
+					if (result.error) {
+						$("#fail_message").html(result.message.join("<br />"));
+						$("#save_fail").slideDown(1000).delay(3000).slideUp(1000);
+					} else {
+						$("#save_success").slideDown(1000).delay(3000).slideUp(1000);
+						var id = result.content.id.pop();
+						self.new_user().id(id);
+						self.users.push(self.new_user);
+					}
+				}
+			});
+		}
 		
 		self.genNewPassword = function() {
 			self.randomPassword(randomPass());
@@ -113,14 +133,9 @@
 
 <form method="post">
 <div class="row">
-	<div class="span2">
-		<ul class="nav nav-pills nav-stacked">
-			<li><a href="/setup/admin">Administrator</a></li>
-			<li class="active"><a href="/setup/users">Users</a></li>
-			<li><a href="/setup/content_types">Content Types</a></li>
-			<li><a href="/setup/security">Security</a></li>
-		</ul>
-	</div>
+	<?php
+	$this->load->view("setup/menu");
+	?>
 	<div class="span10">
 		<div class="row">
 			<div class='span7'>
@@ -163,13 +178,40 @@
 		</table>
 	</div>
 	
-		<div class="offset2 span5">
-			<h4>Random password</h4> <input type="text" data-bind="value: randomPassword" onclick="select()" />
-			<div><a href="#gen" class="btn " data-bind="click: genNewPassword"><i class="icon-lock"></i> Generate new password</a></div>
-		</div>
+		
 	
 </div>
 </form>
+
+<div id="new_user" class="modal hide fade">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3>New User</h3>
+	</div>
+	<div class="modal-body">
+		<form data-bind="with: new_user">
+			<label>Name</label>
+			<input type="text" name="name" placeholder="Joe Soap" class='grid_input' data-bind="value: name" autocomplete="off">
+			<label>Email</label>
+			<input type="text" name="email" placeholder="admin@10layer.com" class='grid_input' data-bind="value: email" autocomplete="off">
+			<label>Password</label>
+			<input type="password" name="password" placeholder="" class='grid_input' data-bind="event: { change: changePassword }" autocomplete="off">
+			<label>Random password</label>
+			<input type="text" data-bind="value: $root.randomPassword" onclick="select()" />
+			<a href="#gen" class="btn " data-bind="click: $root.genNewPassword"><i class="icon-lock"></i> Generate random password</a>
+			
+			<label>Permission</label>
+			<select data-bind="options: $root.permissions, value: permission, optionsText: 'name', optionsValue: 'value' "></select>
+			<label class="checkbox">Active
+				<input type="checkbox" name="status" value="" data-bind="checked: isActive" />
+			</label>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<a href="#" class="btn" data-dismiss="modal" >Close</a>
+		<a href="#" class="btn btn-primary" data-bind="click: clickAddSave">Save user</a>
+	</div>
+</div>
 <?php
 	$this->load->view("/templates/footer");
 ?>
