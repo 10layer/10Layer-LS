@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="/resources/chosen/chosen.css">
 <script src="/resources/chosen/chosen.jquery.js"></script>
 <script type="text/javascript">
+	
 
 	var Content = function(data) {
 		var self = this;
@@ -33,6 +34,7 @@
 		self.searchStr = ko.observable("");
 		self.startDate = ko.observable(<?= date("U", strtotime('-30 day')) ?>);
 		self.endDate = ko.observable(<?= time() ?>);
+		
 		
 		$.getJSON("/api/publish/zone/<?= $collection->_id ?>/"+self.id(), function(data) {
 			if (data.content.length) {
@@ -112,6 +114,20 @@
 		var self = this;
 		self.zones = ko.observableArray();
 		self.content_type_list = ko.observableArray();
+		self.isAjaxRunning = ko.observable(false);
+		
+		self.ajax_processes = new Array;
+
+		$(document).ajaxSend(function(e, x, s) {
+			self.isAjaxRunning(true);
+			self.ajax_processes.push(s.url);
+		});
+
+		$(document).ajaxComplete(function(e, x, s) {
+			self.ajax_processes.splice(self.ajax_processes.indexOf(s.url), 1);
+			self.isAjaxRunning((self.ajax_processes.length > 0));
+		});
+		
 		self.newZone = ko.observable(new Zone({
 			name: "",
 			min_items: 0,
@@ -246,6 +262,9 @@
 		}
 		
 		self.save = function() {
+			if (self.isAjaxRunning()) {
+				return false;
+			}
 			self.saveZones();
 			var data = {};
 			data._id = "<?= $collection->_id ?>";
@@ -400,7 +419,7 @@ var zone_id = '';
 						</div>
 					</div>
 					<div class="span1 pull-right">
-						<span style='float:right;margin-right:10px;' class='btn btn-success' data-bind="click: $parent.save">Publish</span>
+						<span style='float:right;margin-right:10px;' class='btn btn-success btn_publish' data-bind="click: $parent.save, css: { disabled: $parent.isAjaxRunning() }">Publish</span>
 					</div>
 					<div class="row">
 						<div class="span2 pull-right alert alert-error" style="display: none" id="save_fail">Failed to save section</div>
