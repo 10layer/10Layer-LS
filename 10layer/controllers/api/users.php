@@ -86,6 +86,17 @@
 			$this->validation->validate("email", "Email", $user->email, array("required", "valid_email"));
 			if ($is_new) {
 				$this->validation->validate("email", "Email", $user->email, array("database_nodupe"=>"email in users"));
+			} else {
+				$result = $this->mongo_db->where(array("email"=>$user->email))->get("users");
+				foreach($result as $u) {
+					if ($u->_id != $user->id) {
+						//print $u->_id." != ".$user->id." ".$user->email;
+						$this->validation->passed = false;
+						$this->validation->failed_fields[]="email";
+						$this->validation->failed_names[]="Email";
+						$this->validation->failed_messages[]="Attempting to give email address {$user->email} to two or more users";
+					}
+				}
 			}
 
 			$this->validation->validate("name", "Name", $user->name, array("required"));
