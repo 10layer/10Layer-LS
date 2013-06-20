@@ -247,7 +247,6 @@
 		{ _id: "file", name: "File" },
 		{ _id: "hidden", name: "Hidden" },
 		{ _id: "image", name: "Image" },
-		{ _id: "nesteditems", name: "Tree" },
 		{ _id: "password", name: "Password" },
 		{ _id: "radio", name: "Radio" },
 		{ _id: "search", name: "Search" },
@@ -255,8 +254,7 @@
 		{ _id: "select", name: "Select" },
 		{ _id: "text", name: "Text" },
 		{ _id: "textarea", name: "Text Area" },
-		{ _id: "zone", name: "Zone" },
-		{ _id: "zone_select", name: "Zone Select" }
+		{ _id: "zone", name: "Zone" }
 	];
 	
 	var empty_type_template = { 
