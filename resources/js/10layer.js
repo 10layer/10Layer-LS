@@ -1,16 +1,16 @@
 function nullStr(s) {
 	if (s) {
-		return(s)
+		return(s);
 	} else {
 		return('');
 	}
 }
 
 function leadingZeros(s) {
-    if (s<10) {
-    	return '0'+s;
-    }
-    return s;
+	if (s<10) {
+		return '0'+s;
+	}
+	return s;
 }
 
 function sqlCurrentDate() {
@@ -25,8 +25,10 @@ function sqlCurrentTime() {
 
 // Assumes date is Unix timestamp if integer, else assume it's a string
 function dateToString(date) {
-	if (date == "") return "";
-	di = Number(date);
+	if (date === "") {
+		return "";
+	}
+	var di = Number(date);
 	if (!_.isNaN(di)) {
 		var d = new Date(di * 1000); // Javascript to Unix Epoch
 	} else {
@@ -36,7 +38,9 @@ function dateToString(date) {
 }
 
 function stringToDate(str) {
-	if (str == "") return "";
+	if (str === "") {
+		return "";
+	}
 	if (_.isNumber(str)) {
 		return str;
 	}
@@ -44,7 +48,7 @@ function stringToDate(str) {
 	while (d.length < 5) {
 		d.push(0);
 	}
-	val = new Date(d[0], d[1] - 1, d[2], d[3], d[4]);
+	var val = new Date(d[0], d[1] - 1, d[2], d[3], d[4]);
 	return val/1000;
 }
 
@@ -57,7 +61,7 @@ function baseName(filename) {
 }
 
 function isImage(filename) {
-	imgTypes=["jpg", "jpeg", "png", "gif"];
+	var imgTypes=["jpg", "jpeg", "png", "gif"];
 	if (imgTypes.indexOf(fileExt(filename))>=0) {
 		return true;
 	}
