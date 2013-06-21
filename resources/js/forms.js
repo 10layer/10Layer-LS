@@ -166,7 +166,7 @@ function get_wordcount(sender) {
 function init_form() {	
 	$(".chzn-select").chosen();
 	
-	$( ".datepicker" ).datepicker();
+	$(".my-datepicker").datepicker({ autoclose: true });
 	
 	var autocomplete_timer = false;
 
