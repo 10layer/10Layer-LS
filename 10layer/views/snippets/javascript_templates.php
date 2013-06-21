@@ -131,7 +131,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? stringToDate(field.value) : '' %>' />
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>_datetime' value='<%= (field.value) ? dateToString(field.value) : '' %>' class='datetime_change datetime_date datepicker <%= field.class %>' data-date="<%= (field.value) ? dateToString(field.value) : '' %>" data-date-format="yyyy-mm-dd" />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>_datetime' value='<%= (field.value) ? dateToString(field.value) : '' %>' class='datetime_change datetime_date my-datepicker <%= field.class %>' data-date="<%= (field.value) ? dateToString(field.value) : '' %>" data-date-format="yyyy-mm-dd" />
 		</div>
 	</div>
 </script>
@@ -154,7 +154,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (val) ? stringToDate(val) : '' %>' />
-			<input type='text' name='<%= field.contenttype %>_<%= field.name %>_datetime' value='<%= (val) ? dateToString(val) : '' %>' class='datetime_change datetime_date datepicker <%= field.class %>' data-date="<%= (val) ? dateToString(val) : '' %>" data-date-format="yyyy-mm-dd" />
+			<input type='text' name='<%= field.contenttype %>_<%= field.name %>_datetime' value='<%= (val) ? dateToString(val) : '' %>' class='datetime_change datetime_date my-datepicker <%= field.class %>' data-date="<%= (val) ? dateToString(val) : '' %>" data-date-format="yyyy-mm-dd" />
 		</div>
 	</div>
 </script>
@@ -179,7 +179,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.value) ? stringToDate(field.value) : '' %>' />
-			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date my-datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
 			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' value="<%= val_hour %>" /> :
 			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' value="<%= val_minute %>" />
 		</div>
@@ -209,7 +209,7 @@
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class="controls">
 			<input type="hidden" name='<%= field.contenttype %>_<%= field.name %>' value='<%= (field.defaultValue) ? stringToDate(field.defaultValue) : '' %>' />
-			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
+			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_date' class='datetime_change datetime_date my-datepicker <%= field.class %>' data-date-format="yyyy-mm-dd" value="<%= val_date %>" />
 			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_hour' class='datetime_change datetime_hour <%= field.class %>' value="<%= val_hour %>" /> :
 			<input type='text' id='<%= field.contenttype %>_<%= field.name %>_datetime_minute' class='datetime_change datetime_minute <%= field.class %>' value="<%= val_minute %>" />
 		</div>
