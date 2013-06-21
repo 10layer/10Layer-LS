@@ -20,6 +20,7 @@
 		
 		public function _remap() {
 			$data["type"]=$this->uri->segment(1);
+			$data["content_type"]=$this->uri->segment(2);
 			$data["content_types"]=$this->model_content->get_content_types_list();
 			$this->load->view("content/create",$data);
 		}
