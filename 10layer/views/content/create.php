@@ -2,15 +2,13 @@
 	$data["menu1_active"]="create";
 	$data["menu2_active"]="create/".$type;
 	$this->load->view('templates/header',$data);
-	link_js("/resources/js/forms.js");
-	ckeditor();
 ?>
+<script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
-<link rel="stylesheet" href="/resources/chosen/chosen.css">
-<script src="/resources/chosen/chosen.jquery.js"></script>
-
-<link rel="stylesheet" href="/resources/bootstrap-datepicker/css/datepicker.css">
-<script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+<script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
+<script src="/resources/ckeditor2/ckeditor.js"></script>
+<script src="/resources/ckeditor2/adapters/jquery.js"></script>
+<script language="javascript" src="/resources/js/ckeditor-ck.js"></script>
 <script language="javascript">
 	
 	var content_types=<?= json_encode($content_types); ?>;
