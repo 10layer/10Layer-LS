@@ -22,6 +22,8 @@
 				$this->returndata();
 				return true;
 			}
+			ini_set("zlib.output_compression_level", 9);
+			ini_set("zlib.output_compression", "On");
 		}
 		
 		/**
