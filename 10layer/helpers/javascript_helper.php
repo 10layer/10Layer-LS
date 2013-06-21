@@ -34,15 +34,6 @@
 					gecko_spellcheck: false,
 					no_events: true,
 					oninit: function() {
-						//var ed=this.activeEditor;
-						//var tinymce=this;
-						//ed.controlManager.setActive('spellchecker', true);
-						//this.execCommand('mceSpellCheck', true);
-						/*ed.onKeyUp.add(function(ed, e) {
-							clearTimeout(spell_timer);
-							spell_timer=setTimeout(function() {updateSpelling(tinymce)}, 1000);
-							//markDirty(e);
-					    });*/
 					    var found=false;
 					    $("#contentform").children().each(function() {
 					    	if (!found && ($(this).attr("type") != "hidden" && $(this).is("input") || $(this).is("textarea"))) {
@@ -55,7 +46,6 @@
 				
 				function updateSpelling(tinymce) {
 					tinymce.execCommand('mceWordcountCheck');
-					//tinymce.execCommand('mceActiveSpellCheck');
 				}
 			
 			};
@@ -87,16 +77,12 @@
 					toolbar: [
 						['Source','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize']
 					],
-					//skin: 'kama',
-					
 					filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
-					
 					filebrowserWindowWidth  : 1000,
 					filebrowserWindowHeight : 600,
 					on : { 'paste' : function(ev) {
 						ev.data.html=parsePaste(ev.data.html);
 					} }
-					
 				};
 				$('.wysiwyg').ckeditor(config);
 				editors[editors.length] = $('.wysiwyg').ckeditorGet();	
@@ -112,8 +98,8 @@
 				data=data.replace(/<font(?:.|\s)*?>/g,"");
 				data=data.replace(/<\/font>/g,"");
 				
-				data=data.replace(/<iframe(?:.|\s)*?>/g, "");
-				data=data.replace(/<\/iframe>/g,"");
+				//data=data.replace(/<iframe(?:.|\s)*?>/g, "");
+				//data=data.replace(/<\/iframe>/g,"");
 				
 				data=data.replace(/<fb:like(?:.|\s)*?>/g, "");
 				data=data.replace(/<\/fb:like>/g,"");
@@ -122,10 +108,8 @@
 				data=data.replace(/<br(?:.|\s)*?>/g,"<p>");
 				
 				data=data.replace(/<p>$$/g,"");
-  				//console.log(data);
 				return data;
 			}
-			
 		</script>
 	<?php
 	}
