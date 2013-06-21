@@ -26,13 +26,7 @@
 				this.raiseErrors = true;
 				this.formSelector = "noforms";
 			});
-			
-			this.before('/create/:content_type', function(req) {
-				/*if ($(document.body).data('content_type') == req.params['content_type'] && $(document.body).data('page')=='list') {
-					return false;
-				}*/
-			});
-		
+
 			this.get('#', function(req) {});
 			this.get('/create/:content_type', function(req) {
 				$(document.body).data('content_type', req.params['content_type']);
