@@ -28,7 +28,7 @@
 			if (!empty($email)) {
 				$password=$this->model_user->get_password_by_email($email);
 				if (!empty($password)) {
-					$otp=$this->model_user->updateOtp($email);
+					$otp=$this->model_user->update_otp($email);
 					$this->email_otp($email, $otp);
 					$data["email_sent"]=true;
 				}

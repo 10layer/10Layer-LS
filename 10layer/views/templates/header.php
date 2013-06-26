@@ -29,7 +29,11 @@
 						<img width="40" height="40" alt="10Layer" style="width: 40px; height: 40px" src="/resources/images/logo_navbar.png" />
 					</li>
 					<?php
-						$this->load->view_if_exists("menus/main/default");
+						if (isset($menu1) && ($menu1 == "login")) {
+							$this->load->view_if_exists("menus/main/login");	
+						} else {
+							$this->load->view_if_exists("menus/main/default");
+						}
 					?>
 				</ul>
 			</div>

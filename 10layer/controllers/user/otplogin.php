@@ -22,7 +22,7 @@
 			
 			public function _remap() {
 				$otp=$this->uri->segment(3);
-				$user=$this->model_user->getByOtp($otp);
+				$user=$this->model_user->get_by_otp($otp);
 				if (empty($user->id)) {
 					show_404("user/otplogin");
 				}

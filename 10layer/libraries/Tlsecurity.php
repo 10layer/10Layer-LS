@@ -43,6 +43,7 @@
 			if ($this->ci->model_user->security_check_exclude_path($path)) {
 				return true;
 			}
+			$this->_check_security_data(); //Make sure we have the correct collection "permissions" in the DB
 			$this->checkLogin();
 			$this->checkStatus();
 			$this->checkUrl();
@@ -78,8 +79,6 @@
 			    $this->ci->session->unset_userdata($data);
 			    $result=$this->doLogin();
 			    if ($result) {
-			    	/*$this->ci->load->library("tluserprefs");
-			    	$this->ci->tluserprefs->user_setup();*/
 			    	return true;
 			    } else {
 			    	$data["error"]=1;
@@ -89,7 +88,7 @@
 				}
 			}
 
-			$loggedin=$this->ci->model_user->checklogin();
+			$loggedin=$this->ci->model_user->check_login();
 			if (!$loggedin) {
 				$data["error"]=0;
 				$this->ci->load->view("user/login",$data);
@@ -100,7 +99,7 @@
 		}
 		
 		public function checkOtp($otp) {
-			$result=$this->ci->model_user->otpLogin($otp);
+			$result=$this->ci->model_user->otp_login($otp);
 			if (!$result) {
 				$this->logout();
 				redirect("/home");
@@ -115,7 +114,7 @@
 		 * @return void
 		 */
 		public function logout() {
-			$data=array("id"=>false,"name"=>false,"urlid"=>false);
+			$data=array("id"=>false,"name"=>false,"urlid"=>false, "permission"=>false);
 			$this->ci->session->unset_userdata($data);
 			redirect(base_url());
 		}
@@ -132,8 +131,6 @@
 		}
 		
 		protected function checkStatus() {
-			//$status_id=$this->ci->session->userdata("status_id");
-			//print $this->ci->session->userdata("id");
 			$status=$this->ci->model_user->get_user_status($this->ci->session->userdata("id"));
 			if ($status=="Active") {
 				return true;
@@ -157,38 +154,28 @@
 			if ($url=="/manage/users/my_account") {
 				return true;
 			}
-			//Exact match
-			/*$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url);
-			if ($permission) {
-				$this->_permissionDeny();
-			}
-			//One of the index urls
-			$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url."/home");
-			if ($permission) {
-				$this->_permissionDeny();
-			}
-			//Remap url
-			$pieces=$this->ci->uri->segment_array();
-			unset($pieces[sizeof($pieces)-1]);
-			$url="/".implode("/",$pieces)."/*";
-			$permission=$this->ci->model_user->checkUrlPermission($this->ci->session->userdata("id"), $url);
-			if ($permission) {
-				$this->_permissionDeny();
-			}*/
-			//Last check - look for inheretence
-			/*$permission_id=$this->ci->model_user->getUserPermission($this->ci->session->userdata("id"));
-			$allowedurls=$this->ci->model_user->getUrlsByPermission($permission_id);
-			foreach($allowedurls as $allowedurl) {
-				$pieces=$this->ci->uri->segment_array();
-				while(!empty($pieces)) {
-					array_pop($pieces);
-					$url="/".implode("/",$pieces);
-					if ($url==$allowedurl) {
-						$this->_permissionDeny();
+			$userid = $this->ci->session->userdata("id");
+			$my_permission = $this->ci->session->userdata("permission");
+			$found = false;
+			$permissions = $this->ci->mongo_db->get("permissions");
+			$segments = $this->ci->uri->segment_array();
+			while ($found == false && (!empty($segments))) {
+				$url = implode("/", $segments);
+				if (!empty($url) && $url[0]!='/') {
+					$url='/'.$url;
+				}
+				$permission = $this->ci->mongo_db->get_where_one("permissions", array("url"=>$url));
+				if (!empty($permission->url)) {
+					if (in_array($my_permission, $permission->allow)) {
+						$found = true;
+						return true; // Totally allowed to do this, bail here
+					} elseif (in_array($my_permission, $permission->deny)) {
+						$found = true;
+						$this->_permissionDeny(); // Access Denied!
 					}
 				}
-			}*/
-			//You made it!
+				array_pop($segments);
+			}
 			return true;
 		}
 		
@@ -248,26 +235,42 @@
 			return $api_keys;
 		}
 		
-		public function api_key_role($api_key) {
-			$api_keys = $this->ci->mongo_db->get_where("api_keys", array("api_key"=>$api_key));
-			if (empty($api_keys)) {
+		public function api_key_permission($api_key) {
+			$api_key = $this->ci->mongo_db->get_where_one("api_keys", array("api_key"=>$api_key));
+			if (empty($api_key->permission)) {
 				return false;
 			}
-			$api_key = array_pop($api_keys);
-			return $api_key->role;
+			
+			return $api_key->permission;
 		}
 		
 		protected function _gen_api_keys() {
 			$this->ci->load->helper('string');
 			$this->ci->mongo_db->delete("api_keys");
-			$roles = array("viewer", "editor", "administrator");
-			foreach($roles as $role) {
+			$permissions = array("viewer", "editor", "administrator");
+			foreach($permissions as $permission) {
 				$api_key = new stdClass();
 				$api_key->api_key = random_string("unique");
-				$api_key->role = $role;
+				$api_key->permission = $permission;
 				$this->ci->mongo_db->insert("api_keys", $api_key);
 			}
 			return $this->ci->mongo_db->get("api_keys");
+		}
+
+		protected function _check_security_data() {
+			$permission_test = $this->ci->mongo_db->get_one("permissions");
+			if (empty($permission_test->url)) {
+				$dbdata = array(
+					array("url"=>"/setup", "allow"=>array("administrator"), "deny"=>array("editor", "viewer")),
+					array("url"=>"/create", "allow"=>array("editor", "administrator"), "deny"=>array("viewer")),
+					array("url"=>"/edit", "allow"=>array("editor", "administrator"), "deny"=>array("viewer")),
+					array("url"=>"/publish", "allow"=>array("editor", "administrator"), "deny"=>array("viewer")),
+				);
+				foreach($dbdata as $row) {
+					$this->ci->mongo_db->insert("permissions", $row);
+				}
+				$this->ci->mongo_db->add_index("permissions", array("url"));
+			}
 		}
 		
 	}

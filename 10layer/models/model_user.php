@@ -21,27 +21,27 @@
 				return false;
 			}
 			$encpass=crypt($password, substr($email, 0, 4));
-			$user=$this->mongo_db->get_where("users",array("email"=>$email,"password"=>$encpass));
+			$user=$this->mongo_db->get_where_one("users",array("email"=>$email,"password"=>$encpass));
 			if (empty($user)) {
-				$user=$this->mongo_db->get_where("users",array("email"=>$email,"password"=>$password));
+				$user=$this->mongo_db->get_where_one("users",array("email"=>$email,"password"=>$password));
 			}
 			if (!empty($user)) {
-				$user=$user[0];
 				$status = ($user->isActive) ? 'Active' : 'Suspended';
-				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$status, "role"=>$user->permission));
-				$api_key = array_pop($this->mongo_db->get_where("api_keys", array("role"=>$user->permission)));
+				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$status, "permission"=>$user->permission));
+
+				$api_key = $this->mongo_db->get_where_one("api_keys", array("permission"=>$user->permission));
 				$this->session->set_userdata("api_key", $api_key->api_key);
 				return true;
 			}
 			return false;
 		}
 		
-		public function otpLogin($otp) {
+		public function otp_login($otp) {
 			$otp=trim($otp);
 			if (empty($otp)) {
 				return false;
 			}
-			$user=array_shift($this->mongo_db->get_where("users",array("otp"=>$otp))); //We need to limit this to avoid deleted users
+			$user=$this->mongo_db->get_where_one("users",array("otp"=>$otp)); //We need to limit this to avoid deleted users
 			if (!empty($user)) {
 				//$this->update($user->_id,array("otp"=>"","status_id"=>1));
 				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status_id"=>1, "permission"=>$user->permissions));
@@ -51,39 +51,29 @@
 		}
 		
 		/**
-		 * updateOtp function.
+		 * update_otp function.
 		 * 
 		 * @access public
 		 * @param String $email
 		 * @return String OTP key
 		 */
-		public function updateOtp($email) {
+		public function update_otp($email) {
 			$user=$this->mongo_db->get_where("users",array("email"=>$email));
 			if (empty($user)) {
 				return false;
 			}
 			$user = $user[0];
 			$key = genkey($user->email.$user->password.time());
-			$this->mongo_db->where(array("_id" => $user->_id))->update("users", array("otp"=>$key));
+			$this->mongo_db->where("_id", $user->_id)->update("users", array("otp"=>$key));
 			return $key;
 		}
 		
-		public function checklogin() {
+		public function check_login() {
 			$id=$this->session->userdata("id");
 			if (!empty($id)) {
 				return true;
 			}
 			return false;
-		}
-		
-		//Deprecated
-		public function get_user_roles($user_id) {
-			$this->db->select("tl_roles.*");
-			$this->db->from("tl_roles");
-			$this->db->join("tl_roles_users_link","tl_roles.id=tl_roles_users_link.role_id");
-			$this->db->where("tl_roles_users_link.user_id",$user_id);
-			$query=$this->db->get();
-			return $query->result();
 		}
 		
 		public function get_by_id($id) {
@@ -101,12 +91,12 @@
 			return $this->get_by_id($urlid);
 		}
 		
-		public function getByOtp($otp) {
+		public function get_by_otp($otp) {
 			$otp=trim($otp);
 			if (empty($otp)) {
 				return false;
 			}
-			return array_shift($this->mongo_db->get_where("users",array("otp"=>$otp)));
+			return $this->mongo_db->get_where_one("users",array("otp"=>$otp));
 		}
 		
 		public function update($id, $data) {
@@ -115,7 +105,7 @@
 			} elseif (isset($data["password"])) {
 				unset($data["password"]);
 			}
-			$this->mongo_db->where(array("_id"=>$id))->update("users",$data);
+			$this->mongo_db->where("_id", $id)->update("users",$data);
 			return true;
 		}
 		
@@ -183,19 +173,19 @@
 		 * @access public
 		 * @return array
 		 */
-		public function getAllUsers() {
+		public function get_all_users() {
 			return $this->mongo_db->get("users");
 		}
 		
-		public function get_statuses() {
+		/*public function get_statuses() {
 			$query=$this->db->get("tl_user_status");
 			return $query->result();
-		}
+		}*/
 		
-		public function get_status($status_id) {
+		/*public function get_status($status_id) {
 			$query=$this->db->get_where("tl_user_status",array("id"=>$status_id));
 			return $query->row();
-		}
+		}*/
 		
 		public function get_user_status($uid) {
 			$user=$this->mongo_db->get_where("users",array("_id"=>$uid));
@@ -219,13 +209,13 @@
 			return $query->result();
 		}*/
 		
-		public function getUserRoles($uid) {
+		/*public function getUserRoles($uid) {
 			$this->db->select("tl_roles_users_link.role_id")->from("tl_roles_users_link")->where("user_id",$uid);
 			$this->db->select("tl_roles.name");
 			$this->db->join("tl_roles","tl_roles_users_link.role_id=tl_roles.id");
 			$query=$this->db->get();
 			return $query->result();
-		}
+		}*/
 		
 		/*public function getUserPermissionTypes() {
 			$query=$this->db->get("tl_permissions");
@@ -278,7 +268,7 @@
 			$this->db->truncate("tl_permissions_urls");
 		}*/
 		
-		public function getUserRoleTypes() {
+		/*public function getUserRoleTypes() {
 			$query=$this->db->get("tl_roles");
 			return $query->result();
 		}
@@ -313,7 +303,7 @@
 			foreach($permissions as $permission) {
 				$this->db->insert("tl_permissions_users_link",array("user_id"=>$uid,"permission_id"=>$permission));
 			}
-		}
+		}*/
 	}
 
 ?>

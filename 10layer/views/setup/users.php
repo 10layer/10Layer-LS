@@ -47,7 +47,7 @@
 				password = item.password;
 				permission = item.permission;
 				activeness = item.isActive; 
-				return new User(id, name,email, password, permission,activeness) 
+				return new User(id, name,email, password, permission, activeness) 
 			});
 			self.users(mapped);
 		});

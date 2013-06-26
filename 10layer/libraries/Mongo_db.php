@@ -201,12 +201,17 @@ class Mongo_db {
 	*	criteria.
 	*
 	*	@usage : $this->mongo_db->where(array('foo' => 'bar'))->get('foobar');
+	*   @usage: $this->mongo_db->where('foo', 'bar')->get('foobar');
 	*/
 	
-	public function where($wheres = array()) {
-		foreach($wheres as $wh => $val):
-			$this->wheres[$wh] = $val;
-		endforeach;
+	public function where($wheres = array(), $val = false) {
+		if (!is_string($val)) {
+			foreach($wheres as $wh => $val):
+				$this->wheres[$wh] = $val;
+			endforeach;
+		} else {
+			$this->wheres[$wheres] = $val;
+		}
 		return($this);
 	}
 	
@@ -532,6 +537,10 @@ class Mongo_db {
 	public function get_where($collection = "", $where = array(), $limit = 99999) {
 		return($this->where($where)->limit($limit)->get($collection));
 	}
+
+	public function get_where_one($collection = "", $where = array(), $limit = 99999) {
+		return($this->where($where)->limit($limit)->get_one($collection));
+	}
 	
 	/**
 	*	--------------------------------------------------------------------------------
@@ -562,6 +571,18 @@ class Mongo_db {
 		return($returns);
 		
 		//return(iterator_to_array($documents));
+	}
+
+	public function get_one($collection = "") {
+		MongoCursor::$timeout = 20000; //20secs
+		if(empty($collection))
+			show_error("In order to retreive documents from MongoDB, a collection name must be passed", 500);
+		$results = array();
+		$document = $this->db->{$collection}->findOne($this->wheres, $this->selects);
+		$return = (object) $document;
+		
+		$this->_clear();
+		return($return);
 	}
 
 	public function get_light($urlid){

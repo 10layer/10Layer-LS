@@ -66,12 +66,12 @@
 			if (empty($api_key)) {
 				return false;
 			}
-			$role=$this->tlsecurity->api_key_role($api_key);
-			if (empty($role)) {
+			$permission=$this->tlsecurity->api_key_permission($api_key);
+			if (empty($permission)) {
 				return false;
 			}
 			
-			if ($role == "viewer") { //Viewer shouldn't be able to do anything that requires security
+			if ($permission == "viewer") { //Viewer shouldn't be able to do anything that requires security
 				return false;
 			}
 			return true;

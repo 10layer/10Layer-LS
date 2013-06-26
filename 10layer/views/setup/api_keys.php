@@ -21,7 +21,7 @@
 		self._id = ko.observable(data._id);
 		self.name = ko.observable(data.name);
 		self.api_key = ko.observable(data.api_key ? data.api_key : "");
-		self.role = ko.observable(data.role);
+		self.permission = ko.observable(data.permission);
 		self.expiry = ko.observable(data.expiry ? data.expiry : 0 );
 		self.revoked = ko.observable(data.revoked ? data.revoked : false );
 		self.isEdit = ko.computed(function() {
@@ -57,14 +57,14 @@
 	var ApiKeyViewModel = function() {
 		var self = this;
 		self.api_keys = ko.observableArray([]);
-		self.roles = [
+		self.permissions = [
 			{ name: "Administrator", value: "administrator" }, 
 			{ name: "Editor", value: "editor" }, 
 			{ name: "Viewer", value: "viewer" }
 		];
 
 		self.api_key = ko.observable();
-		self.api_key(new ApiKey({ _id: false, name: "", api_key: "", role: "viewer", revoked: false }));
+		self.api_key(new ApiKey({ _id: false, name: "", api_key: "", permission: "viewer", revoked: false }));
 
 		self.update = function() {
 			$.getJSON("/api/users/api_keys?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
@@ -96,7 +96,7 @@
 		
 		self.clickAdd = function() {
 			$.getJSON("/api/users/generate_api_key?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
-				self.api_key(new ApiKey({ _id: false, name: "", api_key: data.content, role: "viewer", revoked: false }));
+				self.api_key(new ApiKey({ _id: false, name: "", api_key: data.content, permission: "viewer", revoked: false }));
 				$(".edit").modal("show");
 			});
 		};
@@ -150,7 +150,7 @@
 				<th></th>
 				<th>Name</th>
 				<th>API Key</th>
-				<th>Role</th>
+				<th>Permission</th>
 				<th>Expiry</th>
 				<th class='centralise'>Revoked</th>
 			</tr>
@@ -159,7 +159,7 @@
 				<td data-bind="click: $parent.clickEdit"><i class="icon-edit"></i></td>
 				<td data-bind="text: name"></td>
 				<td data-bind="text: api_key" autocomplete="off"></td>
-				<td data-bind="text: role"></td>
+				<td data-bind="text: permission"></td>
 				<td data-bind="text: expiryText, css: { 'text-warning': isExpired() }"></td>
 				<td class='centralise'><input type="checkbox" name="status" value="" data-bind="checked: revoked" /></td>
 			</tr>
@@ -178,8 +178,8 @@
 		<input type="text" name="name" placeholder="Joe Soap" class='grid_input' data-bind="value: name" autocomplete="off">
 		<label>API key</label>
 		<input type="text" name="api_key" placeholder="" class='grid_input' data-bind="value: api_key" autocomplete="off">
-		<label>Role</label>
-		<select name="role" data-bind="value: role">
+		<label>Permission</label>
+		<select name="permission" data-bind="value: permission">
 			<option value="viewer">Viewer</option>
 			<option value="editor">Editor</option>
 			<option value="administrator">Administrator</option>
