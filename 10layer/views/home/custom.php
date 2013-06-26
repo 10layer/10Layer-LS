@@ -1,5 +1,3 @@
-
-
 <script type="text/javascript" >
 $(function(){
 	$(".chzn-select").chosen().change(function(){
@@ -8,7 +6,7 @@ $(function(){
 	
 	$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
 	$('#dyncontent').html("Loading...");
-	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
+	$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", {  order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }, function(data) {
 		$('#dyncontent').html(_.template($("#listing-template").html(), { data:data}));
 	});
 
@@ -29,7 +27,7 @@ $(function(){
 		var content_types = $("#content_types").val();
 		var workflow = $("#workflows").val();
 		var search_string = $('#search_query').val();
-		var params = {order_by: "start_date DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }
+		var params = {order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 50, fields: [ "id", "title", "last_modified", "start_date", "workflow_status", "last_editor", "content_type" ] }
 		if(search_string != '' && search_string){
 			params.search = search_string;
 		}
@@ -93,9 +91,7 @@ $(function(){
 	    </tbody>
 	</table>
 </script>
-
 <div id="filter_pane">
-	
 	<div id="quick_search_container" >
 		<h5>Quick Search / Filters </h5>
 		<div style="float:left; margin-right:10px; margin-top:4px;">
@@ -104,14 +100,13 @@ $(function(){
 				<option value=''></option>
 				<?php
 					$this->load->model('model_user');
-					$users=$this->model_user->getAllUsers();
+					$users=$this->model_user->get_all_users();
 					foreach($users as $user){
 						echo "<option value='".$user->name."'>".$user->name."</option>";
 					}
 				?>
 			</select>
 		</div>
-
 		<div style="float:left; margin-right:10px; margin-top:4px;">
 			<a href="#" class="close reset" style="float: right">&times;</a>
 			<select id='content_types' class="chzn-select" data-placeholder="Content type" name="tag_workflow_status" id="" style='width:200px;display:none;'>
@@ -124,9 +119,7 @@ $(function(){
 					}
 				?>
 			</select>
-			
 		</div>
-
 		<div <div style="float:left; margin-right:10px; margin-top:4px;">
 			<a href="#" class="close reset" style="float: right">&times;</a>
 			<select id='workflows' class="chzn-select" data-placeholder="Workflow status" name="tag_workflow_status" id="" style='width:200px;display:none;'>
@@ -136,15 +129,12 @@ $(function(){
 				<option value="Published">Published</option>
 			</select>
 		</div>
-
 		<div class="input-append" style="float:right;">
 			<a href="#" class="close reset" style="float: right">&times;</a>
 			<input type="text" id='search_query' class="">
 			<a id="quick_search_button" class="btn">Quick Search</a>
 		 </div>
-		
 	</div>
-
 </div>
 <div id="dyncontent">
 	
