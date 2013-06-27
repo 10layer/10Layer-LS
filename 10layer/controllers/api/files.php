@@ -41,6 +41,8 @@
 			}
 			if (isset($this->vars["filename"])) {
 				$filename = $this->vars["filename"];
+				$fparts = pathinfo($filename);
+				$filename = url_title($fparts["filename"]).".".$fparts["extension"];
 			} else {
 				$filename = md5($raw);
 			}
