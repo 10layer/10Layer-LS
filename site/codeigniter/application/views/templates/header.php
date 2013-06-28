@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="/resources/bootstrap/css/bootstrap.min.css" type="text/css" media="screen, projection" charset="utf-8" />
 	
 	<link rel="stylesheet" href="/resources/chosen/chosen.css" type="text/css" media="screen, projection" charset="utf-8" />
+	<link rel="stylesheet" href="<?= base_url() ?>resources/font-awesome/css/font-awesome.min.css" type="text/css" media="screen, projection" charset="utf-8" />
 	<link rel="stylesheet" href="<?= base_url() ?>resources/css/style.css" type="text/css" media="screen, projection" charset="utf-8" />
 	
 	<script type="text/javascript" src="/resources/jquery/jquery182.js"></script>
@@ -20,7 +21,16 @@
 			<div class="container">
 				<ul id="menu1" class="nav">
 					<li>
-						<a href="<?= base_url() ?>">Home</a>
+						<a href="<?= base_url() ?>#top">Home</a>
+					</li>
+					<li>
+						<a href="<?=base_url() ?>#about" class="scroll">About</a>
+					</li>
+					<li>
+						<a href="<?=base_url() ?>#built" class="scroll">Built on 10Layer</a>
+					</li>
+					<li>
+						<a href="<?=base_url() ?>#news" class="scroll">News</a>
 					</li>
 					<li>
 						<?= anchor("section/docs", "Docs") ?>
@@ -34,24 +44,22 @@
 					<li>
 						<?= anchor("page/contact", "Contact") ?>
 					</li>
-					<li>
-						<?= anchor("page/about", "About") ?>
-					</li>
+					
 				</ul>
 			</div>
 		</div>
 	</div>
 	
-	<div class="row hero <?= ($this->uri->ruri_string() == "/home/index") ? 'hero-home' : '' ?>">
-		<div class="hero-scroller hide" style="position: fixed; width: 100%; left: 50%; bottom: 20px" data-0="bottom: 20px" data-300="bottom: 300px" data-500="bottom:5000px">
-		<a data-0="color:rgba(255,255,255,1)" data-300="color:rgba(255,255,255,0)" href="#body" class="scroll" >
-			<i class="icon-chevron-down icon-white"></i>
+	<div class="row hero <?= ($this->uri->ruri_string() == "/home/index") ? 'hero-home' : '' ?>" id="<?= ($this->uri->ruri_string() == "/home/index") ? 'top' : '' ?>">
+		<div class="hero-scroller hide" style="position: absolute; left: 50%; bottom: 20px; " >
+		<a data-0="color:rgba(255,255,255,1)" data-300="color:rgba(255,255,255,0)" href="#jump_1" class="scroll" >
+			<i class="icon-chevron-down icon-white icon-4x"></i>
 		</a>
 		</div>
 		
 	</div>
 	
 	
-	<div class="container main-container" id="body">
+	<div class="main-container" id="jump_1">
 	
 	

@@ -1,7 +1,7 @@
 	</div>
 	<div class="footer" id="footer">
 		<div class="container">
-			Copyright <?= date("Y") ?> 10Layer Pty (Ltd)
+			Copyright <?= date("Y") ?> 10Layer Pty (Ltd) | <a href="mailto:info@10layer.com">info@10layer.com</a> | 
 		</div>
 	</div>
 	<script type="text/javascript">
@@ -16,16 +16,17 @@
 			}
 		}
 		});
-		$(".scroll").click(function(e) {
+		$("a").click(function(e) {
 			var href = $(this).attr("href");
-			console.log("Hello");
-			console.log(href.indexOf("#"));
-			if (href.indexOf("#") == 0) {
-				e.preventDefault();
-				//href = href.substr(1);
-				console.log(href);
-				s.animateTo($(href).offset().top, { duration: 500 });
+			if (href.indexOf("#") > -1) {
+				href = href.substr(href.lastIndexOf("#"));
+				if($(href).offset()) {
+					e.preventDefault();
+					s.animateTo($(href).offset().top, { duration: 500 });
+					return false;
+				}
 			}
+			return true;
 		});
 	});
 	</script>
