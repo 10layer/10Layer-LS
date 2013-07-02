@@ -45,6 +45,7 @@
 			$this->m->addServer('localhost', 11211);
 			$akey = $this->vars;
 			unset($akey["jsoncallback"]);
+			unset($akey["_"]);
 			$this->key = md5($this->uri->uri_string()."?".http_build_query($akey));
 			$this->data = $this->m->get($this->key);
 			if (!empty($this->data)) {

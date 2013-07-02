@@ -324,6 +324,7 @@
 				$this->returndata();
 				return false;
 			}
+			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
 			$this->returndata();
@@ -367,6 +368,7 @@
 			if ($this->mongo_db->insert("content_deleted", $result)) {
 				$this->mongo_db->where(array("_id"=>$id))->delete("content");
 				$this->data["msg"]="Item $id deleted";
+				$this->m->flush(); //Clear the cache
 			} else {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Error deleting $id";
@@ -412,6 +414,7 @@
 			if ($this->mongo_db->insert("content", $result)) {
 				$this->mongo_db->where(array("_id"=>$id))->delete("content_deleted");
 				$this->data["msg"]="Item $id undeleted";
+				$this->m->flush(); //Clear the cache
 			} else {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Error undeleting $id";

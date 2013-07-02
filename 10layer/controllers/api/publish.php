@@ -49,10 +49,15 @@
 			$result["manifest"] = $manifest;
 			$this->mongo_db->insert("published", $result);
 			$this->data["message"]="Section updated";
+			$this->m->flush();
 			$this->returndata();
 		}
 		
 		public function section($section_id) {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$result=array_pop($this->mongo_db->where(array("_id"=>$section_id))->get("published"));
 			if (empty($result)) {
 				$this->show_error("No results found for $section_id");
@@ -64,10 +69,15 @@
 			}
 			$result->zones = $tmp;
 			$this->data["content"]=$result;
+			$this->cache();
 			$this->returndata();
 		}
 		
 		public function zone($section_id, $zone_id) {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$section=array_pop($this->mongo_db->where(array("_id"=>$section_id))->get("published"));
 			if (empty($section)) {
 				$this->show_error("No results found for $section_id");
@@ -75,6 +85,7 @@
 			if (isset($section->zones[$zone_id])) {
 				$this->data["content"] = $section->zones[$zone_id];
 			}
+			$this->cache();
 			$this->returndata();
 		}
 		
