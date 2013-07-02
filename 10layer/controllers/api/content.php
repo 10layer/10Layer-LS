@@ -50,6 +50,10 @@
 		 * @return void
 		 */
 		public function listing() {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$this->published();
 			$this->_check_callbacks();
 			$this->data["content"]=$this->mongo_db->get("content");
@@ -60,6 +64,7 @@
 			} else {
 				$this->data["count"]=sizeof($this->data["content"]);
 			}
+			$this->cache();
 			$this->returndata();
 			return true;
 		}
@@ -73,6 +78,10 @@
 		 * @return void
 		 */
 		public function count() {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$this->_check_callbacks();
 			$content_type=$this->input->get_post("content_type");
 			if (!empty($content_type)) {
@@ -83,6 +92,7 @@
 				}
 			}
 			$this->data["count"]=$this->mongo_db->count("content");
+			$this->cache();
 			$this->returndata();
 			return true;
 		}
@@ -97,6 +107,10 @@
 		 * @return void
 		 */
 		public function get() {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$this->_check_callbacks();
 			$this->published();
 			$this->data["count"]=1;
@@ -109,6 +123,7 @@
 				$this->data["error"]=true;
 				$this->data["msg"]="Content not found";
 			}
+			$this->cache();
 			$this->returndata();
 		}
 
@@ -123,6 +138,10 @@
 		 * @return void
 		 */
 		public function get_linked_object() {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			function array_values_recursive($ary) {
 				$lst = array();
 				foreach( array_keys($ary) as $k ){
@@ -170,6 +189,7 @@
 				$this->data["error"]=true;
 				$this->data["msg"]="Content not found";
 			}
+			$this->cache();
 			$this->returndata();
 		}
 
@@ -452,10 +472,15 @@
 		 * @return void
 		 */
 		public function blank() {
+			if ($this->cached) {
+				$this->returndata();
+				return true;
+			}
 			$this->_check_callbacks();
 			$this->data["count"]=0;
 			$this->data["criteria"]["limit"]=0;
 			$this->data["content"]=false;
+			$this->cache();
 			$this->returndata();
 		}
 		

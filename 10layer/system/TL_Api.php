@@ -11,6 +11,9 @@
 		protected $secure=false;
 		protected $_render=true;
 		protected $_start_time=0;
+		public $key;
+		public $m; //Memcached
+		public $cached = false;
 		public $vars=array();
 		public $data;
 		
@@ -38,6 +41,22 @@
 			} else {
 				$this->vars=array_merge($_GET, $_POST);
 			}
+			$this->m = new Memcached();
+			$this->m->addServer('localhost', 11211);
+			$akey = $this->vars;
+			unset($akey["jsoncallback"]);
+			$this->key = md5($this->uri->uri_string()."?".implode("&", $akey));
+			$this->data = $this->m->get($this->key);
+			if (!empty($this->data)) {
+				$this->cached = true;
+				$this->data["cached"] = true;
+				$this->data["memcached_key"] = $this->key;
+			}
+		}
+
+		public function cache() {
+			$this->m->set($this->key, $this->data);
+			return true;
 		}
 		
 		protected function enforce_secure() {
