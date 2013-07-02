@@ -25,7 +25,7 @@
 			if (empty($user)) {
 				$user=$this->mongo_db->get_where_one("users",array("email"=>$email,"password"=>$password));
 			}
-			if (!empty($user)) {
+			if (!empty($user->_id)) {
 				$status = ($user->isActive) ? 'Active' : 'Suspended';
 				$this->session->set_userdata(array("id"=>$user->_id, "name"=>$user->name, "status"=>$status, "permission"=>$user->permission));
 
