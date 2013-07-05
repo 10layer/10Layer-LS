@@ -44,8 +44,12 @@
 			$this->m = new Memcached();
 			$this->m->addServer('localhost', 11211);
 			$akey = $this->vars;
-			unset($akey["jsoncallback"]);
-			unset($akey["_"]);
+			if (is_array($akey) && isset($akey["jsoncallback"])) {
+				unset($akey["jsoncallback"]);
+			}
+			if (is_array($akey) && isset($akey["_"])) {
+				unset($akey["_"]);
+			}
 			$this->key = md5($this->uri->uri_string()."?".http_build_query($akey));
 			$this->data = $this->m->get($this->key);
 			if (!empty($this->data)) {
