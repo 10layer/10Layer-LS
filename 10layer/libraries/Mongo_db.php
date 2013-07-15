@@ -408,8 +408,42 @@ class Mongo_db {
 	
 	function where_near($field = '', $co = array())
 	{
-		$this->__where_init($field);
-		$this->where[$what]['$near'] = $co;
+		$this->_where_init($field);
+		$this->wheres[$what]['$near'] = $co;
+		return($this);
+	}
+
+	/**
+	*	--------------------------------------------------------------------------------
+	*	WHERE EXISTS
+	*	--------------------------------------------------------------------------------
+	*
+	*	Get documents which have certain parameters set
+	*
+	*	@usage : $this->mongo_db->where_exists('foo')->get('foobar');
+	*/
+	
+	function where_exists($field = '')
+	{
+		$this->_where_init($field);
+		$this->wheres[$field]['$exists'] = true;
+		return($this);
+	}
+
+	/**
+	*	--------------------------------------------------------------------------------
+	*	WHERE NOT EXISTS
+	*	--------------------------------------------------------------------------------
+	*
+	*	Get documents which don't have certain parameters set
+	*
+	*	@usage : $this->mongo_db->where_not_exists('foo')->get('foobar');
+	*/
+	
+	function where_not_exists($field = '')
+	{
+		$this->_where_init($field);
+		$this->wheres[$field]['$exists'] = false;
 		return($this);
 	}
 	
