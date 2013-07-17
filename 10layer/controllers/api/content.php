@@ -158,9 +158,8 @@
 			}
 			$this->_check_callbacks();
 			$this->data["count"]=1;
-			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
-			$content=array_pop($this->mongo_db->limit(1)->get("content"));
+			$content=$this->mongo_db->get_one("content");
 
 			$content_type=$this->get_content_type();
 			$fields=$this->get_field_data($content_type);
@@ -172,14 +171,18 @@
 					array_push($observed, $field);
 				}
 			}
-			foreach($observed as $the_field){
+			foreach($observed as $the_field) {
 				$field_name = $the_field->name;
-				$value = $content->$field_name;
-				if(is_array($value)){
-					$vals = array_values_recursive($value);
-					$content->$field_name = $this->mongo_db->where_in("_id", $vals)->get('content');
+				if (isset($content->$field_name)) {
+					$value = $content->$field_name;
+					if(is_array($value)){
+						$vals = array_values_recursive($value);
+						$content->$field_name = $this->mongo_db->where_in("_id", $vals)->get('content');
+					} else {
+						$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
+					}
 				} else {
-					$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
+					$value = false;
 				}
 			}
 				

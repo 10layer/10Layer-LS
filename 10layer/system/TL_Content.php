@@ -194,16 +194,20 @@ class TLContent {
 	protected function getOptions() {
 		$ci=&get_instance();
 		foreach($this->fields as $key=>$field) {
+			for($x = 0; $x < sizeof($this->fields[$key]->options); $x++) {
+				if (empty($this->fields[$key]->options[$x])) {
+					unset($this->fields[$key]->options[$x]);
+				}
+			}
 			if (($field->type=="select") && empty($this->fields[$key]->options)) {
 				$ci->mongo_db->state_save();
 				$result=$ci->mongo_db->where(array("content_type"=>$field->content_types))->limit(500)->order_by(array("title", "desc"))->select(array("title", "_id"))->get("content");
 				$ci->mongo_db->state_restore();
 				if(!empty($result)) {
 					foreach($result as $item) {
-						$this->fields[$key]->options[$item->_id]=$item->title;
+						$this->fields[$key]->options[$item->title]=$item->_id;
 					}
 				}
-
 			}
 		}
 
@@ -220,23 +224,23 @@ class TLContent {
 	*
 	* Eg.of copying from another field and making the field into an urlid
 	* array(
-	    		"name"=>"urlid",
-	    		"hidden"=>true,
-	    		"transformations"=>array(
-	    			"copy"=>"title",
-	    			"urlid",
-	    		)
-	    	)
-	 *
-	 * Eg. of using existing PHP functions
-	 * "transformations"=>array(
-	    	"substr"=>array(2,5), //Call function with vars (value will be inserted as first var)
-	    	"strtoupper" //Call without vars - note that the function name is now a value instead of a key
-	    ),
-	 *
-	 * @access public
-	 * @return void
-	 */
+	*    		"name"=>"urlid",
+	*    		"hidden"=>true,
+	*    		"transformations"=>array(
+	*    			"copy"=>"title",
+	*    			"urlid",
+	*    		)
+	*    	)
+	*
+	* Eg. of using existing PHP functions
+	* "transformations"=>array(
+	*    	"substr"=>array(2,5), //Call function with vars (value will be inserted as first var)
+	*    	"strtoupper" //Call without vars - note that the function name is now a value instead of a key
+	*    ),
+	*
+	* @access public
+	* @return void
+	*/
 	public function transformFields($tbl=false) {
 	    $ci=&get_instance();
 	    $ci->load->library("datatransformations");
