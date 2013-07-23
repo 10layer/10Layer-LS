@@ -512,12 +512,21 @@ class Mongo_db {
 					$parts=explode(' ',$val);
 					$this->sorts[$parts[0]] = -1;
 				} else {
+					if (strpos($val, " ")!==false) {
+						$parts=explode(' ',$val);
+						$val = $parts[0];
+					}
 					$this->sorts[$val] = 1;
 				}
 			} else if($val == -1 || $val === FALSE || strtolower($val) == 'desc'):
 				$this->sorts[$col] = -1; 
 			else:
+				if (strpos($val, " ")!==false) {
+					$parts=explode(' ',$val);
+					$val = $parts[0];
+				}
 				$this->sorts[$col] = 1;
+
 			endif;
 		endforeach;
 		return($this);
