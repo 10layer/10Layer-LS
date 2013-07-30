@@ -88,3 +88,10 @@ function randomPass(letterCount) {
 	}
 	return s;
 }
+
+$(function() {
+	//Fix dropdown toggle for Bootstrap
+	$('.dropdown-menu li a').on('click', function(e) {
+    	$(this).dropdown('toggle');
+	});
+});
