@@ -492,6 +492,23 @@ class Mongo_db {
 		$this->wheres[$field] = new MongoRegex($regex);
 		return($this);
 	}
+
+	public function or_like($field = "", $value = "", $flags = "i", $enable_start_wildcard = TRUE, $enable_end_wildcard = TRUE) {
+		$field = (string) trim($field);
+		// $this->_where_init($field);
+		//$this->wheres['$or'][$field] = array();
+		$value = (string) trim($value);
+		$value = quotemeta($value);
+		if($enable_start_wildcard !== TRUE):
+			$value = "^" . $value;
+		endif;
+		if($enable_end_wildcard !== TRUE):
+			$value .= "$";
+		endif;
+		$regex = "/$value/$flags";
+		$this->wheres['$or'][][$field] = new MongoRegex($regex);
+		return($this);
+	}
 	
 	/**
 	*	--------------------------------------------------------------------------------
