@@ -19,6 +19,7 @@
 		}
 		
 		public function save() {
+			$this->enforce_secure();
 			$id = $this->input->get_post("_id");
 			if (empty($id)) {
 				$this->data["error"]=true;
@@ -33,13 +34,18 @@
 				$this->returndata();
 				return false;
 			}
-			$this->enforce_secure();
+			$this->_save($id, $zones);
+			$this->returndata();
+		}
+
+		protected function _save($id, $zones) {
 			$x = 0;
 			$this->mongo_db->where(array("_id"=>$id))->delete("published");
 			$result = array("_id"=>$id);
 			$manifest = array();
 			foreach($zones as $key=>$zone) {
 				foreach($zone as $doc) {
+					$doc = (array) $doc;
 					$id=$doc["_id"];
 					$item=array_pop($this->model_content->get($id));
 					$result["zones"][$key][]=$item;
@@ -47,10 +53,10 @@
 				}
 			}
 			$result["manifest"] = $manifest;
+			//print_r($manifest);
 			$this->mongo_db->insert("published", $result);
 			$this->data["message"]="Section updated";
 			$this->m->flush();
-			$this->returndata();
 		}
 		
 		public function section($section_id) {
@@ -63,7 +69,6 @@
 				$this->show_error("No results found for $section_id");
 			}
 			$tmp = array();
-			//print_r($result);
 			foreach($result->zones as $key=>$val) {
 				$tmp[$key] = $this->is_published($val);
 			}
@@ -115,7 +120,15 @@
 			$this->returndata();
 		}
 		
-		public function document() {
+		/**
+		 * publish_document function.
+		 *
+		 * Publish a single document to the top of a zone
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		public function publish_document() {
 			$this->enforce_secure();
 			$section_id = $this->input->get_post("section_id");
 			if (empty($section_id)) {
@@ -165,9 +178,13 @@
 				$this->returndata();
 				return false;
 			}
-			$published = array_pop($this->mongo_db->get_where("published",array("_id"=>$section_id)));
+			$published = $this->mongo_db->get_where_one("published",array("_id"=>$section_id));
 			//Now we're ready to add this item to the zone
-			$newzone = $published->zones[$zone_id];
+			if (isset($published->zones[$zone_id])) {
+				$newzone = $published->zones[$zone_id];
+			} else {
+				$newzone=array();
+			}
 			//Make sure it's not already in there somewhere
 			for($x=0; $x< sizeof($newzone); $x++) {
 				if ($newzone[$x]["_id"] == $id) {
@@ -177,11 +194,76 @@
 			//Add this item to the start of the zone
 			array_unshift($newzone, $doc);
 			//Make sure we don't have too many items
-			array_splice($newzone, $zone["zone_max_items"]);
+			if ($zone["zone_max_items"] > 0) {
+				array_splice($newzone, $zone["zone_max_items"]);
+			}
 			//Set the new zone in Published
 			$published->zones[$zone_id] = $newzone;
-			$this->mongo_db->where(array("_id"=>$section_id))->update("published", array("zones"=>$published->zones));
-			print_r($published);
+			$this->_save($section_id, $published->zones);
+			$this->returndata();
+		}
+
+		/**
+		 * unpublish_document function.
+		 *
+		 * Removes all instances of the document from the published table
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		public function unpublish_document() {
+			$this->enforce_secure();
+			$id = $this->input->get_post("id");
+			if (empty($id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="id required";
+				$this->returndata();
+				return false;
+			}
+			$result = $this->mongo_db->where(array("manifest._id"=>$id))->get("published");
+			foreach($result as $section_id=>$section) {
+				foreach($section->zones as $key=>$zone) {
+					for($x = 0; $x < sizeof($zone); $x++) {
+						if ($zone[$x]["_id"] == $id) {
+							unset($zone[$x]);
+						}
+					}
+					$section->zones[$key] = $zone;
+				}
+
+				$this->_save($section->_id, $section->zones);
+			}
+		}
+
+		/**
+		 * document function.
+		 *
+		 * Find all the places a document is published
+		 * 
+		 * @access protected
+		 * @return void
+		 */
+		public function document() {
+			//$this->enforce_secure();
+			$id = $this->input->get_post("id");
+			if (empty($id)) {
+				$this->data["error"]=true;
+				$this->data["msg"][]="id required";
+				$this->returndata();
+				return false;
+			}
+			$result = $this->mongo_db->where(array("manifest._id"=>$id))->get("published");
+			$sections = array();
+			foreach($result as $section) {
+				$sections[$section->_id] = array();
+				foreach($section->manifest as $zone) {
+					if ($zone["_id"] == $id) {
+						$sections[$section->_id][] = $zone["zone"];
+					}
+				}
+			}
+			$this->data["sections"] = $sections;
+			$this->returndata();
 		}
 
 		/**
