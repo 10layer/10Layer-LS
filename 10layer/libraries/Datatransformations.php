@@ -177,8 +177,25 @@ class Datatransformations {
 		return $s;
 	}
 
+	/**
+	 * extract_image function.
+	 * 
+	 * Takes a file upload field and extracts an image from it. Useful to get an image from a PDF, for example.
+	 *
+	 * @access public
+	 * @param mixed &$sender
+	 * @param string $value
+	 * @param string $field
+	 * @return string
+	 */
 	public function extract_image(&$sender, $value, $field) {
 		$img = $sender->getField($field)->value;
+		if (is_array($img)) {
+			$img = array_pop($img);
+		}
+		if (empty($img)) {
+			return false;
+		}
 		$parts = pathinfo($img);
 		$returndir = $parts["dirname"];
 		$fullimg = realpath(".".$img);
