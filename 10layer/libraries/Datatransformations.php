@@ -177,6 +177,22 @@ class Datatransformations {
 		return $s;
 	}
 
+	public function extract_image(&$sender, $value, $field) {
+		$img = $sender->getField($field)->value;
+		$parts = pathinfo($img);
+		$returndir = $parts["dirname"];
+		$fullimg = realpath(".".$img);
+		if (file_exists(".".$img)) {
+			$parts = pathinfo($fullimg);
+			$newimg = $parts["dirname"]."/".$parts["filename"].".png";
+			//if ($parts[extension] == "pdf") {
+				$success = exec("convert '".escapeshellarg($fullimg)."[0]' '{$newimg}'", $result);
+			//}
+			return $returndir."/".$parts["filename"].".png";
+		}
+		return false;
+	}
+
 	
 	/**
 	 * Remove any non-ASCII characters and convert known non-ASCII characters 

@@ -362,6 +362,10 @@
 			hint: "Returns very, very clean text",
 		},
 		{
+			fn: "extract_image",
+			hint: "Grabs an image from a file",
+		},
+		{
 			fn: "custom",
 			hint: "Define your own rad transformation",
 		}
