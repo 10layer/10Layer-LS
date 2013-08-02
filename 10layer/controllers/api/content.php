@@ -297,29 +297,13 @@
 				$this->id();
 				$result=$this->mongo_db->upsert('content', $data);
 				//Update any instances where we've already published
-				$published = $this->mongo_db->get_where("published", array("manifest._id"=>$id));
-				foreach($published as $section) {
-					//Find the relevant zones
-					$section_id = $section->_id;
-					unset($section->_id);
-					foreach($section->zones as $zonekey=>$zone) {
-						for($x = 0; $x < sizeof($zone); $x++) {
-							if ($zone[$x]["_id"] == $id) {
-								$zone[$x] = $data;
-								$zone[$x]->_id = $id;
-								$section->zones["$zonekey"] = $zone;
-								$update_result = $this->mongo_db->where(array("_id"=>$section_id))->upsert('published', $section);
-							}
-						}
-					}
-				}
+				$this->update_manifest($id);
 			} else {
 				$data->content_type=$content_type;
 				$data->timestamp=time();
 				$data->_id=$urlid;
 				$result=$this->mongo_db->insert('content', $data);
 			}
-			//unset($data->id);
 			$this->data["id"]=$urlid;
 			if (!$result) {
 				$this->data["error"]=true;
@@ -330,6 +314,26 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
+			$this->returndata();
+		}
+
+
+		public function change_workflow() {
+			$this->enforce_secure();
+			if (empty($this->vars["id"])) {
+				$this->show_error("id required");
+			}
+			if (empty($this->vars["workflow_status"])) {
+				$this->show_error("workflow_status required");
+			}
+			$this->id();
+			//$doc = $this->mongo_db->get_one("content");
+			//$doc->workflow_status = $this->vars["workflow_status"];
+			$this->mongo_db->update("content", array("workflow_status"=>$this->vars["workflow_status"]));
+			$this->update_manifest($this->vars["id"]);
+			$this->m->flush(); //Clear the cache
+			$this->data["id"] = $this->vars["id"];
+			$this->data["workflow_status"] = $this->vars["workflow_status"];
 			$this->returndata();
 		}
 		
