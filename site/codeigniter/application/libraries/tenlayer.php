@@ -26,7 +26,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		return $result->content;
@@ -44,7 +44,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		return $result;
@@ -59,7 +59,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		return $result->content->zones;
@@ -74,7 +74,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		return $result->content;
@@ -90,7 +90,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		if (empty($result->content)) {
@@ -109,7 +109,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		$items = $result->content;
@@ -152,7 +152,7 @@ class TenLayer {
 		} catch(Exception $e) {
 			return false;
 		}
-		if ($result->error) {
+		if (!empty($result->error)) {
 			return false;
 		}
 		return "/".$result->filename."?dynamic";
