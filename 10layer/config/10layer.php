@@ -33,4 +33,6 @@
 	$config["memcache_servers"]=array(
 		array("server"=>"127.0.0.1","port"=>11211),
 	);
+
+	$config["google_api_key"] = "";
 ?>
