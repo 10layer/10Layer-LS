@@ -623,6 +623,24 @@
 			var section_title = $(this).attr("data-sectiontitle");
 			$("#published_list").append("<li><input type='hidden' name='autopublish_sections' value='"+section_id+"."+zone_urlid+"' /><a href='#'>"+section_title+" :: "+zone_title+"</li>");
 		});
+
+		$(document).on('click', '#select_all', function() {
+			$(".select_item").prop("checked", $(this).prop("checked"));
+		});
+
+		$(document).on('click', '.workflow_change', function() {
+			var workflow = $(this).attr("data-workflow");
+			var items = [];
+			$(".select_item:checked").each(function() {
+				items.push({ id: $(this).val(), workflow_status: workflow });
+			});
+			$.getJSON("<?= base_url() ?>api/content/multiple/change_workflow?jsoncallback=?", { items: items, api_key: $(document.body).data('api_key') }, function(data) {
+				$(".select_item:checked").each(function() {
+					$(this).parent().parent().children().last().html(workflow);
+					$(this).dropdown("toggle");
+				});
+			});
+		});
 				
 	}); //End of $(function)
 	
@@ -638,9 +656,9 @@
 		<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<!--<li><a href="#" class="group_action" data-action="">Create</a></li>
-				<li><a href="#">Edit</a></li>
-				<li><a href="#">Publish</a></li>-->
+				<li><a href="#" class="workflow_change" data-workflow="New">Workflow - New</a></li>
+				<li><a href="#" class="workflow_change" data-workflow="Edited">Workflow - Edited</a></li>
+				<li><a href="#" class="workflow_change" data-workflow="Published">Workflow - Published</a></li>
 				<li><a href="#" id="_delete_multiple">Delete</a></li>
 			</ul>
 		</div>
@@ -661,7 +679,7 @@
 	<table class='table table-bordered table-striped table-condensed'>
 	    <thead>
 	    <tr>
-	    	<th></th>
+	    	<th><input type="checkbox" class="select-all" id="select_all" /></th>
 	    	<th>Title</th>
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
