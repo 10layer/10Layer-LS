@@ -180,10 +180,10 @@
 				$this->returndata();
 				return true;
 			}
-			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".jpg";
 			if (file_exists($cache)) {
 				if ($render) {
-					header("Content-type: image/png");
+					header("Content-type: image/jpg");
 					header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
 			        header('Content-Length: '.filesize($cache));
 		    	    readfile($cache);
@@ -194,14 +194,13 @@
 					return true;
 				}
 			}
-			
 			if (!is_dir($realpath."/content/cache/".$parts["dirname"])) {
 				$result = mkdir($realpath."/content/cache/".$parts["dirname"], 0755, true);
 			}
 			exec("convert '".escapeshellarg($file)."' -auto-level -background transparent -density 72 -depth 8 -strip -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
-			exec("optipng -o7 '{$cache}'");
+			//exec("optipng -o7 '{$cache}'");
 			if ($render) {
-				header("Content-type: image/png");
+				header("Content-type: image/jpg");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
 				header('Content-Length: '.filesize($cache));
 				readfile($cache);
