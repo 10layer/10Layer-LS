@@ -155,7 +155,7 @@
 				$quality = 80;
 			}
 			if (empty($format)) {
-				$format = "jpg"
+				$format = "jpg";
 			}
 			$render = $this->input->get_post("render");
 			$dir = "content";
