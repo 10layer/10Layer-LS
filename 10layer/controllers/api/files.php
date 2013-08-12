@@ -158,6 +158,7 @@
 			$filetypes = array("jpg", "jpeg", "png", "svg", "gif", "mp4", "m4v", "doc", "docx", "xls", "xlsx", "pdf");
 			$file = $dir."/".$filename;
 			$parts = pathinfo($filename);
+			$realpath = realpath(".");
 
 			if (strpos($filename,"..")!==false) {
 				//This doesn't look good
@@ -179,7 +180,6 @@
 				$this->returndata();
 				return true;
 			}
-			
 			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".png";
 			if (file_exists($cache)) {
 				if ($render) {
@@ -195,10 +195,11 @@
 				}
 			}
 			
-			if (!is_dir("content/cache/".$parts["dirname"])) {
-				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
+			if (!is_dir($realpath."/content/cache/".$parts["dirname"])) {
+				$result = mkdir($realpath."/content/cache/".$parts["dirname"], 0755, true);
 			}
 			exec("convert '".escapeshellarg($file)."' -auto-level -background transparent -density 72 -depth 8 -strip -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
+			exec("optipng -o7 '{$cache}'");
 			if ($render) {
 				header("Content-type: image/png");
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
