@@ -140,6 +140,7 @@
 			$extent = "";
 			$grey = "";
 			$greystr = "";
+			$format = $this->input->get_post("format");
 			if (!empty($greyscale)) {
 				$grey = "-colorspace gray";
 				$greystr = "-greyscale";
@@ -153,11 +154,15 @@
 			if (empty($quality)) {
 				$quality = 80;
 			}
+			if (empty($format)) {
+				$format = "jpg";
+			}
 			$render = $this->input->get_post("render");
 			$dir = "content";
 			$filetypes = array("jpg", "jpeg", "png", "svg", "gif", "mp4", "m4v", "doc", "docx", "xls", "xlsx", "pdf");
 			$file = $dir."/".$filename;
 			$parts = pathinfo($filename);
+			$realpath = realpath(".");
 
 			if (strpos($filename,"..")!==false) {
 				//This doesn't look good
@@ -179,11 +184,10 @@
 				$this->returndata();
 				return true;
 			}
-			
-			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".png";
+			$cache = "content/cache/".$parts["dirname"]."/".smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".".$format;
 			if (file_exists($cache)) {
 				if ($render) {
-					header("Content-type: image/png");
+					header("Content-type: image/".$format);
 					header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
 			        header('Content-Length: '.filesize($cache));
 		    	    readfile($cache);
@@ -194,13 +198,13 @@
 					return true;
 				}
 			}
-			
-			if (!is_dir("content/cache/".$parts["dirname"])) {
-				$result=mkdir("content/cache/".$parts["dirname"], 0755, true);
+			if (!is_dir($realpath."/content/cache/".$parts["dirname"])) {
+				$result = mkdir($realpath."/content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert '".escapeshellarg($file)."' -auto-level -background transparent -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
+			exec("convert '".escapeshellarg($file)."' -auto-level -background transparent -density 72 -depth 8 -strip -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
+			//exec("optipng -o7 '{$cache}'");
 			if ($render) {
-				header("Content-type: image/png");
+				header("Content-type: image/".$format);
 				header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime($cache)).' GMT', true, 200);
 				header('Content-Length: '.filesize($cache));
 				readfile($cache);

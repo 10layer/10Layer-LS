@@ -80,7 +80,7 @@ $autoload['helper'] = array('url','string','javascript', 'apikey');
 |
 */
 
-$autoload['config'] = array();
+$autoload['config'] = array('');
 
 
 /*

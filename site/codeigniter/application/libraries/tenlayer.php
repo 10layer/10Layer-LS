@@ -117,7 +117,7 @@ class TenLayer {
 		return $items[$rand];
 	}
 
-	public function image($url, $width = 1000, $height = 1000, $bounding = true, $grey=false, $render = false) {
+	public function image($url, $width = 1000, $height = 1000, $bounding = true, $grey=false, $render = false, $format = 'jpg') {
 		if (is_array($url)) {
 			$url = array_pop($url);
 		}
@@ -140,12 +140,12 @@ class TenLayer {
 		if (empty($bounding)) {
 			$opstr = "bound";
 		}
-		$filename = "content/cache/".$parts["dirname"]."/".$this->smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".png";
+		$filename = "content/cache/".$parts["dirname"]."/".$this->smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".".$format;
 		if (file_exists("./".$filename)) {
 			return "/".$filename;
 		}
 		try {
-			$result=json_decode(file_get_contents($this->apiurl."files/image/?filename=$url&width=$width&height=$height&bounding=$_bounding&greyscale=$_grey"));
+			$result=json_decode(file_get_contents($this->apiurl."files/image/?filename=$url&width=$width&height=$height&bounding=$_bounding&greyscale=$_grey&format=$format"));
 			if (empty($result)) {
 				return false;
 			}
@@ -156,6 +156,11 @@ class TenLayer {
 			return false;
 		}
 		return "/".$result->filename."?dynamic";
+	}
+
+	public function shorturl($url) {
+		$result=json_decode(file_get_contents($this->apiurl."utils/shorturl/?url=".rawurlencode($url)));
+		return $result->shorturl;
 	}
 
 	protected function remove_accent($str) { 
