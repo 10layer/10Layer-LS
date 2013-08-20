@@ -18,6 +18,7 @@ class ShortUrl {
 	public function url($url) {
 		$query=$this->ci->mongo_db->get_where_one("shorturls", array("url"=>$url));
 		if (empty($query->shorturl)) {
+			$this->ci->mongo_db->where(array("url"=>$url))->delete("shorturls");
 			$shorturl = $this->_gen_url($url);
 			$this->ci->mongo_db->insert("shorturls", array(
 				"url"=>$url,
