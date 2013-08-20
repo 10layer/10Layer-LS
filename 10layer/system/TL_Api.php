@@ -50,7 +50,7 @@
 			if (is_array($akey) && isset($akey["_"])) {
 				unset($akey["_"]);
 			}
-			$this->key = md5($this->uri->uri_string()."?".http_build_query($akey));
+			$this->key = md5(base_url().$this->uri->uri_string()."?".http_build_query($akey));
 			$this->data = $this->m->get($this->key);
 			if (!empty($this->data)) {
 				$this->cached = true;
