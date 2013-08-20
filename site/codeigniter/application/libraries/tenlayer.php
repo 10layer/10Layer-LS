@@ -19,7 +19,9 @@ class TenLayer {
 	
 	public function get($id) {
 		try {
+			$this->ci->benchmark->mark('api_get_'.$id.'_start');
 			$result=json_decode(file_get_contents($this->apiurl."content/get?id=$id"));
+			$this->ci->benchmark->mark('api_get_'.$id.'_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -37,7 +39,9 @@ class TenLayer {
 			show_error("config should be an array");
 		}
 		try {
+			$this->ci->benchmark->mark('api_listing_start');
 			$result=json_decode(file_get_contents($this->apiurl."content/listing?".http_build_query($config)));
+			$this->ci->benchmark->mark('api_listing_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -52,7 +56,9 @@ class TenLayer {
 	
 	public function section($section_name) {
 		try {
+			$this->ci->benchmark->mark('api_section_'.$section_name.'_start');
 			$result=json_decode(file_get_contents($this->apiurl."publish/section/$section_name"));
+			$this->ci->benchmark->mark('api_section_'.$section_name.'_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -67,7 +73,9 @@ class TenLayer {
 	
 	public function zone($section, $zone) {
 		try {
+			$this->ci->benchmark->mark('api_zone_'.$section.'_'.$zone.'_start');
 			$result=json_decode(file_get_contents($this->apiurl."publish/zone/$section/$zone"));
+			$this->ci->benchmark->mark('api_zone_'.$section.'_'.$zone.'_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -83,7 +91,9 @@ class TenLayer {
 	public function nid_to_url($nid) {
 		$api_key = $this->ci->config->item("api_key");
 		try {
+			$this->ci->benchmark->mark('api_nid_to_url_'.$nid.'_start');
 			$result=json_decode(file_get_contents($this->apiurl."content/get?where_nid=$nid&api_key=$api_key"));
+			$this->ci->benchmark->mark('api_nid_to_url_'.$nid.'_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -102,7 +112,9 @@ class TenLayer {
 	
 	public function random($content_type) {
 		try {
+			$this->ci->benchmark->mark('api_random_'.$content_type.'_start');
 			$result=json_decode(file_get_contents($this->apiurl."content/listing/?content_type=$content_type"));
+			$this->ci->benchmark->mark('api_random_'.$content_type.'_end');
 			if (empty($result)) {
 				return false;
 			}
@@ -158,9 +170,16 @@ class TenLayer {
 		return "/".$result->filename."?dynamic";
 	}
 
-	public function shorturl($url) {
-		$result=json_decode(file_get_contents($this->apiurl."utils/shorturl/?url=".rawurlencode($url)));
-		return $result->shorturl;
+	public function shorturl($id, $url) {
+		$api_key = $this->ci->config->item("api_key");
+		$this->ci->benchmark->mark('api_shorturl_'.$url.'_start');
+		print $this->apiurl."content/shorturl/?api_key=$api_key&id=$id&url=".rawurlencode($url);
+		$result=json_decode(file_get_contents($this->apiurl."content/shorturl/?api_key=$api_key&id=$id&url=".rawurlencode($url)));
+		$this->ci->benchmark->mark('api_shorturl_'.$url.'_end');
+		if (!empty($result->_shorturl)) {
+			return $result->_shorturl;	
+		}
+		return $url;
 	}
 
 	protected function remove_accent($str) { 
