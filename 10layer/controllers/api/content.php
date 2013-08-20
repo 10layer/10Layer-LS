@@ -493,6 +493,35 @@
 			$this->cache();
 			$this->returndata();
 		}
+
+		/**
+		 * shorturl function.
+		 * 
+		 * Generates a shorturl and adds it to the content table. Note shorturl in utils
+		 * works a bit differently.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function shorturl() {
+			$this->enforce_secure();
+			if (empty($this->vars["id"])) {
+				$this->show_error("id required");
+			}
+			if (empty($this->vars["url"])) {
+				$this->show_error("url required");
+			}
+			$this->load->library("shorturl");
+			$data["_shorturl"] = $this->shorturl->url($this->vars["url"]);
+			//Update
+			$this->id();
+			$result=$this->mongo_db->upsert('content', $data);
+			//Update any instances where we've already published
+			$this->update_manifest($this->vars["id"]);
+			$this->m->flush(); //Clear the cache
+			$this->data["shorturl"] = $data["_shorturl"];
+			$this->returndata();
+		}
 		
 		//Callbacks
 		
