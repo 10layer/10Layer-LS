@@ -173,7 +173,6 @@ class TenLayer {
 	public function shorturl($id, $url) {
 		$api_key = $this->ci->config->item("api_key");
 		$this->ci->benchmark->mark('api_shorturl_'.$url.'_start');
-		print $this->apiurl."content/shorturl/?api_key=$api_key&id=$id&url=".rawurlencode($url);
 		$result=json_decode(file_get_contents($this->apiurl."content/shorturl/?api_key=$api_key&id=$id&url=".rawurlencode($url)));
 		$this->ci->benchmark->mark('api_shorturl_'.$url.'_end');
 		if (!empty($result->_shorturl)) {
