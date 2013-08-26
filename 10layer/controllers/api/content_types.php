@@ -57,6 +57,7 @@
 				$this->_save($data->content_type);
 			};
 			$this->data["content"]=$data;
+			$this->m->flush(); //Clear the cache
 			$this->returndata();
 		}
 		
