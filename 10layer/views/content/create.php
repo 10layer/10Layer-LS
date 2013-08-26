@@ -6,9 +6,9 @@
 <script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
-<script src="/resources/ckeditor2/ckeditor.js"></script>
-<script src="/resources/ckeditor2/adapters/jquery.js"></script>
-<script language="javascript" src="/resources/js/ckeditor-ck.js"></script>
+<script src="/resources/ckeditor4/ckeditor.js"></script>
+<script src="/resources/ckeditor4/adapters/jquery.js"></script>
+<script language="javascript" src="/resources/js/ckeditor.js"></script>
 <script language="javascript">
 	
 	var content_types=<?= json_encode($content_types); ?>;
