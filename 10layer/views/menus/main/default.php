@@ -99,6 +99,7 @@
 		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/healthchecks">Health Check</a></li>-->
 		<li class="menuitem"><a href="<?= base_url() ?>setup/users">Users</a></li>
 		<li class="menuitem"><a href="<?= base_url() ?>setup/content_types">Content Types</a></li>
+		<li class="menuitem"><a href="<?= base_url() ?>setup/api_keys">API Keys</a></li>
 		<!--<li class="menuitem"><a href="<?= base_url() ?>setup/security">Security</a></li>-->
 	</ul>
 </li>
