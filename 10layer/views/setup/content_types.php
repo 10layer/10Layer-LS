@@ -24,6 +24,7 @@
 	
 	var Field = function(data) {
 		var self = this;
+		self.isActive = ko.observable(false);
 		self.name = ko.observable(data.name);
 		self.isRemovable = (!_.contains(req_types, data.name));
 		self.label = ko.observable(data.label);
@@ -108,6 +109,7 @@
 			self.options.push(val);
 			e.target.value = "";
 		}
+
 	}
 	
 	var ContentType = function(data, key) {
@@ -164,6 +166,14 @@
 			}
 			var tmp = self.fields();
 			self.fields.splice(pos, 2, tmp[pos + 1], tmp[pos]);
+		}
+
+		self.clickActive = function(data) {
+			var tmp = self.fields();
+			_.each(tmp, function(item) { item.isActive(false); });
+			self.fields(tmp);
+			data.isActive(true);
+			//console.log(self.fields.indexOf(data));
 		}
 	};
 		
@@ -499,35 +509,40 @@
 </script>
 
 <div class="page-header">
-	<h1>Setup Content Types</h1>
+	<div class="row">
+		<div class="span4">
+			<h1>Content Types</h1>
+		</div>
+	
+		<div class="span8">
+			<p>This is where you set up the meat of your CMS, your content types. You can customise your website completely by using different content types.</p>
+			<p>There are some pre-made content types that you can select, or you can create your own.</p>
+			<p>It's okay to accept the defaults. You'll be able to come back and change the content types later.</p>
+		</div>
+	</div>
+</div>
+<div class="row">		
+	<div class="span4">
+		<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Update content types</button>
+		<p />
+		<div id="save_success" class="alert alert-success fade in" style="display: none"><a class="close" href="#">&times;</a> Content Types updated</div>
+		<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> Failed to update Content Types</div>
+	</div>
 </div>
 <form method="post">
 <div class="row">
-	<?php
-	$this->load->view("setup/menu");
-	?>
+	<div class="span2">
+		<ul class="nav nav-pills nav-stacked">
+			<!-- ko foreach: contentTypes -->
+			<li data-bind="css: { active: isActive }"><a href="#" data-bind=""><span data-bind="text:name, click: $parent.clickShowContentType"></span> <i data-bind="click: $parent.clickRemoveContentType" class="icon-remove"></i></a> </li>
+			<!-- /ko -->
+			<li><a href="#" data-bind="click: clickAddContentType"><i class="icon-plus"></i></a></li>
+		</ul>
+	</div>
 	<div class="span10">
-		<div class="row">
-			<div class="span6">
-				<p>This is where you set up the meat of your CMS, your content types. You can customise your website completely by using different content types.</p>
-				<p>There are some pre-made content types that you can select, or you can create your own.</p>
-				<p>It's okay to accept the defaults. You'll be able to come back and change the content types later.</p>
-			</div>
-			<div class="span4">
-				<button class="btn btn-large btn-primary" data-bind="click: save"><i class="icon-fire icon-white"></i> Update content types</button>
-				<p />
-				<div id="save_success" class="alert alert-success fade in" style="display: none"><a class="close" href="#">&times;</a> Content Types updated</div>
-				<div id="save_fail" class="alert alert-error fade in" style="display: none"><a class="close" href="#">&times;</a> Failed to update Content Types</div>
-			</div>
-		</div>
+		
 		<div id="content_type_app">
 			<script> var x=0; </script>
-			<ul class="nav nav-tabs">
-				<!-- ko foreach: contentTypes -->
-				<li data-bind="css: { active: isActive }"><a href="#" data-bind=""><span data-bind="text:name, click: $parent.clickShowContentType"></span> <i data-bind="click: $parent.clickRemoveContentType" class="icon-remove"></i></a> </li>
-				<!-- /ko -->
-				<li><a href="#" data-bind="click: clickAddContentType"><i class="icon-plus"></i></a></li>
-			</ul>
 			<!-- ko foreach: contentTypes -->
 				<!-- ko if: isActive -->
 			<fieldset class="form-inline">
@@ -540,17 +555,30 @@
 				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: collection"> Collection</label>
 			</fieldset>
 			<legend>Fields</legend>
+			<ul class="nav nav-tabs">
+				<!-- ko foreach: fields -->
+				<li data-bind="css: { active: isActive }">
+					<a href="#" data-bind="text:name, click: $parent.clickActive"></a>
+				</li>
+				<!-- /ko -->
+				<li>
+					<a href="#" class="" data-bind="click: clickAddField"><i class="icon-plus"></i></button></a>
+				</li>
+				
+			</ul>
+			<legend>Fields</legend>
 			<div data-bind="foreach: fields">
+				<!-- ko if: isActive -->
 				<div class="span9">
 				<fieldset>
-					<legend><button class='field-edit btn btn-small btn-primary'><i class='icon-edit icon-white'></i></button> 
+					<legend>
 						<!-- ko if: isRemovable -->
 						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
 						<!-- /ko -->
 						<span data-bind="text: name"></span> 
 						<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-up'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-down'></i></a></span>
 					</legend>
-					<div class='field-details' style='display: none'>
+					<div class='field-details'>
 						<label>Name</label>
 						<input type="text" name="name" value="" data-bind="value: name">
 					
@@ -625,10 +653,7 @@
 					</div>
 				</fieldset>
 				</div>
-			</div>
-				
-			<div class="span3">
-				<button class="btn btn-primary" data-bind="click: clickAddField"><i class="icon-plus icon-white"></i></button>
+				<!-- /ko -->
 			</div>
 				<!-- /ko -->
 			<!-- /ko -->
