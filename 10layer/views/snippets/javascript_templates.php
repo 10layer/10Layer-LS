@@ -497,9 +497,8 @@
 								selected = true;
 							}
 						}
-						//console.log(field.value, option);
 					%>
-					<%= (selected) ? 'selected="selected"' : '' %> ><%= option %></option>
+					<%= (selected) ? 'selected="selected"' : '' %> ><%= (!_.isNumber(key)) ? key : option %></option>
 				<% }); %>
 				</select>
 			</div>

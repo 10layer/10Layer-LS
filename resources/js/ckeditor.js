@@ -10,10 +10,10 @@ function clearCKEditor() {
 function parsePaste(data) {
 	data=data.replace(/<meta(?:.|\s)*?>/g,"");
 	
-	data=data.replace(/<span(?:.|\s)*?>/g,"");
-	data=data.replace(/<\/span>/g,"");
-	data=data.replace(/<div(?:.|\s)*?>/g,"");
-	data=data.replace(/<\/div>/g,"");
+	// data=data.replace(/<span(?:.|\s)*?>/g,"");
+	// data=data.replace(/<\/span>/g,"");
+	// data=data.replace(/<div(?:.|\s)*?>/g,"");
+	// data=data.replace(/<\/div>/g,"");
 	data=data.replace(/<font(?:.|\s)*?>/g,"");
 	data=data.replace(/<\/font>/g,"");
 	
@@ -23,25 +23,26 @@ function parsePaste(data) {
 	data=data.replace(/<fb:like(?:.|\s)*?>/g, "");
 	data=data.replace(/<\/fb:like>/g,"");
 	
-	data=data.replace(/<br><br>/g,"<br>");
-	data=data.replace(/<br(?:.|\s)*?>/g,"<p>");
+	// data=data.replace(/<br><br>/g,"<br>");
+	// data=data.replace(/<br(?:.|\s)*?>/g,"<p>");
 	
-	data=data.replace(/<p>$$/g,"");
+	// data=data.replace(/<p>$$/g,"");
 	return data;
 }
 
 function initCKEditor() {
 	clearCKEditor();
 	var config = {
-		toolbar: [
-			['Source','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize']
-		],
+		// toolbar: [
+		// 	['Source','-','Bold', 'Italic', '-', 'NumberedList', 'BulletedList', '-', 'Link', 'Unlink','-','Image','-','Maximize']
+		// ],
 		filebrowserImageBrowseUrl : '/workers/picturechooser/browse',
 		filebrowserWindowWidth  : 1000,
 		filebrowserWindowHeight : 600,
-		on : { 'paste' : function(ev) {
-			ev.data.html=parsePaste(ev.data.html);
-		} }
+		height: 400,
+		// on : { 'paste' : function(ev) {
+		// 	ev.data.html=parsePaste(ev.data.html);
+		// } }
 	};
 	$('.wysiwyg').ckeditor(config);
 	editors[editors.length] = $('.wysiwyg').ckeditorGet();

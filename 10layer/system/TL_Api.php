@@ -50,7 +50,7 @@
 			if (is_array($akey) && isset($akey["_"])) {
 				unset($akey["_"]);
 			}
-			$this->key = md5($this->uri->uri_string()."?".http_build_query($akey));
+			$this->key = md5(base_url().$this->uri->uri_string()."?".http_build_query($akey));
 			$this->data = $this->m->get($this->key);
 			if (!empty($this->data)) {
 				$this->cached = true;
@@ -118,6 +118,33 @@
 			}
 		}
 		
+		/**
+		 * This function should be called after updating a content item to fix the publishing collection
+		 *
+		 * @param $id Url ID
+		 * 
+		 */
+		protected function update_manifest($id) {
+			$data = $this->mongo_db->where("_id", $id)->get_one("content");
+			$published = $this->mongo_db->get_where("published", array("manifest._id"=>$id));
+			foreach($published as $section) {
+				//Find the relevant zones
+				$section_id = $section->_id;
+				unset($section->_id);
+				foreach($section->zones as $zonekey=>$zone) {
+					for($x = 0; $x < sizeof($zone); $x++) {
+						if ($zone[$x]["_id"] == $id) {
+							$zone[$x] = $data;
+							$zone[$x]->_id = $id;
+							$section->zones["$zonekey"] = $zone;
+							$update_result = $this->mongo_db->where(array("_id"=>$section_id))->upsert('published', $section);
+						}
+					}
+				}
+			}
+			return true;
+		}
+
 		protected function show_error($msg) {
 			$this->data["error"]=true;
 			$this->data["message"]=$msg;

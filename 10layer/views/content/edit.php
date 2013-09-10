@@ -7,10 +7,12 @@
 <script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
-<script src="/resources/ckeditor2/ckeditor.js"></script>
-<script src="/resources/ckeditor2/adapters/jquery.js"></script>
-<script language="javascript" src="/resources/js/ckeditor-ck.js"></script>
-
+<!-- <script src="/resources/ckeditor2/ckeditor.js"></script> -->
+<!-- <script src="/resources/ckeditor2/adapters/jquery.js"></script> -->
+<!-- <script language="javascript" src="/resources/js/ckeditor-ck.js"></script> -->
+<script language="javascript" src="/resources/ckeditor4/ckeditor.js"></script>
+<script src="/resources/ckeditor4/adapters/jquery.js"></script>
+<script language="javascript" src="/resources/js/ckeditor.js"></script>
 <script>
 	var currentpage=false;
 	
@@ -227,15 +229,73 @@
 			$.getJSON("<?= base_url() ?>api/content/get_linked_object?jsoncallback=?", { api_key: $(document.body).data('api_key'), id: urlid, meta: true }, function(data) {
 				$('#dyncontent').html(_.template($("#edit-template").html(), {data:data, content_type: content_type, urlid: urlid }));
 				init_form();
+				init_section_modal(content_type);
 				$(".chzn-select").chosen();
 			});
 		}
-		
+
+		init_section_modal = function(content_type) {
+			$("#modal-sections .modal-section").hide();
+			$("#modal-sections .checkbox").each(function() {
+				$(this).find("input").prop("checked", false);
+				var content_types = $(this).attr("data-content-types");
+				content_types = content_types.split(" ");
+				if (content_types.indexOf(content_type) >= 0) {
+					$(this).show();
+					$(this).parent().show();
+				} else {
+					$(this).hide();
+				}
+			});
+			$.getJSON("<?= base_url() ?>api/publish/document", {
+				api_key: "<?= $this->session->userdata('api_key') ?>",
+				id: $(document.body).data('urlid')
+			}, function(data) {
+				_.each(data.sections, function(zones, section) {
+					_.each(zones, function(zone) {
+						$("#modal-sections input[name=" + section+"]").each(function() {
+						 	if ($(this).val() == zone) {
+						 		$(this).prop("checked", true);
+						 	}
+						});
+					});
+				});
+			});
+		}
+
+		$(document).on('click', '#btn-publish-publish', function() {
+			$(document.body).data('action',"_edit");
+			save();
+			$.getJSON("<?= base_url() ?>api/publish/unpublish_document", {
+				api_key: "<?= $this->session->userdata('api_key') ?>",
+				id: $(document.body).data('urlid')
+			},
+			function(data) {
+				$("#modal-sections .checkbox input:checked").each(function() {
+					var section_id = $(this).attr("name");
+					var zone_id = $(this).val();
+					$.getJSON("<?= base_url() ?>api/publish/publish_document", {
+						api_key: "<?= $this->session->userdata('api_key') ?>",
+						section_id: section_id,
+						zone_id: zone_id,
+						id: $(document.body).data('urlid')
+					},
+					function(data) {
+					});
+				});
+			});
+			$("#modal-sections").modal("hide");
+		});
+
 		$(document).on('click', '.the_action', function() {
 			action = $(this).attr('id');
 			$(document.body).data('action',action);
 			save();
 			return false;
+		});
+
+		$(document).on('click', '#btn-publish', function() {
+			$("#modal-sections").modal();
 		});
 		
 		function save() {
@@ -397,8 +457,6 @@
 		
 		function uploadCanceled(e) {
 			$(document.body).data("saving",false);
-			console.log("uploadCanceled");
-			console.log(e);
 		}
 		
 		$(document).on('click', '.select_on_click', function() {
@@ -567,6 +625,24 @@
 			var section_title = $(this).attr("data-sectiontitle");
 			$("#published_list").append("<li><input type='hidden' name='autopublish_sections' value='"+section_id+"."+zone_urlid+"' /><a href='#'>"+section_title+" :: "+zone_title+"</li>");
 		});
+
+		$(document).on('click', '#select_all', function() {
+			$(".select_item").prop("checked", $(this).prop("checked"));
+		});
+
+		$(document).on('click', '.workflow_change', function() {
+			var workflow = $(this).attr("data-workflow");
+			var items = [];
+			$(".select_item:checked").each(function() {
+				items.push({ id: $(this).val(), workflow_status: workflow });
+			});
+			$.getJSON("<?= base_url() ?>api/content/multiple/change_workflow?jsoncallback=?", { items: items, api_key: $(document.body).data('api_key') }, function(data) {
+				$(".select_item:checked").each(function() {
+					$(this).parent().parent().children().last().html(workflow);
+					$(this).dropdown("toggle");
+				});
+			});
+		});
 				
 	}); //End of $(function)
 	
@@ -582,9 +658,9 @@
 		<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
 			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
 			<ul class="dropdown-menu">
-				<!--<li><a href="#" class="group_action" data-action="">Create</a></li>
-				<li><a href="#">Edit</a></li>
-				<li><a href="#">Publish</a></li>-->
+				<li><a href="#" class="workflow_change" data-workflow="New">Workflow - New</a></li>
+				<li><a href="#" class="workflow_change" data-workflow="Edited">Workflow - Edited</a></li>
+				<li><a href="#" class="workflow_change" data-workflow="Published">Workflow - Published</a></li>
 				<li><a href="#" id="_delete_multiple">Delete</a></li>
 			</ul>
 		</div>
@@ -605,7 +681,7 @@
 	<table class='table table-bordered table-striped table-condensed'>
 	    <thead>
 	    <tr>
-	    	<th></th>
+	    	<th><input type="checkbox" class="select-all" id="select_all" /></th>
 	    	<th>Title</th>
 	    	<th>Last Edit</th>
 	    	<th>Edited by</th> 
@@ -678,7 +754,7 @@
 					<li class='divider-vertical'></li>
 					<li><button id="_edit" class="the_action btn btn-mini btn-info">Save and Edit</button></li>
 					<li class='divider-vertical'></li>
-					<li><button id="_publish" class="the_action btn btn-mini btn-warning">Save and Publish</button></li>
+					<li><button id="btn-publish" class="btn btn-mini btn-warning">Save and Publish</button></li>
 					<li class='divider-vertical'></li>
 					<li><button id="_delete" class="btn btn-mini btn-danger">Delete</button></li>
 					<li class="divider-vertical"></li>
@@ -754,6 +830,46 @@
 	</div>
 	<div class="modal-footer">
 		<div id="msgdialog-buttons" class="btn-group">
+		</div>
+	</div>
+</div>
+
+<div id="modal-sections" class="modal hide fade" role="dialog">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="msgdialog-header">Publish to Sections</h3>
+	</div>
+	<div class="modal-body">
+		<form id="modal-sections-form">
+			<?php
+			$collections=$this->model_collections->get_all();
+			foreach($collections as $collection) {
+				$sections=$this->model_collections->get_options($collection->_id);
+				foreach($sections as $section) {
+				?>
+				<div class="modal-section" data-section="<?= $section->_id ?>">
+					<h3><?= $section->title ?></h3>
+					<?php
+					foreach($section->zone as $zone) {
+					?>
+					<label class="checkbox" data-content-types="<?= implode(' ', $zone["zone_content_types"]) ?>">
+						<input type="checkbox" name="<?= $section->_id ?>" value="<?= $zone["zone_urlid"] ?>" />
+						<?= $zone["zone_name"] ?>
+					</label>
+					<?php
+					}
+				?>
+				</div>
+				<?php
+				}
+			}
+			?>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<div class="btn-group">
+			<a href="#" id="btn-publish-publish" class="btn btn-primary">Publish</a>
+			<a href="#" class="btn btn-warning" data-dismiss="modal">Cancel</a>
 		</div>
 	</div>
 </div>

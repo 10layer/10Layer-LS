@@ -11,6 +11,7 @@ Requirements
 - ImageMagick
 - MongoDB
 - MongoDB PHP drivers
+- OptiPNG (Recommended)
 
 License
 =======
@@ -42,7 +43,7 @@ We generate a public and private key
 
 We install the prerequisites. Choose "Internet Site" for the Postfix setup.
 	
-	apt-get install git-core mongodb-server php5 apache2 php5-dev php-pear build-essential postfix imagemagick
+	apt-get install git-core mongodb-server php5 apache2 php5-dev php-pear build-essential postfix imagemagick optipng
 	
 We install the Mongo drivers for PHP. In Debian, this should be available as a package, so you could alternatively apt-get install php-mongo.
 	

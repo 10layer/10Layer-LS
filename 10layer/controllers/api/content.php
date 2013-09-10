@@ -158,9 +158,8 @@
 			}
 			$this->_check_callbacks();
 			$this->data["count"]=1;
-			$this->mongo_db->limit(1);
 			$this->data["criteria"]["limit"]=1;
-			$content=array_pop($this->mongo_db->limit(1)->get("content"));
+			$content=$this->mongo_db->get_one("content");
 
 			$content_type=$this->get_content_type();
 			$fields=$this->get_field_data($content_type);
@@ -172,14 +171,18 @@
 					array_push($observed, $field);
 				}
 			}
-			foreach($observed as $the_field){
+			foreach($observed as $the_field) {
 				$field_name = $the_field->name;
-				$value = $content->$field_name;
-				if(is_array($value)){
-					$vals = array_values_recursive($value);
-					$content->$field_name = $this->mongo_db->where_in("_id", $vals)->get('content');
+				if (isset($content->$field_name)) {
+					$value = $content->$field_name;
+					if(is_array($value)){
+						$vals = array_values_recursive($value);
+						$content->$field_name = $this->mongo_db->where_in("_id", $vals)->get('content');
+					} else {
+						$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
+					}
 				} else {
-					$content->$field_name = $this->mongo_db->where(array("_id"=>$value))->get('content');
+					$value = false;
 				}
 			}
 				
@@ -294,29 +297,13 @@
 				$this->id();
 				$result=$this->mongo_db->upsert('content', $data);
 				//Update any instances where we've already published
-				$published = $this->mongo_db->get_where("published", array("manifest._id"=>$id));
-				foreach($published as $section) {
-					//Find the relevant zones
-					$section_id = $section->_id;
-					unset($section->_id);
-					foreach($section->zones as $zonekey=>$zone) {
-						for($x = 0; $x < sizeof($zone); $x++) {
-							if ($zone[$x]["_id"] == $id) {
-								$zone[$x] = $data;
-								$zone[$x]->_id = $id;
-								$section->zones["$zonekey"] = $zone;
-								$update_result = $this->mongo_db->where(array("_id"=>$section_id))->upsert('published', $section);
-							}
-						}
-					}
-				}
+				$this->update_manifest($id);
 			} else {
 				$data->content_type=$content_type;
 				$data->timestamp=time();
 				$data->_id=$urlid;
 				$result=$this->mongo_db->insert('content', $data);
 			}
-			//unset($data->id);
 			$this->data["id"]=$urlid;
 			if (!$result) {
 				$this->data["error"]=true;
@@ -327,6 +314,26 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
+			$this->returndata();
+		}
+
+
+		public function change_workflow() {
+			$this->enforce_secure();
+			if (empty($this->vars["id"])) {
+				$this->show_error("id required");
+			}
+			if (empty($this->vars["workflow_status"])) {
+				$this->show_error("workflow_status required");
+			}
+			$this->id();
+			//$doc = $this->mongo_db->get_one("content");
+			//$doc->workflow_status = $this->vars["workflow_status"];
+			$this->mongo_db->update("content", array("workflow_status"=>$this->vars["workflow_status"]));
+			$this->update_manifest($this->vars["id"]);
+			$this->m->flush(); //Clear the cache
+			$this->data["id"] = $this->vars["id"];
+			$this->data["workflow_status"] = $this->vars["workflow_status"];
 			$this->returndata();
 		}
 		
@@ -484,6 +491,35 @@
 			$this->data["criteria"]["limit"]=0;
 			$this->data["content"]=false;
 			$this->cache();
+			$this->returndata();
+		}
+
+		/**
+		 * shorturl function.
+		 * 
+		 * Generates a shorturl and adds it to the content table. Note shorturl in utils
+		 * works a bit differently.
+		 *
+		 * @access public
+		 * @return void
+		 */
+		public function shorturl() {
+			$this->enforce_secure();
+			if (empty($this->vars["id"])) {
+				$this->show_error("id required");
+			}
+			if (empty($this->vars["url"])) {
+				$this->show_error("url required");
+			}
+			$this->load->library("shorturl");
+			$data["_shorturl"] = $this->shorturl->url($this->vars["url"]);
+			//Update
+			$this->id();
+			$result=$this->mongo_db->upsert('content', $data);
+			//Update any instances where we've already published
+			$this->update_manifest($this->vars["id"]);
+			$this->m->flush(); //Clear the cache
+			$this->data["shorturl"] = $data["_shorturl"];
 			$this->returndata();
 		}
 		

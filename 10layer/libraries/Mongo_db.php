@@ -408,8 +408,42 @@ class Mongo_db {
 	
 	function where_near($field = '', $co = array())
 	{
-		$this->__where_init($field);
-		$this->where[$what]['$near'] = $co;
+		$this->_where_init($field);
+		$this->wheres[$what]['$near'] = $co;
+		return($this);
+	}
+
+	/**
+	*	--------------------------------------------------------------------------------
+	*	WHERE EXISTS
+	*	--------------------------------------------------------------------------------
+	*
+	*	Get documents which have certain parameters set
+	*
+	*	@usage : $this->mongo_db->where_exists('foo')->get('foobar');
+	*/
+	
+	function where_exists($field = '')
+	{
+		$this->_where_init($field);
+		$this->wheres[$field]['$exists'] = true;
+		return($this);
+	}
+
+	/**
+	*	--------------------------------------------------------------------------------
+	*	WHERE NOT EXISTS
+	*	--------------------------------------------------------------------------------
+	*
+	*	Get documents which don't have certain parameters set
+	*
+	*	@usage : $this->mongo_db->where_not_exists('foo')->get('foobar');
+	*/
+	
+	function where_not_exists($field = '')
+	{
+		$this->_where_init($field);
+		$this->wheres[$field]['$exists'] = false;
 		return($this);
 	}
 	
@@ -458,6 +492,23 @@ class Mongo_db {
 		$this->wheres[$field] = new MongoRegex($regex);
 		return($this);
 	}
+
+	public function or_like($field = "", $value = "", $flags = "i", $enable_start_wildcard = TRUE, $enable_end_wildcard = TRUE) {
+		$field = (string) trim($field);
+		// $this->_where_init($field);
+		//$this->wheres['$or'][$field] = array();
+		$value = (string) trim($value);
+		$value = quotemeta($value);
+		if($enable_start_wildcard !== TRUE):
+			$value = "^" . $value;
+		endif;
+		if($enable_end_wildcard !== TRUE):
+			$value .= "$";
+		endif;
+		$regex = "/$value/$flags";
+		$this->wheres['$or'][][$field] = new MongoRegex($regex);
+		return($this);
+	}
 	
 	/**
 	*	--------------------------------------------------------------------------------
@@ -478,12 +529,21 @@ class Mongo_db {
 					$parts=explode(' ',$val);
 					$this->sorts[$parts[0]] = -1;
 				} else {
+					if (strpos($val, " ")!==false) {
+						$parts=explode(' ',$val);
+						$val = $parts[0];
+					}
 					$this->sorts[$val] = 1;
 				}
 			} else if($val == -1 || $val === FALSE || strtolower($val) == 'desc'):
 				$this->sorts[$col] = -1; 
 			else:
+				if (strpos($val, " ")!==false) {
+					$parts=explode(' ',$val);
+					$val = $parts[0];
+				}
 				$this->sorts[$col] = 1;
+
 			endif;
 		endforeach;
 		return($this);

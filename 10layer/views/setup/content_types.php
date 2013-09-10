@@ -226,7 +226,7 @@
 		
 		self.save = function() {
 			$.ajax("/api/content_types/save?api_key=<?= $this->session->userdata("api_key") ?>", {
-				data: ko.toJSON({ content_types: self.contentTypes() }),
+				data: ko.toJSON({ content_types: self.contentTypes(), delete_all: true }),
 				type: "post", contentType: "application/json",
 				success: function(result) { 
 					if (result.error) {
@@ -360,6 +360,10 @@
 		{
 			fn: "safetext",
 			hint: "Returns very, very clean text",
+		},
+		{
+			fn: "extract_image",
+			hint: "Grabs an image from a file",
 		},
 		{
 			fn: "custom",
