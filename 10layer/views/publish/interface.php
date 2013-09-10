@@ -37,7 +37,7 @@
 		
 		
 		$.getJSON("/api/publish/zone/<?= $collection->_id ?>/"+self.id(), function(data) {
-			if (data.content && data.content.length) {
+			if (data.content) {
 				var mapped = _.map( data.content, function(item) {
 					return new Content(item);
 				});
