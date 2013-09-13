@@ -227,11 +227,11 @@
 				msg.push("UrlID cannot be empty");
 				pass = false;
 			}
-			if (!_.isNumber(self.newZone().max_items())) {
+			if (!_.isNumber(parseInt(self.newZone().max_items()))) {
 				msg.push("Max items must be numeric");
 				pass = false;
 			}
-			if (!_.isNumber(self.newZone().min_items())) {
+			if (!_.isNumber(parseInt(self.newZone().min_items()))) {
 				msg.push("Min items must be numeric");
 				pass = false;
 			}
