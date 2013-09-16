@@ -40,6 +40,7 @@ function initCKEditor() {
 		filebrowserWindowWidth  : 1000,
 		filebrowserWindowHeight : 600,
 		height: 400,
+		extraPlugins: 'youtube',
 		// on : { 'paste' : function(ev) {
 		// 	ev.data.html=parsePaste(ev.data.html);
 		// } }
