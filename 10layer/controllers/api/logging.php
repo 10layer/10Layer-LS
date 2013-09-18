@@ -27,19 +27,33 @@
 		 *
 		 */
 		public function hit() {
-			$content_type = $this->uri->segment(4);
-			$id = $this->uri->segment(5);
-			if (isset($this->vars["ip_address"])) {
-				$ip_address = $this->vars["ip_address"];
-			} else {
-				$ip_address = $this->input->ip_address();
+			$this->load->library('user_agent');
+			if ($this->agent->is_robot()) {
+				//Robot, don't log a hit
+				$this->returndata();
+				return;
 			}
-			if (isset($this->vars["user_agent"])) {
-				$user_agent = $this->vars["user_agent"];
-			} else {
-				$user_agent = $this->input->user_agent();
+			$dbdata = array();
+			$referrer = $this->agent->referrer();
+			$parts = explode("/", $referrer);
+			$id = array_pop($parts);
+			if ($this->mongo_db->where(array("_id" => $id))->count("content") > 0) {
+				$dbdata["content_type"] = array_pop($parts);
+				$dbdata["content_id"] = $id;
 			}
-			$this->mongo_db->insert("hits", array("content_id"=>$id, "content_type"=>$content_type, "timestamp"=>time(), "ip_address" => $ip_address, "user_agent" => $user_agent));
+			
+			$dbdata["url"] = $referrer;
+			
+			$dbdata["ip_address"] = $this->input->ip_address();
+			
+			$dbdata["user_agent"] = $this->input->user_agent();
+			
+			$dbdata["is_mobile"] = $this->agent->is_mobile();
+
+			$dbdata["timestamp"] = time();
+
+			$this->mongo_db->insert("hits", $dbdata);
+			
 			$this->returndata();
 		}
 
