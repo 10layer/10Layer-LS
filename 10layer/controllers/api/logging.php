@@ -29,7 +29,17 @@
 		public function hit() {
 			$content_type = $this->uri->segment(4);
 			$id = $this->uri->segment(5);
-			$this->mongo_db->insert("hits", array("content_id"=>$id, "content_type"=>$content_type, "timestamp"=>time()));
+			if (isset($this->vars["ip_address"])) {
+				$ip_address = $this->vars["ip_address"];
+			} else {
+				$ip_address = $this->input->ip_address();
+			}
+			if (isset($this->vars["user_agent"])) {
+				$user_agent = $this->vars["user_agent"];
+			} else {
+				$user_agent = $this->input->user_agent();
+			}
+			$this->mongo_db->insert("hits", array("content_id"=>$id, "content_type"=>$content_type, "timestamp"=>time(), "ip_address" => $ip_address, "user_agent" => $user_agent));
 			$this->returndata();
 		}
 
