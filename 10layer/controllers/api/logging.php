@@ -4,7 +4,8 @@
 	/**
 	 * Logging class
 	 * 
-	 * Example: logging/hit/article/2013-01-01-blah
+	 * Example to put in your footer on your site:
+	 * <script>$.get("<?= $this->config->item('apiurl') ?>logging/hit");</script>
 	 *
 	 * @extends CI_Controller
 	 */
