@@ -47,7 +47,7 @@
 		public function save() {
 			$data = $this->vars;
 			if (!empty($data->delete_all)) {
-				$this->mongo_db->delete("content_types");
+				$this->mongo_db->delete_all("content_types");
 			}
 			if (isset($data->content_types) && is_array($data->content_types)) {
 				foreach($data->content_types as $ct) {
