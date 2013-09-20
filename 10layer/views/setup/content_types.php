@@ -123,8 +123,12 @@
 		self.fields = ko.observableArray([]);
 		self.fields(
 			_.map(
-				data.fields, function(item) { 
-					return new Field(item)
+				data.fields, function(item, key) {
+					var f = new Field(item);
+					if (key == 0) {
+						f.isActive(true);
+					}
+					return f;
 				}
 			)
 		);
@@ -558,7 +562,12 @@
 			<ul class="nav nav-tabs">
 				<!-- ko foreach: fields -->
 				<li data-bind="css: { active: isActive }">
-					<a href="#" data-bind="text:name, click: $parent.clickActive"></a>
+					<a href="#" data-bind="click: $parent.clickActive"><span data-bind="text:name"></span> <!-- ko if: isRemovable -->
+					<i data-bind="click: $parent.clickRemove" class='icon-trash'></i>
+					<!-- /ko -->
+					<i data-bind='click: $parent.moveLeft' class='icon-arrow-left'></i><i data-bind='click: $parent.moveRight' class='icon-arrow-right'></i>
+					</a>
+					
 				</li>
 				<!-- /ko -->
 				<li>
