@@ -56,6 +56,35 @@
 				init_form();
 			});
 		}
+
+		var hook_final = function() {};
+
+		$(document).on('click', '#btn-publish', function() {
+			var workflow_el = $(document.body).data('content_type')+"_workflow_status";
+			$("[name='"+workflow_el+"']").val("Published");
+			$("#modal-sections").modal();
+		});
+		$(document).on('click', '#btn-publish-publish', function() {
+
+			$(document.body).data('action',"_edit");
+			save();
+			hook_final = function() {
+
+				$("#modal-sections .checkbox input:checked").each(function() {
+					var section_id = $(this).attr("name");
+					var zone_id = $(this).val();
+					$.getJSON("<?= base_url() ?>api/publish/publish_document", {
+						api_key: "<?= $this->session->userdata('api_key') ?>",
+						section_id: section_id,
+						zone_id: zone_id,
+						id: $(document.body).data('urlid')
+					},
+					function(data) {
+					});
+				});
+			}
+			$("#modal-sections").modal("hide");
+		});
 		
 		$(document).on('click', '.the_action', function() {
 			action = $(this).attr('id');
@@ -147,6 +176,7 @@
 			    $("#msgdialog").modal();
 			} else {
 
+				$(document.body).data('urlid', data.id);
 
 				var url = '<?php echo base_url(); ?>';    
 				if($(document.body).data("action") == '_create'){
@@ -160,6 +190,8 @@
 				if($(document.body).data("action") == '_edit'){
 					url += 'edit/'+$(document.body).data('content_type')+"/"+data.id;
 				}
+
+				hook_final();
 
 				$(location).attr('href',url);
 				
@@ -332,7 +364,7 @@
 				<li class='divider-vertical'></li>
 				<li><button id="_edit" class="the_action btn btn-mini btn-warning" id="dosubmit_right">Save and Edit</button></li>
 				<li class='divider-vertical'></li>
-				<li><button id="_publish" class="the_action btn btn-mini btn-danger" id="dosubmit_right">Save and Publish</button></li>
+				<li><button class="btn btn-mini btn-danger" id="btn-publish">Save and Publish</button></li>
 				<li class='divider-vertical'></li>
 				<li style=" padding-top:5px; width:300px;">
 					<div id='progress_container' style='display:none;' class="progress progress-striped active">
@@ -360,6 +392,46 @@
 <div id="createdialog"></div>
 <div id="dyncontent">
 
+</div>
+
+<div id="modal-sections" class="modal hide fade" role="dialog">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="msgdialog-header">Publish to Sections</h3>
+	</div>
+	<div class="modal-body">
+		<form id="modal-sections-form">
+			<?php
+			$collections=$this->model_collections->get_all();
+			foreach($collections as $collection) {
+				$sections=$this->model_collections->get_options($collection->_id);
+				foreach($sections as $section) {
+				?>
+				<div class="modal-section" data-section="<?= $section->_id ?>">
+					<h3><?= $section->title ?></h3>
+					<?php
+					foreach($section->zone as $zone) {
+					?>
+					<label class="checkbox" data-content-types="<?= implode(' ', $zone["zone_content_types"]) ?>">
+						<input type="checkbox" name="<?= $section->_id ?>" value="<?= $zone["zone_urlid"] ?>" />
+						<?= $zone["zone_name"] ?>
+					</label>
+					<?php
+					}
+				?>
+				</div>
+				<?php
+				}
+			}
+			?>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<div class="btn-group">
+			<a href="#" id="btn-publish-publish" class="btn btn-primary">Publish</a>
+			<a href="#" class="btn btn-warning" data-dismiss="modal">Cancel</a>
+		</div>
+	</div>
 </div>
 <?php
 	$this->load->view("templates/footer");
