@@ -88,7 +88,13 @@
 				$this->show_error("No results found for $section_id");
 			}
 			if (isset($section->zones[$zone_id])) {
-				$this->data["content"] = $section->zones[$zone_id];
+				$content = $section->zones[$zone_id];
+				for($x=0; $x < sizeof($content); $x++) {
+					if (empty($content[$x])) {
+						unset($content[$x]);
+					}
+				}
+				$this->data["content"] = $content;
 			}
 			$this->cache();
 			$this->returndata();
