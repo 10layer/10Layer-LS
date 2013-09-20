@@ -201,7 +201,7 @@
 			if (!is_dir($realpath."/content/cache/".$parts["dirname"])) {
 				$result = mkdir($realpath."/content/cache/".$parts["dirname"], 0755, true);
 			}
-			exec("convert ".escapeshellarg($file)." -auto-level -background transparent -density 72 -depth 8 -strip -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality 80 -gravity center $extent '{$cache}'", $result);
+			exec("convert ".escapeshellarg($file)." -auto-level -background transparent -density 72 -depth 8 -strip -resize ".escapeshellarg($width)."x".escapeshellarg($height)."{$op} {$grey} -quality $quality -gravity center $extent '{$cache}'", $result);
 			//exec("optipng -o7 '{$cache}'");
 			if ($render) {
 				header("Content-type: image/".$format);
