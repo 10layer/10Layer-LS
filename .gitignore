@@ -3,8 +3,7 @@
 */logs/!index.html
 */cache/*
 */cache/!index.html
-application/config/mongodb.php
 /content
-application/config/mongodb.php
+/application/config/mongodb.php
 application/config/10layer.php
 .vagrant/
