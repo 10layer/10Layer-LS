@@ -59,6 +59,16 @@ class apache {
 			require => Package["php5"],
 	}
 	->
+	package {
+		"memcached":
+			ensure => present,
+	}
+	->
+	package {
+		"php5-memcached":
+			ensure => present,
+			require => Package["php5"],
+	}
 	exec { 'pecl-mongo-install':
        command => '/usr/bin/pecl install mongo',
        unless => "/usr/bin/pecl info mongo",
