@@ -19,6 +19,15 @@ class apache {
 			require => Exec["apt-get update"],
 	}
 	->
+	file {
+   		"/etc/apache2/sites-available/default":
+   			owner => root,
+   			group => root,
+   			mode => 0644,
+   			source => "/vagrant/puppet/conf/default",
+   			notify => Service["apache2"],
+    }
+	->
 	service {
 		"apache2":
 			ensure => running,
