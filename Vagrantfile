@@ -14,5 +14,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision :puppet, :manifests_path => "puppet/manifests"
 
+  config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :owner => "www-data", :group => "www-data"
 
 end
