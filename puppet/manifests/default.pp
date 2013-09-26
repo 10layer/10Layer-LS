@@ -69,6 +69,14 @@ class apache {
 			ensure => present,
 			require => Package["php5"],
 	}
+	->
+	package {
+		"php5-curl":
+			ensure => present,
+			require => Package["php5"],
+			notify => Service['apache2'],
+	}
+	
 	exec { 'pecl-mongo-install':
        command => '/usr/bin/pecl install mongo',
        unless => "/usr/bin/pecl info mongo",
@@ -91,6 +99,8 @@ class apache {
 			notify => Service["apache2"],
 			require => Package["apache2"],
 	}
+
+
 }
 
 class imagemagick {
