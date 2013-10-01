@@ -693,7 +693,7 @@
 		<% var x=0; _.each(content, function(item) {  %>
 	    <tr id="row_<%= item.id %>">
 	    	<td><input type="checkbox" class="select_item" name="select_item" value="<%= item._id %>"></td>
-	    	<td class='content-workflow-<%= item.workflow_status %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
+	    	<td class='<%= item.workflow_status.toLowerCase() %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
 	    	<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
 	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
 	    	<td style="width: 100px"><%= dateToString(item.start_date) %></td>
