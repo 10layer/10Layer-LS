@@ -41,6 +41,8 @@ function initCKEditor() {
 		filebrowserWindowHeight : 600,
 		height: 400,
 		extraPlugins: 'youtube',
+		contentsCss: '/resources/bootstrap/css/bootstrap.min.css',
+		extraAllowedContent: '*(*)',
 		// on : { 'paste' : function(ev) {
 		// 	ev.data.html=parsePaste(ev.data.html);
 		// } }
