@@ -7,3 +7,4 @@
 /application/config/mongodb.php
 application/config/10layer.php
 .vagrant/
+.DS_Store
