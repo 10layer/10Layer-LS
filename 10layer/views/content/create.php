@@ -3,6 +3,9 @@
 	$data["menu2_active"]="create/".$type;
 	$this->load->view('templates/header',$data);
 ?>
+<?php
+	$this->socketio->js();
+?>
 <script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
