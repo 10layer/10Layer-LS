@@ -8,12 +8,20 @@
  */
 class Home extends CI_Controller {
 
-	function __construct() {
+	public function __construct() {
 		parent::__construct();
 		//$this->load->library("google_analytics");
 	}
 	
-	function index() {
+	public function index() {
+		$data["menu1_active"]="home";
+		$this->load->view('templates/header',$data);
+		$this->load->view('home/custom',$data);
+		$this->load->view("templates/footer");
+	}
+
+	public function _remap() {
+		$data["content_type"] = $this->uri->segment(2);
 		$data["menu1_active"]="home";
 		$this->load->view('templates/header',$data);
 		$this->load->view('home/custom',$data);
