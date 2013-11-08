@@ -35,4 +35,7 @@
 	);
 
 	$config["google_api_key"] = "";
+
+	$config["socket_io_enable"] = true;
+	$config["socket_io_server"] = "http://localhost:8181"; # Include port
 ?>
