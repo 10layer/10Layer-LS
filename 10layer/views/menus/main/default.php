@@ -43,7 +43,7 @@
 		}
 		if (isset($content_type->_id)) {
 	?>
-	<li class="menuitem"><?= anchor("edit/".$content_type->_id,$content_type->name) ?></li>
+	<li class="menuitem"><?= anchor("listing/".$content_type->_id,$content_type->name) ?></li>
 	<?php
 		}
 	}
