@@ -19,6 +19,7 @@
 		}
 		
 		public function _remap() {
+			$this->load->library("socketio");
 			$type=$this->uri->segment(1);
 			$urlid=$this->uri->segment(2);
 			$data["type"]=$type;
