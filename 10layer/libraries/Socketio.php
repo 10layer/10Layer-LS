@@ -18,6 +18,7 @@
 		protected $ci = false;
 		protected $elephant = false;
 		protected $server = "http://localhost:8181";
+		protected $running = false;
 		
 		
 		/**
@@ -32,18 +33,28 @@
 			$this->elephant = new Elephant($this->server, 'socket.io', 1, false, true, true);
 			try {
 				$this->elephant->init();
+				$this->running = true;
 			} catch (Exception $e) {
-				show_error("Socket.io error: ".$e->getMessage());
+				// show_error("Socket.io error: ".$e->getMessage());
+				$this->running = false;
 			}
 		}
 
 		public function emit($key, $val) {
-			$this->elephant->emit($key, $val, null);
+			if ($this->running) {
+				$this->elephant->emit($key, $val, null);
+			}
 		}
 
 		public function js() {
-			$data["server"] = $this->server;
-			$this->ci->load->view("snippets/socketio_javascript", $data);
+			if ($this->running) {
+				$data["server"] = $this->server;
+				$this->ci->load->view("snippets/socketio_javascript", $data);
+			}
+		}
+
+		public function is_running() {
+			return $this->running;
 		}
 
 	}
