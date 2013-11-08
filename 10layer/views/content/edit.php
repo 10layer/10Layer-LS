@@ -3,6 +3,9 @@
 	$data["menu2_active"]="edit/".$type;
 	$this->load->view('templates/header',$data);
 ?>
+<?php
+	$this->socketio->js();
+?>
 <script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
@@ -367,7 +370,7 @@
 
 				var url = '<?php echo base_url(); ?>';    
 				if($(document.body).data("action") == '_done'){
-					url += 'edit/'+$(document.body).data('content_type');
+					url += 'listing/'+$(document.body).data('content_type');
 				}
 
 
@@ -651,21 +654,25 @@
 </script>
 <script type="text/template" id="listing-template">
 	<div id="contentlist" class="boxed full">
-		<div id='pagination' class='pagination' style="float: left; margin-right: 50px"></div>
-		<div id="listSearchContainer" style="float: left; margin-right: 50px; margin-top: 20px">
-			<%= _.template($('#listing-template-search').html(), { search: data.search, content_type: content_type }) %>
+		<div class="row">
+			<div id='pagination' class='pagination' style="float: left; margin-right: 50px"></div>
+			<div id="listSearchContainer" style="float: left; margin-right: 50px; margin-top: 20px">
+				<%= _.template($('#listing-template-search').html(), { search: data.search, content_type: content_type }) %>
+			</div>
+			<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
+				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="#" class="workflow_change" data-workflow="New">Workflow - New</a></li>
+					<li><a href="#" class="workflow_change" data-workflow="Edited">Workflow - Edited</a></li>
+					<li><a href="#" class="workflow_change" data-workflow="Published">Workflow - Published</a></li>
+					<li><a href="#" id="_delete_multiple">Delete</a></li>
+				</ul>
+			</div>
 		</div>
-		<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li><a href="#" class="workflow_change" data-workflow="New">Workflow - New</a></li>
-				<li><a href="#" class="workflow_change" data-workflow="Edited">Workflow - Edited</a></li>
-				<li><a href="#" class="workflow_change" data-workflow="Published">Workflow - Published</a></li>
-				<li><a href="#" id="_delete_multiple">Delete</a></li>
-			</ul>
-		</div>
-		<div id='content-table'>
-			<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
+		<div class="row">
+			<div id='content-table'>
+				<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
+			</div>
 		</div>
 	</div>
 </script>
@@ -690,20 +697,23 @@
 	    </tr>
 	    </thead>
 	    <tbody>
-		<% var x=0; _.each(content, function(item) {  %>
-	    <tr id="row_<%= item.id %>">
-	    	<td><input type="checkbox" class="select_item" name="select_item" value="<%= item._id %>"></td>
-	    	<td class='<%= item.workflow_status.toLowerCase() %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
-	    	<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
-	    	<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-	    	<td style="width: 100px"><%= dateToString(item.start_date) %></td>
-	    	<td class='content-workflow-<%= item.workflow_status %>'><%= item.workflow_status %></td>
-	    </tr>
-		<% x++; }); %>
+		<% var x=0; _.each(content, function(item) { %>
+		<%=	_.template($("#listing-template-content-row").html(), { item: item } ) %>
+		<% }); %>
 	    </tbody>
 	</table>
 </script>
 
+<script type='text/template' id='listing-template-content-row'>
+	<tr id="row_<%= item._id %>" data-urlid="<%= item._id %>">
+		<td><input type="checkbox" class="select_item" name="select_item" value="<%= item._id %>"></td>
+		<td class='<%= item.workflow_status.toLowerCase() %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
+		<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
+		<td><%= (item.last_editor) ? item.last_editor : '' %></td>
+		<td style="width: 100px"><%= dateToString(item.start_date) %></td>
+		<td class='content-workflow-<%= item.workflow_status %>'><%= item.workflow_status %></td>
+	</tr>
+</script>
 
 
 <script type='text/template' id='edit-template'>
