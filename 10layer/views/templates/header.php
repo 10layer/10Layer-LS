@@ -35,6 +35,8 @@
 							$this->load->view_if_exists("menus/main/default");
 						}
 					?>
+					<li class="hide" id="online_indicator"><a href="#"><i class="icon-signal"></i> Online</a></li>
+					<li class="hide" id="offline_indicator"><a href="#"><i class="icon-off"></i> Offline</a></li>
 				</ul>
 			</div>
 		</div>
