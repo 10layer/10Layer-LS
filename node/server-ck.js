@@ -1,0 +1,2 @@
+//Config
+var port=8080,socketio=require("socket.io"),http=require("http"),server=http.createServer().listen(port,function(){console.log("Server started, listening at "+port)});socketio.listen(server).on("connection",function(e){e.on("announce",function(t){console.log("Data Received: ",t);e.broadcast.emit("announced",t)});e.on("disconnect",function(t){console.log(t);e.broadcast.emit("announced","user disconnected")})});
