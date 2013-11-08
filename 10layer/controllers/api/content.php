@@ -314,6 +314,8 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
+			$this->load->library("socketio");
+			$this->socketio->emit("update", $this->mongo_db->get_one('content', array("_id" => $urlid )));
 			$this->returndata();
 		}
 
@@ -358,27 +360,27 @@
 				$this->returndata();
 				return false;
 			}
-			$id=$this->input->get_post("id");
-			if (empty($id)) {
+			
+			if (empty($this->vars["id"])) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="ID must be set";
 				$this->returndata();
 				return false;
 			}
-			$result=array_pop($this->mongo_db->get_where("content", array("_id"=>$id)));
+			$result=array_pop($this->mongo_db->get_where("content", array("_id"=>$this->vars["id"])));
 			if (empty($result)) {
 				$this->data["error"]=true;
-				$this->data["msg"][]="ID $id not found";
+				$this->data["msg"][]="ID {$this->vars["id"]} not found";
 				$this->returndata();
 				return false;
 			}
 			if ($this->mongo_db->insert("content_deleted", $result)) {
-				$this->mongo_db->where(array("_id"=>$id))->delete("content");
-				$this->data["msg"]="Item $id deleted";
+				$this->mongo_db->where(array("_id"=>$this->vars["id"]))->delete("content");
+				$this->data["msg"]="Item {$this->vars["id"]} deleted";
 				$this->m->flush(); //Clear the cache
 			} else {
 				$this->data["error"]=true;
-				$this->data["msg"][]="Error deleting $id";
+				$this->data["msg"][]="Error deleting {$this->vars["id"]}";
 			}
 			$this->returndata();
 		}
@@ -404,13 +406,14 @@
 				$this->returndata();
 				return false;
 			}
-			$id=$this->input->get_post("id");
-			if (empty($id)) {
+			
+			if (empty($this->vars["id"])) {
 				$this->data["error"]=true;
 				$this->data["msg"][]="ID must be set";
 				$this->returndata();
 				return false;
 			}
+			$id = $this->vars["id"];
 			$result=array_pop($this->mongo_db->get_where("content_deleted", array("_id"=>$id)));
 			if (empty($result)) {
 				$this->data["error"]=true;
@@ -459,18 +462,16 @@
 				$this->returndata();
 				return false;
 			}
-			$api_key = $this->input->get_post("api_key");
-			$url = base_url()."api/content/$action?api_key=$api_key";
-			$this->data["content"]=array();
+			$this->_render = false;
 			foreach($items as $item) {
-				$ch = curl_init(); 
-				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $item);
-				$output = curl_exec($ch); 
-				curl_close($ch);
-				$this->data["content"][] = $output;
+				$this->vars = $item;
+				$this->$action();
+
+				$tmp[] = $this->data;
+				$this->data = array();
 			}
+			$this->_render = true;
+			$this->data["content"] = $tmp;
 			$this->returndata();
 		}
 		
@@ -534,14 +535,13 @@
 		 * @return void
 		 */
 		protected function content_type() {
-			$content_type=$this->input->get_post("content_type");
-			if (!empty($content_type)) {
-				if (is_array($content_type)) {
-					$this->mongo_db->where_in("content_type", $content_type);
+			if (isset($this->vars["content_type"])) {
+				if (is_array($this->vars["content_type"])) {
+					$this->mongo_db->where_in("content_type", $this->vars["content_type"]);
 				} else {
-					$this->mongo_db->where(array("content_type"=>$content_type));
+					$this->mongo_db->where(array("content_type"=>$this->vars["content_type"]));
 				}
-				$this->data["criteria"]["content_type"]=$content_type;
+				$this->data["criteria"]["content_type"]=$this->vars["content_type"];
 			}
 		}
 		
@@ -554,10 +554,9 @@
 		 * @return void
 		 */
 		protected function limit() {
-			$limit=$this->input->get_post("limit");
-			if (!empty($limit)) {
-				$this->mongo_db->limit($limit);
-				$this->data["criteria"]["limit"]=$limit;
+			if (isset($this->vars["limit"])) {
+				$this->mongo_db->limit($this->vars["limit"]);
+				$this->data["criteria"]["limit"]=$this->vars["limit"];
 			}
 		}
 		
@@ -570,10 +569,9 @@
 		 * @return void
 		 */
 		protected function offset() {
-			$offset=$this->input->get_post("offset");
-			if (!empty($offset)) {
-				$this->mongo_db->offset($offset);
-				$this->data["criteria"]["offset"]=$offset;
+			if (isset($this->vars["offset"])) {
+				$this->mongo_db->offset($this->vars["offset"]);
+				$this->data["criteria"]["offset"]=$this->vars["offset"];
 			}
 		}
 		
@@ -586,13 +584,12 @@
 		 * @return void
 		 */
 		protected function order_by() {
-			$order_by=$this->input->get_post("order_by");
-			if (!empty($order_by)) {
-				if (!is_array($order_by)) {
-					$order_by=array($order_by);
+			if (isset($this->vars["order_by"])) {
+				if (!is_array($this->vars["order_by"])) {
+					$this->vars["order_by"]=array($this->vars["order_by"]);
 				}
-				$this->mongo_db->order_by($order_by);
-				$this->data["criteria"]["order_by"]=$order_by;
+				$this->mongo_db->order_by($this->vars["order_by"]);
+				$this->data["criteria"]["order_by"]=$this->vars["order_by"];
 			}
 		}
 		
@@ -605,10 +602,9 @@
 		 * @return void
 		 */
 		protected function id() {
-			$id=$this->input->get_post("id");
-			if (!empty($id)) {
-				$this->mongo_db->where(array("_id"=>$id));
-				$this->data["criteria"]["id"]=$id;
+			if (isset($this->vars["id"])) {
+				$this->mongo_db->where(array("_id"=>$this->vars["id"]));
+				$this->data["criteria"]["id"]=$this->vars["id"];
 			}
 		}
 		
@@ -621,9 +617,8 @@
 		 * @return void
 		 */
 		protected function ids() {
-			$ids=$this->input->get_post("ids");
-			$this->mongo_db->where_in("_id", $ids);
-			$this->data["criteria"]["id"]=$ids;
+			$this->mongo_db->where_in("_id", $this->vars["ids"] );
+			$this->data["criteria"]["id"]=$this->vars["ids"] ;
 		}
 		
 		/**
@@ -639,8 +634,8 @@
 				$this->mongo_db->where(array("workflow_status"=>"Published"));
 				return true;
 			}
-			$published=$this->input->get_post("published");
-			if (!empty($published)) {
+			
+			if (isset($this->vars["published"])) {
 				$this->mongo_db->where(array("workflow_status"=>"Published"));
 				$this->data["criteria"]["published"]=true;
 				return true;
@@ -657,10 +652,9 @@
 		 * @return void
 		 */
 		protected function search() {
-			$search=$this->input->get_post("search");
-			if (!empty($search)) {
-				$this->mongo_db->like("title", $search);
-				$this->data["criteria"]["search"]=$search;
+			if (isset($this->vars["search"])) {
+				$this->mongo_db->like("title", $this->vars["search"]);
+				$this->data["criteria"]["search"]=$this->vars["search"];
 			}
 		}
 		
@@ -673,11 +667,13 @@
 		 * @return void
 		 */
 		protected function fields() {
-			$fields=$this->input->get_post("fields");
-			if (!is_array($fields)) {
-				$fields=array($fields);
+			if (isset($this->vars["fields"])) {
+				if (!is_array($this->vars["fields"])) {
+					$this->vars["fields"]=array($this->vars["fields"]);
+				}
+				$this->mongo_db->select($this->vars["fields"]);
+				$this->data["criteria"]["fields"]=$this->vars["fields"];
 			}
-			$this->mongo_db->select($fields);
 		}
 		
 		/**
@@ -689,13 +685,13 @@
 		 * @return void
 		 */
 		protected function last_editor() {
-			$last_editor = $this->input->get_post("last_editor");
+			$last_editor = $this->vars["last_editor"] || null;
 			$this->mongo_db->where(array("last_editor"=>$last_editor));
 			$this->data["criteria"]["last_editor"] = $last_editor;
 		}
 		
 		protected function workflow() {
-			$workflow_status = $this->input->get_post("workflow");
+			$workflow_status = $this->vars["workflow"] || null;
 			$this->mongo_db->where(array("workflow_status"=>$workflow_status));
 			$this->data["criteria"]["workflow_status"] = $workflow_status;
 		}
@@ -709,7 +705,7 @@
 		 * @return void
 		 */
 		protected function exclude() {
-			$exclude=$this->vars["exclude"];
+			$exclude=$this->vars["exclude"] || null;
 			if (!empty($exclude)) {
 				if (!is_array($exclude)) {
 					$exclude=array($exclude);
@@ -754,7 +750,7 @@
 		 * @return void
 		 */
 		protected function start_date() {
-			$start_date=$this->vars["start_date"];
+			$start_date=$this->vars["start_date"] || null;
 			if (!empty($start_date)) {
 				$this->mongo_db->where_gte("start_date", (Int) $start_date); //Only ID for now - we should probably allow any field
 				$this->data["criteria"]["start_date"]=date("c", $start_date);
@@ -770,7 +766,7 @@
 		 * @return void
 		 */
 		protected function end_date() {
-			$end_date=$this->vars["end_date"];
+			$end_date=$this->vars["end_date"] || null;
 			if (!empty($end_date)) {
 				$this->mongo_db->where_lte("start_date", (Int) $end_date); //Only ID for now - we should probably allow any field
 				$this->data["criteria"]["end_date"]=date("c", $end_date);
@@ -786,23 +782,22 @@
 		 * @return String content_type
 		 */
 		protected function get_content_type() {
-			$content_type=$this->input->get_post("content_type");
-			if (empty($content_type)) {
-				$id=$this->input->get_post("id");
-				if (empty($id)) {
+			if (!isset($this->vars["content_type"])) {
+				if (empty($this->vars["id"])) {
 					return false;
 				}
 				$cache=$this->mongo_db->state_save();
-				$result=$this->mongo_db->get_where("content", array("_id"=>$id));
+				$result=$this->mongo_db->get_where("content", array("_id"=>$this->vars["id"]));
 				if (empty($result)) {
 					$this->data["error"]=true;
-					$this->data["msg"][]="Could not find content ID $id";
+					$this->data["msg"][]="Could not find content ID ".$this->vars["id"];
 					return false;
 				}
 				$this->mongo_db->state_restore($cache);
 				$content_type=$result[0]->content_type;
+				return $content_type;
 			}
-			return $content_type;
+			return $this->vars["content_type"];
 		}
 		
 		/**
