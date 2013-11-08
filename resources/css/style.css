@@ -23,3 +23,6 @@ a {
 .published a {
   color: #3A962E;
 }
+.pagination {
+	margin: 0px;
+}
