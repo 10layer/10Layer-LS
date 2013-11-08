@@ -161,8 +161,20 @@ class mongodb {
 	
 }
 
+class nodejs_setup {
+	package {
+		"socket.io":
+			ensure => latest,
+			provider => "npm",
+	}
+}
+
 include apache
 include tenlayer
 include locales
 include mongodb
 include imagemagick
+
+class { "nodejs": }
+->
+class { "nodejs_setup": }
