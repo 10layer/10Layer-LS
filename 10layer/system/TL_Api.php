@@ -52,7 +52,7 @@
 			}
 			$this->key = md5(base_url().$this->uri->uri_string()."?".http_build_query($akey));
 			$this->data = $this->m->get($this->key);
-			if (!empty($this->data)) {
+			if (!empty($this->data) && empty($this->vars["nocache"])) {
 				$this->cached = true;
 				$this->data["cached"] = true;
 				$this->data["memcached_key"] = $this->key;
