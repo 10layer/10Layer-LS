@@ -76,7 +76,7 @@ class apache {
 			require => Package["php5"],
 			notify => Service['apache2'],
 	}
-	
+	->
 	exec { 'pecl-mongo-install':
        command => '/usr/bin/pecl install mongo',
        unless => "/usr/bin/pecl info mongo",
