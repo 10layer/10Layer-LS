@@ -29,7 +29,7 @@
 		 */
 		public function __construct() {
 			$this->ci=&get_instance();
-			$this->server = $this->ci->config->item("socket_io_server") ? $this->ci->config->item("socket_io_server") : "http://localhost:8181";
+			$this->server = $this->ci->config->item("socket_io_server") ? $this->ci->config->item("socket_io_server") : "http://".$_SERVER["SERVER_NAME"].":8181";
 			$this->elephant = new Elephant($this->server, 'socket.io', 1, false, true, true);
 			try {
 				$this->elephant->init();
