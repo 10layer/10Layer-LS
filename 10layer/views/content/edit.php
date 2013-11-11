@@ -400,7 +400,7 @@
 					$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Okay</button>');
 					$("#msgdialog").modal();
 				} else {
-					var url = '<?php echo base_url(); ?>edit/'+$(document.body).data('content_type');
+					var url = '<?php echo base_url(); ?>listing/'+$(document.body).data('content_type');
 					$(location).attr('href',url);
 				}
 			});
