@@ -140,6 +140,15 @@
 			});
 		});
 
+		$(document).on("delete", function(e, id) {
+			console.log("Delete", id);
+			_.each(self.docs(), function(doc) {
+				if (doc._id() == id) {
+					self.docs.remove(doc);
+				} 
+			});
+		});
+
 		self.getData();
 	}
 
