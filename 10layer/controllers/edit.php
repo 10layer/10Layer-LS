@@ -20,9 +20,9 @@
 		
 		public function _remap() {
 			$this->load->library("socketio");
-			$type=$this->uri->segment(1);
-			$urlid=$this->uri->segment(2);
-			$data["type"]=$type;
+			$type=$this->uri->rsegment(2);
+			$urlid=$this->uri->rsegment(3);
+			$data["content_type"]=$type;
 			$data["urlid"]=$urlid;
 			$data["content_types"]=$this->model_content->get_content_types_list();
 			$this->load->view("content/edit",$data);

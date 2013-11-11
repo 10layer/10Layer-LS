@@ -1,18 +1,14 @@
 <?php 
 	$data["menu1_active"]="edit";
-	$data["menu2_active"]="edit/".$type;
+	$data["menu2_active"]="edit/".$content_type;
 	$this->load->view('templates/header',$data);
 ?>
 <?php
 	$this->socketio->js();
 ?>
-<script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/js/forms.js"></script>
 <script src="/resources/js/davis.min.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
-<!-- <script src="/resources/ckeditor2/ckeditor.js"></script> -->
-<!-- <script src="/resources/ckeditor2/adapters/jquery.js"></script> -->
-<!-- <script language="javascript" src="/resources/js/ckeditor-ck.js"></script> -->
 <script language="javascript" src="/resources/ckeditor4/ckeditor.js"></script>
 <script src="/resources/ckeditor4/adapters/jquery.js"></script>
 <script language="javascript" src="/resources/js/ckeditor.js"></script>
@@ -24,131 +20,9 @@
 	$(function() {
 		
 		$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
-		
-		//Router
-		var app = Davis(function() {
-			this.configure(function () {
-				this.generateRequestOnPageLoad = true;
-				this.raiseErrors = true;
-				this.formSelector = "noforms";
-			});
-			
-			this.before('/edit/:content_type', function(req) {
-				if ($(document.body).data('content_type') == req.params['content_type'] && $(document.body).data('page')=='list') {
-					return false;
-				}
-			});
-			
-			this.before('/edit/:content_type/:urlid', function(req) {
-				if ($(document.body).data('urlid') == req.params['urlid'] && $(document.body).data('page')=='edit') {
-					return false;
-				}
-			});
-			
-			this.before('/api/files/download/*filename', function(req) {
-				//console.log(req);
-				//return false;
-			});
-			
-			this.get('/edit/:content_type', function(req) {
-				$(document.body).data('content_type', req.params['content_type']);
-				$(document.body).data('page', 'list');
-				$(document.body).trigger('router.init_list');
-			});
-			
-			this.get('/edit/:content_type/:urlid', function(req) {
-				$(document.body).data('content_type', req.params['content_type']);
-				$(document.body).data('urlid', req.params['urlid']);
-				$(document.body).data('page', 'edit');
-				$(document.body).trigger('router.init_edit');
-			});
-			this.get('#', function(req) {});
-		});
-	
-		function prepRouter() {
-			clear_ajaxqueue();
-			$('#dyncontent').children().find('.wysiwyg').each(function() {
-				var name=$(this).attr('name');
-				var o=CKEDITOR.instances[name];
-				if (o) o.destroy();
-			});
-		}
-
-		$(document.body).bind('router.init_list', function() {
-			prepRouter();
-			init_list();
-		});
-		
-		$(document.body).bind('router.init_edit', function() {
-			prepRouter();
-			init_edit();
-		});
-		app.start();
-		
-		// Listing
-		function init_list() { //Run this the first time we initiate our list. After that, run update_list
-			content_type=$(document.body).data('content_type');
-			var searchstring=$("#listSearch").val();
-			if (searchstring=='Search') {
-				searchstring='';
-			}
-			$(".menuitem").each(function() {
-				$(this).removeClass('selected');
-			});
-			$('#menuitem_'+content_type).addClass('selected');
-			$('#dyncontent').html("Loading...");
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
-				//console.log("here");
-				//console.log(data);
-				$('#dyncontent').html(_.template($("#listing-template").html(), {content_type: content_type, data:data}));
-				update_pagination(content_type, data.count, 0, 100 );
-				update_autos();
-				$("#list-search").data('searchstring', searchstring);
-			}).error(function(jqXHR, textStatus, errorThrown) {
-				$("#msgdialog-header").html("Error");
-				$("#msgdialog-body").html("<h4>"+textStatus+"</h4><p>"+jqXHR.responseText+"</p>");
-				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>');
-				$("#msgdialog").modal();
-			});
-		}
-		
-		function update_list(content_type, offset) {
-			var searchstring=$("#list-search").val();
-			if (searchstring=='Search') {
-				searchstring='';
-			}
-			if (!offset) {
-				offset=0;
-			}
-			$('#content-table').html("Loading...");
-			//Cancel any existing Ajax calls
-			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
-				//update_pagination( data.count, offset, data.perpage );
-				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
-				update_autos();
-				$("#list-search").data('searchstring', searchstring);
-			});
-		}
-		
-		function search_list() {
-			content_type=$(document.body).data('content_type');
-			var searchstring=$("#list-search").val();
-			if (searchstring=='Search') {
-				return;
-			}
-			offset=0;
-			$('#content-table').html("Loading...");
-			$('#pagination').html('');
-			//Cancel any existing Ajax calls
-			clear_ajaxqueue();
-			$.getJSON("<?= base_url() ?>api/content?jsoncallback=?", { search: searchstring, offset: offset, content_type: content_type, order_by: "last_modified DESC", api_key: $(document.body).data('api_key'), limit: 100, fields: [ "id", "title", "last_modified", "live", "start_date", "workflow_status", "last_editor" ] }, function(data) {
-				update_pagination( content_type, data.count, offset, 100 );
-				$('#content-table').html(_.template($("#listing-template-content").html(), { content_type: content_type, content:data.content }));
-				update_autos();
-				$("#list-search").data('searchstring', searchstring);
-			});
-		}
+		$(document.body).data('content_type', '<?= $content_type ?>');
+		$(document.body).data('urlid', '<?= $urlid ?>');
+		$(document.body).data('page', 'edit');
 		
 		var ajaxqueue=new Array();
 		function clear_ajaxqueue() {
@@ -157,21 +31,6 @@
 				jqXHR=ajaxqueue.pop();
 				jqXHR.abort();
 			}
-		}
-		
-		function update_pagination(content_type, count, offset, perpage) {
-			$("#pagination").pagination(
-				count,
-				{ 
-					items_per_page: perpage,
-					current_page: (offset / perpage ),
-					callback: function(pg) {
-						var offset=(pg)*perpage;
-						update_list(content_type, offset);
-						return false;
-					}
-				}
-			);
 		}
 		
 		function update_autos() {
@@ -193,33 +52,6 @@
 			});
 		}
 		
-		$(document).on('focus', "#list-search", function() {
-			if ($(this).val()=="Search") {
-				$(this).val("");
-			}
-		});
-		
-		function _check_search() {
-			var searchstring=$("#list-search").val();
-			if (searchstring=='Search') {
-				searchstring='';
-			}
-			if (searchstring != $("#list-search").data('searchstring')) {
-				search_list($(this).attr('content_type'));
-			}
-		}
-		
-		$(document).on('keyup','#list-search',function(e) {
-			if(e.keyCode == '13'){
-				clearTimeout($.data(this, 'timer'));
-				search_list($(this).attr('content_type'));
-			}
-			
-			clearTimeout($.data(this, 'timer'));
-			var wait = setTimeout(_check_search, 1000);
-			$(this).data('timer', wait);
-		});
-		
 		//Editing
 		function init_edit() {
 			content_type=$(document.body).data('content_type');
@@ -236,6 +68,8 @@
 				$(".chzn-select").chosen();
 			});
 		}
+
+		init_edit();
 
 		init_section_modal = function(content_type) {
 			$("#modal-sections .modal-section").hide();
@@ -367,17 +201,13 @@
 				$("#msgdialog-body").html("<h4>"+data.msg+"</h4><p>"+info+"</p>");
 			    $("#msgdialog").modal();
 			} else {
-
-				var url = '<?php echo base_url(); ?>';    
+				var url = '<?= base_url(); ?>';    
 				if($(document.body).data("action") == '_done'){
 					url += 'listing/'+$(document.body).data('content_type');
 				}
-
-
 				if($(document.body).data("action") == '_edit'){
 					return false;
 				}
-
 				$(location).attr('href',url);
 			}
 		}
@@ -451,8 +281,6 @@
 				} else {
 					container.find('.preview-image img').hide();
 				}
-				
-				
 			});
 			viewer.readAsDataURL(file);
 			
@@ -579,38 +407,6 @@
 			return false;
 		});
 		
-		$(document).on("click", "#_delete_multiple", function(e) {
-			e.preventDefault();
-			var del_items = [];
-			$(".select_item:checked").each(function() {
-				del_items.push($(this).val());
-			});
-			if (del_items.length == 0) {
-				$("#msgdialog-header").html("Confirm Delete");
-				$("#msgdialog-body").html("<h4>No documents selected</h4> <p>Please select some documents by ticking the checkboxes</p>");
-				$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Okay</button>');
-				$("#msgdialog").modal();
-				return false;
-			}
-			$("#msgdialog-header").html("Confirm Delete");
-			$("#msgdialog-body").html("<p>Are you sure you want to delete "+del_items.length+" document"+((del_items.length > 1) ? "s" : "")+"?</p>");
-			$("#msgdialog-buttons").html('<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="btn_confirm_multi_delete">Delete</button> <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>');
-			$("#msgdialog").modal();
-			return false;
-		});
-		
-		$(document).on("click", "#btn_confirm_multi_delete", function(e) {
-			var del_items = [];
-			$(".select_item:checked").each(function() {
-				del_items.push({ id: $(this).val() });
-			});
-			$.getJSON("<?= base_url() ?>api/content/multiple/delete?jsoncallback=?", { items: del_items, api_key: $(document.body).data('api_key') }, function(data) {
-				$(".select_item:checked").each(function() {
-					$(this).parent().parent().hide();
-				});
-			});
-		});
-		
 		$(document).on("click", ".image-link", function(e) {
 			e.preventDefault();
 			$(this).parent().next(".link-show").toggle();
@@ -628,91 +424,11 @@
 			var section_title = $(this).attr("data-sectiontitle");
 			$("#published_list").append("<li><input type='hidden' name='autopublish_sections' value='"+section_id+"."+zone_urlid+"' /><a href='#'>"+section_title+" :: "+zone_title+"</li>");
 		});
-
-		$(document).on('click', '#select_all', function() {
-			$(".select_item").prop("checked", $(this).prop("checked"));
-		});
-
-		$(document).on('click', '.workflow_change', function() {
-			var workflow = $(this).attr("data-workflow");
-			var items = [];
-			$(".select_item:checked").each(function() {
-				items.push({ id: $(this).val(), workflow_status: workflow });
-			});
-			$.getJSON("<?= base_url() ?>api/content/multiple/change_workflow?jsoncallback=?", { items: items, api_key: $(document.body).data('api_key') }, function(data) {
-				$(".select_item:checked").each(function() {
-					$(this).parent().parent().children().last().html(workflow);
-					$(this).dropdown("toggle");
-				});
-			});
-		});
 				
 	}); //End of $(function)
 	
 	version_map=new Array( "", "New", "Edited", "Published" );
 	
-</script>
-<script type="text/template" id="listing-template">
-	<div id="contentlist" class="boxed full">
-		<div class="row">
-			<div id='pagination' class='pagination' style="float: left; margin-right: 50px"></div>
-			<div id="listSearchContainer" style="float: left; margin-right: 50px; margin-top: 20px">
-				<%= _.template($('#listing-template-search').html(), { search: data.search, content_type: content_type }) %>
-			</div>
-			<div id="group_actions" class="btn-group" style="float: left; margin-top: 20px">
-				<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">With selected <span class="caret"></span></a>
-				<ul class="dropdown-menu">
-					<li><a href="#" class="workflow_change" data-workflow="New">Workflow - New</a></li>
-					<li><a href="#" class="workflow_change" data-workflow="Edited">Workflow - Edited</a></li>
-					<li><a href="#" class="workflow_change" data-workflow="Published">Workflow - Published</a></li>
-					<li><a href="#" id="_delete_multiple">Delete</a></li>
-				</ul>
-			</div>
-		</div>
-		<div class="row">
-			<div id='content-table'>
-				<%= _.template($('#listing-template-content').html(), { content_type: content_type, content: data.content }) %>
-			</div>
-		</div>
-	</div>
-</script>
-
-<script type='text/template' id='listing-template-search'>
-	<input content_type='<%= content_type %>' type="text" id="list-search" value="<%= (search) ? search : 'Search' %>" />
-	<span id="loading_icon" style="display:none;">
-		<!--<img src="/tlresources/file/images/loader.gif" />-->
-	</span>
-</script>
-
-<script type='text/template' id='listing-template-content'>
-	<table class='table table-bordered table-striped table-condensed'>
-	    <thead>
-	    <tr>
-	    	<th><input type="checkbox" class="select-all" id="select_all" /></th>
-	    	<th>Title</th>
-	    	<th>Last Edit</th>
-	    	<th>Edited by</th> 
-	    	<th>Start Date</th>
-	    	<th>Workflow</th>
-	    </tr>
-	    </thead>
-	    <tbody>
-		<% var x=0; _.each(content, function(item) { %>
-		<%=	_.template($("#listing-template-content-row").html(), { item: item } ) %>
-		<% }); %>
-	    </tbody>
-	</table>
-</script>
-
-<script type='text/template' id='listing-template-content-row'>
-	<tr id="row_<%= item._id %>" data-urlid="<%= item._id %>">
-		<td><input type="checkbox" class="select_item" name="select_item" value="<%= item._id %>"></td>
-		<td class='<%= item.workflow_status.toLowerCase() %>'><a href='/edit/<%= content_type %>/<%= item._id %>' content_urlid='<%= item._id %>' class='content-title-link'><%= item.title %></a></td>
-		<td style="width: 100px"><%= dateToString(item.last_modified) %></td>
-		<td><%= (item.last_editor) ? item.last_editor : '' %></td>
-		<td style="width: 100px"><%= dateToString(item.start_date) %></td>
-		<td class='content-workflow-<%= item.workflow_status %>'><%= item.workflow_status %></td>
-	</tr>
 </script>
 
 
