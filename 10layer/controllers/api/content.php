@@ -298,6 +298,8 @@
 				$result=$this->mongo_db->upsert('content', $data);
 				//Update any instances where we've already published
 				$this->update_manifest($id);
+				$this->load->library("socketio");
+				$this->socketio->emit("update", $id);
 			} else {
 				$data->content_type=$content_type;
 				$data->timestamp=time();
@@ -314,8 +316,6 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
-			$this->load->library("socketio");
-			$this->socketio->emit("update", $id);
 			$this->returndata();
 		}
 
@@ -336,6 +336,8 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["id"] = $this->vars["id"];
 			$this->data["workflow_status"] = $this->vars["workflow_status"];
+			$this->load->library("socketio");
+			$this->socketio->emit("update", $this->vars["id"]);
 			$this->returndata();
 		}
 		
@@ -378,6 +380,8 @@
 				$this->mongo_db->where(array("_id"=>$this->vars["id"]))->delete("content");
 				$this->data["msg"]="Item {$this->vars["id"]} deleted";
 				$this->m->flush(); //Clear the cache
+				$this->load->library("socketio");
+				$this->socketio->emit("delete", $this->vars["id"]);
 			} else {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Error deleting {$this->vars["id"]}";
@@ -425,6 +429,8 @@
 				$this->mongo_db->where(array("_id"=>$id))->delete("content_deleted");
 				$this->data["msg"]="Item $id undeleted";
 				$this->m->flush(); //Clear the cache
+				$this->load->library("socketio");
+				$this->socketio->emit("undelete", $this->vars["id"]);
 			} else {
 				$this->data["error"]=true;
 				$this->data["msg"][]="Error undeleting $id";
