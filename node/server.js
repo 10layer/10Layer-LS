@@ -14,6 +14,16 @@ socketio.listen(server).on('connection', function(socket) {
 		socket.broadcast.emit('update', data);
 	});
 
+	socket.on('delete', function (data) {
+		console.log('Data Received: ', data);
+		socket.broadcast.emit('delete', data);
+	});
+
+	socket.on('undelete', function (data) {
+		console.log('Data Received: ', data);
+		socket.broadcast.emit('undelete', data);
+	});
+
 	socket.on('disconnect', function (data) {
 		console.log(data);
 		socket.broadcast.emit("announced", 'user disconnected');
