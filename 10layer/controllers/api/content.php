@@ -315,7 +315,7 @@
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
 			$this->load->library("socketio");
-			$this->socketio->emit("update", $this->mongo_db->get_one('content', array("_id" => $urlid )));
+			$this->socketio->emit("update", $id);
 			$this->returndata();
 		}
 
