@@ -7,11 +7,18 @@
 			$("#online_indicator").show();
 			$("#offline_indicator").hide();
 
-			iosocket.on('update', function(message) {
-				// console.log("update", message);
-				$(document).trigger("update", message);
+			iosocket.on('undelete', function(id) {
+				$(document).trigger("undelete", id);
 			});
-			
+
+			iosocket.on('update', function(id) {
+				$(document).trigger("update", id);
+			});
+
+			iosocket.on('delete', function(id) {
+				$(document).trigger("delete", id);
+			});
+
 			iosocket.on('disconnect', function() {
 				//Some offline indication
 				$("#online_indicator").hide();
