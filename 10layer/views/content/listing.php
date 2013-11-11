@@ -116,9 +116,9 @@
 		function update_pagination(content_type, count, offset, perpage) {
 			$("#pagination").pagination(
 				count,
-				{ 
+				{
 					items_per_page: perpage,
-					current_page: (offset / perpage ),
+					current_page: offset,
 					callback: function(pg) {
 						self.pg(pg);
 						var offset=(pg)*perpage;
@@ -129,6 +129,17 @@
 				}
 			);
 		}
+
+		$(document).on("update", function(e, id) {
+			_.each(self.docs(), function(doc) {
+				if (doc._id() == id) {
+					$.getJSON("<?= base_url() ?>api/content/get?jsoncallback=?", { id: id, api_key: $(document.body).data('api_key') }, function(data) {
+						self.docs.replace(doc, new Doc(data.content));
+					});
+				} 
+			});
+		});
+
 		self.getData();
 	}
 
@@ -139,44 +150,10 @@
 		$(document.body).data('page', 'list');
 
 		ko.applyBindings(new ModelView());
-		
-		// $(document).on("click", "#_delete_multiple", function(e) {
-		// 	e.preventDefault();
-		// 	var del_items = [];
-		// 	$(".select_item:checked").each(function() {
-		// 		del_items.push($(this).val());
-		// 	});
-		// 	if (del_items.length == 0) {
-		// 		$("#msgdialog-header").html("Confirm Delete");
-		// 		$("#msgdialog-body").html("<h4>No documents selected</h4> <p>Please select some documents by ticking the checkboxes</p>");
-		// 		$("#msgdialog-buttons").html('<button class="btn" data-dismiss="modal" aria-hidden="true">Okay</button>');
-		// 		$("#msgdialog").modal();
-		// 		return false;
-		// 	}
-		// 	$("#msgdialog-header").html("Confirm Delete");
-		// 	$("#msgdialog-body").html("<p>Are you sure you want to delete "+del_items.length+" document"+((del_items.length > 1) ? "s" : "")+"?</p>");
-		// 	$("#msgdialog-buttons").html('<button class="btn btn-danger" data-dismiss="modal" aria-hidden="true" id="btn_confirm_multi_delete">Delete</button> <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>');
-		// 	$("#msgdialog").modal();
-		// 	return false;
-		// });
-		
-		// $(document).on("click", "#btn_confirm_multi_delete", function(e) {
-		// 	var del_items = [];
-		// 	$(".select_item:checked").each(function() {
-		// 		del_items.push({ id: $(this).val() });
-		// 	});
-		// 	$.getJSON("<?= base_url() ?>api/content/multiple/delete?jsoncallback=?", { items: del_items, api_key: $(document.body).data('api_key') }, function(data) {
-		// 		$(".select_item:checked").each(function() {
-		// 			$(this).parent().parent().hide();
-		// 		});
-		// 	});
-		// });
 
 		$(document).on('click', '#select_all', function() {
 			$(".select_item").prop("checked", $(this).prop("checked"));
 		});
-
-		
 				
 	}); //End of $(function)
 	
