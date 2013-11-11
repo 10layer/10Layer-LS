@@ -8,8 +8,8 @@
 			$("#offline_indicator").hide();
 
 			iosocket.on('update', function(message) {
-				console.log("update", message);
-				
+				// console.log("update", message);
+				$(document).trigger("update", message);
 			});
 			
 			iosocket.on('disconnect', function() {
