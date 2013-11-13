@@ -156,6 +156,74 @@ $(function() {
 			})
 		);
 	});
+
+	$(document).on('change', 'input[type=file]', function() {
+		var files=this.files; //FileList object
+		var el=$(this);
+		var container=el.parent();
+		var multiple = el.attr("data-multiple");
+		var contenttype = el.attr("data-contenttype");
+		var name = el.attr("data-name");
+		container.find('.progress-container').empty();
+		_.each(files, function(f, id) {
+			var filename = f.name;
+			console.log(f);
+			var uid = name + "_" + id;
+			
+			$.ajax({
+				url: "/api/files/upload?api_key=" + $(document.body).data('api_key') + "&filename="+f.name,  //server script to process data
+				type: 'POST',
+				xhr: function() {  // custom xhr
+					var myXhr = $.ajaxSettings.xhr();
+					if (myXhr.upload) { // check if upload property exists
+						myXhr.upload.addEventListener('progress', function(data) {
+							var percentage = Math.round((data.position / data.total) * 100);
+							container.find('.progress-container #' + uid + ' .progress .bar').css('width', percentage + '%');
+						}, false); // for handling the progress of the upload
+					} // else throw an error here maybe?
+					return myXhr;
+				},
+			
+				//Ajax events
+				beforeSend: function(data) {
+					container.find('.progress-container').append(_.template($("#field-image-progress").html(), { uid: uid, filename: filename }));
+					container.find('.progress-container #' + uid + ' .progress').show();
+					container.find('.progress-container #' + uid + '').slideDown();
+					container.find('.progress-container .progress .bar').removeClass('bar-success').removeClass('bar-danger');
+				},
+				success: function(data) {
+					var fullname = data.content.full_name;
+					var filename = data.content.filename;
+					if (data.error) {
+						container.find('.progress-container #' + uid + ' .progress').hide().destroy();
+						container.find('.progress-container #' + uid + ' .alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed for '+filename+'</h4> '+data.message).slideDown(500).delay(2000).slideUp(500);
+						container.find('.progress-container #' + uid + ' .progress .bar').removeClass('bar-danger').addClass('bar-success');
+						return false;
+					}
+					container.find('.progress-container #' + uid + ' .progress').hide();
+					container.find('.progress-container #' + uid + ' .alert').addClass('alert-success').removeClass('alert-error').html('File '+ filename +' uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
+					
+					if (multiple == 1) {
+						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
+					} else {
+						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
+					}
+					el.val(""); //Clear the file upload so we don't upload on form submission
+				},
+				error: function(xhr, s) {
+					container.find('.progress-container #' + uid + ' .alert').removeClass('alert-success').addClass('alert-error').html('File upload failed: '+s).slideDown(500).delay(2000).slideUp(500);
+					container.find('.progress-container #' + uid + ' .progress .bar').removeClass('bar-success').addClass('bar-danger');
+				},
+				// Form data
+				data: f,
+				//Options to tell JQuery not to process data or worry about content-type
+				cache: false,
+				contentType: false,
+				processData: false,
+				timeout: 600000 //10 mins
+			});
+		});
+	});
 	
 });
 

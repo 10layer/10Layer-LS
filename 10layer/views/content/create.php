@@ -100,6 +100,7 @@
 		
 		$(document).ajaxError(function(e, xhr, settings, exception) { 
 			//$("#dyncontent").html('<h1>Caught error</h1>'+xhr.responseText); 
+			console.log(xhr);
 		});
 		
 		$("#dyncontent").ajaxComplete(function() {
@@ -211,81 +212,6 @@
 			return false;
 		});
 		
-		$(document).on('change', 'input[type=file]', function() {
-			content_type=$(document.body).data('content_type');
-			var files=this.files; //FileList object
-			var file=files[0]; //Only handle single upload at a time
-			var el=$(this);
-			var container=el.parent();
-			multiple = el.attr("data-multiple");
-			contenttype = el.attr("data-contenttype");
-			name = el.attr("data-name");
-			var fd = new FormData();
-			fd.append("data", file);
-			fd.append("filename", $(this).val());
-			$.ajax({
-				url: "<?= base_url() ?>api/files/upload?api_key=<?= $this->session->userdata('api_key') ?>&filename="+file.name,  //server script to process data
-				type: 'POST',
-				xhr: function() {  // custom xhr
-					myXhr = $.ajaxSettings.xhr();
-					if(myXhr.upload){ // check if upload property exists
-						myXhr.upload.addEventListener('progress', function(data) {
-							var percentage = Math.round((data.position / data.total) * 100);
-							container.find('.preview-image .progress .bar').css('width', percentage + '%');
-						}, false); // for handling the progress of the upload
-					}
-					return myXhr;
-				},
-				//Ajax events
-				beforeSend: function(data) {
-					container.find('.preview-image .progress').show();
-					container.find('.preview-image').slideDown();
-					container.find('.preview-image .progress .bar').removeClass('bar-success').removeClass('bar-danger');
-				},
-				success: function(data) {
-					if (data.error) {
-						container.find('.preview-image .progress').hide();
-						container.find('.alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed</h4> '+data.message).slideDown(500).delay(2000).slideUp(500);
-						container.find('.preview-image .progress .bar').removeClass('bar-danger').addClass('bar-success');
-						return false;
-					}
-					container.find('.preview-image .progress').hide();
-					container.find('.alert').addClass('alert-success').removeClass('alert-error').html('File uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
-					fullname = data.content.full_name;
-					
-					if (multiple == 1) {
-						container.find('.preview-image-items').prepend(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
-					} else {
-						container.find('.preview-image-items').html(_.template($("#field-image-item").html(), { value: fullname, field: { value: fullname, name: name, contenttype: contenttype, multiple: multiple } } ));
-					}
-					el.val(""); //Clear the file upload so we don't upload on form submission
-				},
-				error: function(xhr, s) {
-					container.find('.alert').removeClass('alert-success').addClass('alert-error').html('File upload failed: '+s).slideDown(500).delay(2000).slideUp(500);
-					container.find('.preview-image .progress .bar').removeClass('bar-success').addClass('bar-danger');
-				},
-				// Form data
-				data: file,
-				//Options to tell JQuery not to process data or worry about content-type
-				cache: false,
-				contentType: false,
-				processData: false,
-				timeout: 600000 //10 mins
-			});
-			
-			var viewer = new FileReader();
-			viewer.onload = (function(f) {
-				if (file.type.match(/image.*/)) {
-					container.find('.preview-image img').attr('src', f.target.result).show();
-				} else {
-					container.find('.preview-image img').hide();
-				}
-			});
-			
-			viewer.readAsDataURL(file);
-			
-		});
-		
 		$(document).on("click", ".add-zone", function(e) {
 			e.preventDefault();
 			var fieldname=$(this).attr("data-fieldname");
@@ -312,7 +238,7 @@
 			var zone_title = $(this).html();
 			var section_id = $(this).attr("data-sectionid");
 			var section_title = $(this).attr("data-sectiontitle");
-			console.log("<li><a href='#'>"+section_title+" :: "+zone_title+"</li>");
+			// console.log("<li><a href='#'>"+section_title+" :: "+zone_title+"</li>");
 			$("#published_list").append("<li><a href='#'>"+section_title+" :: "+zone_title+"</li>");
 		});
 	});

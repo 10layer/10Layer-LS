@@ -274,15 +274,9 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" />
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" <%= (field.multiple) ? 'multiple="true"' : '' %> />
 			
-		<div class="row">
-			<div class="preview-image span3" >
-				<div class="progress progress-striped active" style="display: none">
-					<div class="bar" style="width: 0%;"></div>
-				</div>
-				<div class="alert" style="display: none"></div>
-			</div>
+		<div class="row progress-container">
 		</div>
 		<div class="row">
 			<div class="preview-image-items">
@@ -315,19 +309,22 @@
 	<div class='control-group'>
 		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
 		<div class='controls'>
-			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" />
-			<div class="row">
-				<div class="preview-image span3" >
-					<div class="progress progress-striped active" style="display: none">
-						<div class="bar" style="width: 0%;"></div>
-					</div>
-					<div class="alert" style="display: none"></div>
-				</div>
+			<input type="file" name="<%= field.contenttype %>_<%= field.name %>_element" class="file_upload <%= field.class %>" value="<%= (field.value) ? field.value : '' %>" data-contenttype="<%= field.contenttype %>" data-name="<%= field.name %>" data-multiple="<%= (field.multiple) ? 1 : 0 %>" <%= (field.multiple) ? 'multiple="true"' : '' %> />
+			<div class="row progress-container">
 			</div>
 			<div class="row">
 				<div class="preview-image-items"></div>
 			</div>
 		</div>
+	</div>
+</script>
+
+<script type="text/template" id="field-image-progress">
+	<div class="span3" id="<%= uid %>">
+		<div class="progress progress-striped active" style="display: none">
+			<div class="bar" style="width: 0%;"><%= filename %></div>
+		</div>
+		<div class="alert" style="display: none"></div>
 	</div>
 </script>
 
