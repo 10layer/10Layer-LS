@@ -14,6 +14,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.network :forwarded_port, guest: 8181, host: 8181
 
+  config.vm.network :forwarded_port, guest: 81, host: 8081
+
   config.vm.provision :puppet, :manifests_path => "puppet/manifests", :module_path => "puppet/modules"
 
   config.vm.synced_folder ".", "/vagrant", id: "vagrant-root", :owner => "www-data", :group => "www-data"
