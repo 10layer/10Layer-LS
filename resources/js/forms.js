@@ -192,14 +192,15 @@ $(function() {
 					container.find('.progress-container .progress .bar').removeClass('bar-success').removeClass('bar-danger');
 				},
 				success: function(data) {
-					var fullname = data.content.full_name;
-					var filename = data.content.filename;
+					
 					if (data.error) {
 						container.find('.progress-container #' + uid + ' .progress').hide().destroy();
 						container.find('.progress-container #' + uid + ' .alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed for '+filename+'</h4> '+data.message).slideDown(500).delay(2000).slideUp(500);
 						container.find('.progress-container #' + uid + ' .progress .bar').removeClass('bar-danger').addClass('bar-success');
 						return false;
 					}
+					var fullname = data.content.full_name;
+					var filename = data.content.filename;
 					container.find('.progress-container #' + uid + ' .progress').hide();
 					container.find('.progress-container #' + uid + ' .alert').addClass('alert-success').removeClass('alert-error').html('File '+ filename +' uploaded').show().delay(1000).slideDown(500).delay(2000).slideUp(500);
 					
