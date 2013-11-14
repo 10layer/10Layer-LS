@@ -167,7 +167,7 @@ $(function() {
 		container.find('.progress-container').empty();
 		_.each(files, function(f, id) {
 			var filename = f.name;
-			console.log(f);
+			// console.log(f);
 			var uid = name + "_" + id;
 			
 			$.ajax({
@@ -194,7 +194,7 @@ $(function() {
 				success: function(data) {
 					
 					if (data.error) {
-						container.find('.progress-container #' + uid + ' .progress').hide().destroy();
+						container.find('.progress-container #' + uid + ' .progress').hide();
 						container.find('.progress-container #' + uid + ' .alert').removeClass('alert-success').addClass('alert-error').html('<h4>File upload failed for '+filename+'</h4> '+data.message).slideDown(500).delay(2000).slideUp(500);
 						container.find('.progress-container #' + uid + ' .progress .bar').removeClass('bar-danger').addClass('bar-success');
 						return false;
