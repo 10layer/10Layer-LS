@@ -21,9 +21,9 @@
 	<form id="retrieveform" method="post">
 		<input type="hidden" name="dologin" value="1" />
 		<label>Password</label>
-		<input type="password" name="password" class="required" value="" /><br />
+		<input type="password" name="password" class="required" value="" autocomplete="off" /><br />
 		<label>Confirm Password</label>
-		<input type="password" name="password_confirm" class="required" value="" /><br />
+		<input type="password" name="password_confirm" class="required" value="" autocomplete="off" /><br />
 		<input type="submit" id="submit" name="submit" value="Reset Password" class="btn" />
 	</form>
 	<br clear="both" />
