@@ -154,7 +154,7 @@ class TenLayer {
 		}
 		$filename = "content/cache/".$parts["dirname"]."/".$this->smarturl($parts["filename"], false, true)."-".$width."-".$height."-".$quality."-".$opstr.$greystr.".".$format;
 		if (file_exists("./".$filename)) {
-			return "/".$filename;
+			return $this->_render("/".$filename, $render);
 		}
 		try {
 			$result=json_decode(file_get_contents($this->apiurl."files/image/?filename=$url&width=$width&height=$height&bounding=$_bounding&greyscale=$_grey&format=$format"));
@@ -167,7 +167,19 @@ class TenLayer {
 		if (!empty($result->error)) {
 			return false;
 		}
-		return "/".$result->filename."?dynamic";
+		return $this->_render("/".$result->filename, $render);
+	}
+
+	protected function _render($filename, $render) {
+		if ($render) {
+			header("content-type: image/jpeg");
+			header('Last-Modified: '.gmdate('D, d M Y H:i:s', filemtime(".".$filename)).' GMT', true, 200);
+			header('Content-Length: '.filesize(".".$filename));
+			echo file_get_contents(".".$filename);
+			return 1;
+		} else {
+			return $filename;
+		}
 	}
 
 	public function shorturl($id, $url) {
