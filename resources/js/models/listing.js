@@ -93,7 +93,6 @@ var ListingModelView = function() {
 	}
 
 	self.clickDelete = function(sender, e) {
-		console.log("Delete clicked");
 		var items = [];
 		_.each(self.docs(), function(doc) {
 			if (doc.selected()) {
@@ -115,7 +114,6 @@ var ListingModelView = function() {
 		var items = [];
 		_.each(self.docs(), function(doc) {
 			if (doc.selected()) {
-				// console.log(doc);
 				items.push({ id: doc._id() });
 			}
 		});
@@ -170,7 +168,6 @@ var ListingModelView = function() {
 	});
 
 	$(document).on("delete", function(e, id) {
-		console.log("Delete", id);
 		_.each(self.docs(), function(doc) {
 			if (doc._id() == id) {
 				self.docs.remove(doc);

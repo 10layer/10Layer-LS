@@ -9,7 +9,7 @@
 <script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/knockout/knockout-2.2.1.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
-<script type="text/javascript" src="/resources/js/models/listing.js"></script>
+<script type="text/javascript" src="/resources/js/models/listing-ck.js"></script>
 <script>
 	$(function() {
 		
