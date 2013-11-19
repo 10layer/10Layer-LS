@@ -68,6 +68,7 @@
 			$this->secure=$this->_check_secure();
 			if (!$this->secure) {
 				//You shouldn't be here. Bail.
+				$this->_render = true;
 				$this->data["error"]=true;
 				$this->data["msg"]="Denied";
 				$this->returndata();
