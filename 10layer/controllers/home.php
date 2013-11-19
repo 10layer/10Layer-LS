@@ -21,11 +21,12 @@ class Home extends CI_Controller {
 	}
 
 	public function _remap() {
-		$data["content_type"] = $this->uri->segment(2);
-		$data["menu1_active"]="home";
-		$this->load->view('templates/header',$data);
-		$this->load->view('home/custom',$data);
-		$this->load->view("templates/footer");
+		// $data["content_type"] = $this->uri->segment(2);
+		// $data["menu1_active"]="home";
+		// $this->load->view('templates/header',$data);
+		$this->load->library("socketio");
+		$this->load->view('home/home');
+		// $this->load->view("templates/footer");
 	}
 	
 }

@@ -7,6 +7,7 @@ var Doc = function(data) {
 	self.last_editor = ko.observable(data.last_editor);
 	self.last_modified = ko.observable(data.last_modified);
 	self.start_date = ko.observable(data.start_date);
+	self.content_type = ko.observable(data.content_type);
 	self.selected = ko.observable(false);
 }
 

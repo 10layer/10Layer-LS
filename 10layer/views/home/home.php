@@ -1,6 +1,5 @@
 <?php 
-	$data["menu1_active"]="edit";
-	$data["menu2_active"]="edit/".$content_type;
+	$data["menu1_active"]="home";
 	$this->load->view('templates/header',$data);
 ?>
 <?php
@@ -9,12 +8,12 @@
 <script src="/resources/js/jquery.pagination.js"></script>
 <script src="/resources/knockout/knockout-2.2.1.js"></script>
 <script src="/resources/bootstrap-datepicker/js/bootstrap-datepicker-ck.js"></script>
-<script type="text/javascript" src="/resources/js/models/listing-ck.js"></script>
+<script type="text/javascript" src="/resources/js/models/listing.js"></script>
 <script>
 	$(function() {
 		
 		$(document.body).data('api_key', '<?= $this->session->userdata('api_key') ?>');
-		$(document.body).data('content_type', '<?= $content_type ?>');
+		$(document.body).data('content_type', "");
 		$(document.body).data('page', 'list');
 		$(document.body).data('base_url', '<?= base_url() ?>');
 
