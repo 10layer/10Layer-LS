@@ -26,3 +26,9 @@ a {
 .pagination {
   margin: 0px;
 }
+.red {
+  color: #FF0000;
+}
+.border-bottom {
+  border-bottom: 1px #000 solid;
+}

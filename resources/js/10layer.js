@@ -94,4 +94,8 @@ $(function() {
 	$('.dropdown-menu li a').on('click', function(e) {
     	$(this).dropdown('toggle');
 	});
+
+	$(document).on('click', '#select_all', function() {
+		$(".select_item").prop("checked", $(this).prop("checked"));
+	});
 });
