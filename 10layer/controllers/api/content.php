@@ -541,7 +541,7 @@
 		 * @return void
 		 */
 		protected function content_type() {
-			if (isset($this->vars["content_type"])) {
+			if (isset($this->vars["content_type"]) && !empty($this->vars["content_type"])) {
 				if (is_array($this->vars["content_type"])) {
 					$this->mongo_db->where_in("content_type", $this->vars["content_type"]);
 				} else {
