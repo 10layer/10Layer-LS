@@ -1,7 +1,7 @@
 <script src="<?= $server ?>/socket.io/socket.io.js"></script>
 <script>
 	$(function(){
-		var iosocket = io.connect("<?= $server ?>");
+		var iosocket = io.connect("<?= $server ?>/tenlayer");
 		iosocket.on('connect', function () {
 			//Some online indication
 			$("#online_indicator").show();

@@ -19,6 +19,8 @@
 		protected $elephant = false;
 		protected $server = "http://localhost:8181";
 		protected $running = false;
+		protected $available = false;
+		public $namespace = "";
 		
 		
 		/**
@@ -29,8 +31,14 @@
 		 */
 		public function __construct() {
 			$this->ci=&get_instance();
+			$this->namespace = "/".$this->ci->config->item("mongo_db"); //We default to the active Mongo DB for our Socket IO namespace
 			$this->server = $this->ci->config->item("socket_io_server") ? $this->ci->config->item("socket_io_server") : "http://".$_SERVER["SERVER_NAME"].":8181";
-			$this->elephant = new Elephant($this->server, 'socket.io', 1, false, true, true);
+			
+			$this->connect();
+		}
+
+		public function connect() {
+			$this->elephant = new Elephant($this->server, 'socket.io', 1, true, true, false, "/tenlayer");
 			try {
 				$this->elephant->init();
 				$this->running = true;
@@ -40,21 +48,41 @@
 			}
 		}
 
-		public function emit($key, $val) {
+		public function close() {
 			if ($this->running) {
-				$this->elephant->emit($key, $val, null);
+				$this->elephant->close();
+			}
+		}
+
+		public function emit($key, $val) {
+			if (!$this->running) {
+				$this->connect();
+			}
+			if ($this->running) {
+				// if (is_array($val)) {
+				// 	$val["namespace"] = $this->namespace;
+				// } else {
+				// 	$val = array($val, "namespace" => $this->namespace);
+				// }
+				$this->elephant->emit($key, $val, "/tenlayer");
+				// $this->elephant->send(1, "", "/tenlayer", json_encode(array("name"=>$key, "args"=>$val)));
 			}
 		}
 
 		public function js() {
 			if ($this->running) {
 				$data["server"] = $this->server;
+				$data["namespace"] = $this->namespace;
 				$this->ci->load->view("snippets/socketio_javascript", $data);
 			}
 		}
 
 		public function is_running() {
 			return $this->running;
+		}
+
+		public function is_available() {
+			return $this->available;
 		}
 
 	}

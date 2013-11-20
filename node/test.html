@@ -4,9 +4,10 @@
     <script src="http://127.0.0.1:8181/socket.io/socket.io.js"></script>
     <script>
         $(function(){
-            var iosocket = io.connect("http://127.0.0.1:8181");
+            var iosocket = io.connect("http://127.0.0.1:8181/namespace");
  
             iosocket.on('connect', function () {
+                iosocket.emit("test", { data: "This is a test "});
                 $('#incomingChatMessages').append($('<li>Connected</li>'));
  
                 iosocket.on('announced', function(message) {

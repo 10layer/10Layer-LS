@@ -11,10 +11,12 @@ $socket_payload->user = $this->session->userdata("name");
 ?>
 <script src="<?= rtrim(base_url(), "/") . ":" . $socketio_port ?>/socket.io/socket.io.js"></script>
 <script>
-	var iosocket = io.connect("<?= rtrim(base_url(), "/") . ":" . $socketio_port ?>");
+	var iosocket = io.connect("<?= rtrim(base_url(), '/') . ':' . $socketio_port ?>");
 
 	iosocket.on('connect', function () {
+		console.log("Connected");
 		var payload = <?= json_encode($socket_payload) ?>;
+		console.log("payload");
 		payload.status = "connect";
 		iosocket.emit("announce", payload);
 		iosocket.on('announced', function(data) {
