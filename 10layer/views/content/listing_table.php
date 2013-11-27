@@ -29,7 +29,7 @@
 				<tbody data-bind="foreach:docs">
 					<tr>
 						<td><input data-bind="checked: selected" type="checkbox" class="select_item" name="select_item" ></td>
-						<td data-bind="attr: { class: workflow_status().toLowerCase() }"><a data-bind="text:title, attr: { href: '/edit/' + content_type() + '/' + _id() }" class='content-title-link'></a></td>
+						<td data-bind="attr: { class: workflow_status().toLowerCase() }"><a data-bind="text:title, attr: { href: '/edit/' + _id() }" class='content-title-link'></a></td>
 						<td style="width: 100px" data-bind="text:dateToString(last_modified())"></td>
 						<td data-bind="text:last_editor"></td>
 						<td data-bind="text:dateToString(start_date())"></td>
