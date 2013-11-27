@@ -227,7 +227,7 @@
 		}
 		
 		/**
-		 * checkContentType function.
+		 * check_content_type function.
 		 * 
 		 * Returns this object's content_type by content id
 		 *
@@ -235,13 +235,14 @@
 		 * @param mixed $id
 		 * @return object
 		 */
-		public function checkContentType($id) {
-			$query = $this->mongo_db->get_where("content", array("_id",$id));
-			if (empty($query)) {
+		public function check_content_type($id) {
+			$cache = $this->mongo_db->state_save();
+			$query = $this->mongo_db->select("content_type")->where(array("_id"=>$id))->get_one("content");
+			$this->mongo_db->state_restore($cache);
+			if (!isset($query->content_type)) {
 				return false;
 			}
-			$result = $query[0]->content_type;
-			return $result;
+			return $query->content_type;
 		}
 		
 		/**
