@@ -8,3 +8,5 @@
 application/config/10layer.php
 .vagrant/
 .DS_Store
+application/config/mongodb.php
+codekit-config.json
