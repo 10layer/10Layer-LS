@@ -4,9 +4,8 @@
 */cache/*
 */cache/!index.html
 /content
-/application/config/mongodb.php
-application/config/10layer.php
+/application/*
+application
 .vagrant/
 .DS_Store
-application/config/mongodb.php
 codekit-config.json
