@@ -1,3 +1,67 @@
+<script type='text/template' id='edit-field-address'>
+	<%
+	$.getJSON("/api/utils/countries", function(data) {
+		_.each(data.countries, function(country) {
+			if (field.value.country == country.name) {
+				$("#"+field.contenttype + "_" + field.name + "-country").append("<option selected='selected'>" + country.name + "</option>");	
+			} else {
+				$("#"+field.contenttype + "_" + field.name + "-country").append("<option>" + country.name + "</option>");
+			}
+		});
+		$("#"+field.contenttype + "_" + field.name + "-country").trigger("liszt:updated");
+		$("#"+field.contenttype + "_" + field.name + "-country").change(function() {
+			$("#"+field.contenttype + "_" + field.name + "-province").empty();
+			$.getJSON("/api/utils/provinces", { country: $(this).val() }, function(data) {
+				_.each(data.provinces, function(province) {
+					if (field.value.province == province.name) {
+						$("#"+field.contenttype + "_" + field.name + "-province").append("<option selected='selected'>" + province.name + "</option>");	
+					} else {
+						$("#"+field.contenttype + "_" + field.name + "-province").append("<option>" + province.name + "</option>");
+					}
+				});
+				$("#"+field.contenttype + "_" + field.name + "-province").prepend("<option></option>");
+				$("#"+field.contenttype + "_" + field.name + "-province").trigger("liszt:updated");
+			});
+		});
+	});
+	if (field.value.country) {
+		$.getJSON("/api/utils/provinces", { country: field.value.country }, function(data) {
+			_.each(data.provinces, function(province) {
+				if (field.value.province == province.name) {
+					$("#"+field.contenttype + "_" + field.name + "-province").append("<option selected='selected'>" + province.name + "</option>");	
+				} else {
+					$("#"+field.contenttype + "_" + field.name + "-province").append("<option>" + province.name + "</option>");
+				}
+			});
+			$("#"+field.contenttype + "_" + field.name + "-province").trigger("liszt:updated");
+		});
+	}
+	$(document).on('change', "." + field.contenttype + "_" + field.name + "-watched",  function() {
+		var address = {};
+		$(this).parent().children("textarea,input,select").each(function() {
+			address[$(this).attr("data-fieldname")] = $(this).val();
+		});
+		$("#" + field.contenttype + "_" + field.name + "-json").val(JSON.stringify(address));
+	})
+	%>
+	<!-- edit-field-address -->
+	<div class='control-group'>
+		<label class='control-label <%= field.label_class %>'><%= field.label %></label>
+		<div class='controls well' style="position:relative;">
+			<textarea data-fieldname="address" placeholder="Address" name='<%= field.contenttype %>_<%= field.name %>.address' class='<%= field.contenttype %>_<%= field.name %>-watched'><%= nullStr(field.value.address) %></textarea><br />
+			<select data-placeholder="Country" class="chzn-select <%= field.contenttype %>_<%= field.name %>-watched" data-fieldname="country" name='<%= field.contenttype %>_<%= field.name %>.country' id='<%= field.contenttype %>_<%= field.name %>-country'><option></option></select><br />
+			<select data-fieldname="province" data-placeholder="Province" class="chzn-select <%= field.contenttype %>_<%= field.name %>-watched" name='<%= field.contenttype %>_<%= field.name %>.province' id='<%= field.contenttype %>_<%= field.name %>-province'><option></option></select><br />
+			<input data-fieldname="postal_code" type="text" placeholder="Postal Code" name="<%= field.contenttype %>_<%= field.name %>.postal_code" value="<%= nullStr(field.value.postal_code) %>" class='<%= field.contenttype %>_<%= field.name %>-watched' />
+		</div>
+	</div>
+	<input id="<%= field.contenttype %>_<%= field.name %>-json" type="hidden" class="address-data" name="<%= field.contenttype %>_<%= field.name %>" value='<%= JSON.stringify(field.value) %>' />
+</script>
+
+<script type='text/template' id='create-field-address'>
+	<!-- create-field-address -->
+	<%= _.template($('#edit-field-address').html(), {field: field} ) %>
+</script>
+
 <script type='text/template' id='edit-field-autocomplete'>
 	<!-- edit-field-autocomplete -->
 		<div class='control-group'>

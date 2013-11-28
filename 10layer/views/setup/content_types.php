@@ -254,6 +254,7 @@
 	};
 	
 	var types = [
+		{ _id: "address", name: "Address" },
 		{ _id: "autocomplete", name: "Autocomplete" },
 		{ _id: "checkbox", name: "Checkbox" },
 		{ _id: "date", name: "Date" },

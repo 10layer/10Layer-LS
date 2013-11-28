@@ -32,6 +32,20 @@
 			$this->data["url"] = $url;
 			$this->returndata();
 		}
+
+		public function countries() {
+			$data["countries"] = $this->mongo_db->get("countries");
+			$this->load->view("json", array("data"=>$data));
+		}
+
+		public function provinces() {
+			if (!isset($this->vars["country"]) || empty($this->vars["country"])) {
+				$this->vars["country"] = "South Africa";
+			}
+			$data["country"] = $this->vars["country"];
+			$data["provinces"] = $this->mongo_db->get_where("provinces", array("country"=>$this->vars["country"]));
+			$this->load->view("json", array("data"=>$data));
+		}
 		
 	}
 
