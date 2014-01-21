@@ -24,7 +24,7 @@
 	
 	var Field = function(data) {
 		var self = this;
-		self.isActive = ko.observable(false);
+		self.isActive = ko.observable(data.isActive);
 		self.name = ko.observable(data.name);
 		self.isRemovable = (!_.contains(req_types, data.name));
 		self.label = ko.observable(data.label);
@@ -124,6 +124,7 @@
 		self.fields(
 			_.map(
 				data.fields, function(item, key) {
+					item.isActive = false;
 					var f = new Field(item);
 					if (key == 0) {
 						f.isActive(true);
@@ -147,11 +148,16 @@
 		};
 		
 		self.clickAddField = function(data) {
+			var tmp = self.fields();
+			_.each(tmp, function(item) { item.isActive(false); });
+			self.fields(tmp);
 			self.fields.push(new Field({ 
-				name: "newtype",
-				label: "New Type",
-				type: "text"
+				name: "new_type",
+				label: "",
+				type: "text",
+				isActive: true,
 			}));
+
 		};
 		
 		self.moveLeft = function(data) {
@@ -206,7 +212,7 @@
 		self.transformations = ko.observableArray(transformation_template);
 		
 		
-		$.getJSON("/api/content_types?api_key=<?= $this->session->userdata("api_key") ?>", function(data) {
+		$.getJSON("/api/content_types?api_key=<?= $this->session->userdata('api_key') ?>", function(data) {
 			self.mappedContentTypes = _.map(data.content, function(item, key) { if (item._id == self.content_type_urlid()) {item.isActive = true}; return new ContentType(item, item._id);  });
 			self.contentTypes(self.mappedContentTypes);
 			self.content_type_urlid("<?= $content_type_urlid ?>");
@@ -225,7 +231,7 @@
 				return false;
 			}
 			var emptyType = empty_type_template;
-			emptyType._id = "content_type_"+self.contentTypes().length;
+			emptyType._id = "content_type_" + self.contentTypes().length;
 			self.contentTypes.push(new ContentType( empty_type_template ));
 			self.content_type_urlid(emptyType._id);
 		};
