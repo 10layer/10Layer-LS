@@ -209,6 +209,22 @@ class TLContent {
 					}
 				}
 			}
+			if (!empty($field->external)) {
+				try {
+					$contents=file_get_contents($field->external);
+					$vals=explode(",",$contents);
+					foreach($vals as $val) {
+						$keyval=explode("=",$val);
+						if (sizeof($keyval) == 2) {
+							$this->fields[$key]->options[$keyval[1]]=$keyval[0];
+						} else {
+							$this->fields[$key]->options[$keyval[0]]=$keyval[0];
+						}
+					}
+				} catch(Exception $e) {
+					$this->fields[$key]->options[$e->message]="";
+				}
+			}
 		}
 
 
