@@ -296,9 +296,10 @@
 				//Update
 				$this->id();
 				$doc=$this->mongo_db->get_one("content");
+				$old_workflow = $doc->workflow_status;
+				$urlid = $doc->_id;
 				$this->id();
 				$result=$this->mongo_db->upsert('content', $data);
-				$this->_fire_events($doc->_id, $doc->workflow_status, $data->workflow_status);
 				//Update any instances where we've already published
 				$this->update_manifest($id);
 				$this->load->library("socketio");
@@ -307,6 +308,7 @@
 				$data->content_type=$content_type;
 				$data->timestamp=time();
 				$data->_id=$urlid;
+				$old_workflow = "New";
 				$result=$this->mongo_db->insert('content', $data);
 			}
 			$this->data["id"]=$urlid;
@@ -319,6 +321,7 @@
 			$this->m->flush(); //Clear the cache
 			$this->data["title"]=$content_title;
 			$this->data["msg"]="Saved $content_type";
+			$this->_fire_events($urlid, $old_workflow, $data->workflow_status);
 			$this->returndata();
 		}
 
