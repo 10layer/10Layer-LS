@@ -872,6 +872,7 @@
 				// print_r($new_workflow);
 				if ($action["on"] == $new_workflow) {
 					// print $action["method"];
+					sleep(1);
 					call_user_func(array($this, "_event_".$action["method"]), $action, $doc);
 				}
 			}
