@@ -46,6 +46,8 @@ if (defined('ENVIRONMENT'))
 	}
 }
 
+date_default_timezone_set('UTC');
+
 /*
  *---------------------------------------------------------------
  * SYSTEM FOLDER NAME
