@@ -109,9 +109,18 @@
 			self.options.push(val);
 			e.target.value = "";
 		}
-
 	}
 	
+	var Action = function(data) {
+		var self = this;
+		self.isActive = ko.observable(data.isActive);
+		self.on = ko.observable(data.on);
+		self.name = ko.observable(data.name);
+		self.method = ko.observable(data.method);
+		self.value = ko.observable(data.value);
+		self.format = ko.observable(data.format);
+	}
+
 	var ContentType = function(data, key) {
 		var self = this;
 		
@@ -133,6 +142,22 @@
 				}
 			)
 		);
+
+		self.actions = ko.observableArray([]);
+
+		self.actions(
+			_.map(
+				data.actions, function(item, key) {
+					item.isActive = false;
+					var a = new Action(item);
+					if (key == 0) {
+						a.isActive(true);
+					}
+					return a;
+				}
+			)
+		);
+
 		self.urlid = ko.observable(data._id);
 		self.url = ko.computed(function() {
 			return "/setup/content_types/" + self.urlid();
@@ -185,6 +210,52 @@
 			data.isActive(true);
 			//console.log(self.fields.indexOf(data));
 		}
+
+		self.moveActionLeft = function(data) {
+			var pos = self.actions.indexOf(data);
+			if (pos <= 0) {
+				return false;
+			}
+			var tmp = self.actions();
+			self.actions.splice(pos-1, 2, tmp[pos], tmp[pos-1]);
+		}
+		
+		self.moveActionRight = function(data) {
+			var pos = self.actions.indexOf(data);
+			if (pos >= self.actions().length - 1) {
+				return;
+			}
+			var tmp = self.actions();
+			self.actions.splice(pos, 2, tmp[pos + 1], tmp[pos]);
+		}
+
+		self.clickActionActive = function(data) {
+			var tmp = self.actions();
+			_.each(tmp, function(item) { item.isActive(false); });
+			self.actions(tmp);
+			data.isActive(true);
+		}
+
+		self.clickActionRemove = function(data) {
+			var pos = self.actions.indexOf(data);
+			self.actions.splice(pos, 1);
+		}
+
+		self.clickActionAdd = function(data) {
+			var tmp = self.actions();
+			_.each(tmp, function(item) { item.isActive(false); });
+			self.actions(tmp);
+			self.actions.push(new Action({ 
+				name: "New Action",
+				on: "Published",
+				target: "",
+				method: "url",
+				format: "",
+				isActive: true,
+			}));
+		}
+
+
 	};
 		
 	var ContentTypesModel = function() {
@@ -277,6 +348,19 @@
 		{ _id: "textarea", name: "Text Area" },
 		{ _id: "zone", name: "Zone" }
 	];
+
+	var methods = [
+		{ _id: "email", name: "Email" },
+		{ _id: "get", name: "GET"},
+		// { _id: "method", name: "Method"},
+		{ _id: "post", name: "POST"}
+	];
+
+	var workflows = [
+		{_id: "New", name: "New" },
+		{_id: "Edited", name: "Edit" },
+		{_id: "Published", name: "Publish" },
+	]
 	
 	var empty_type_template = { 
 		"_id" : "new_content_type", 
@@ -556,124 +640,179 @@
 			<script> var x=0; </script>
 			<!-- ko foreach: contentTypes -->
 				<!-- ko if: isActive -->
-			<fieldset class="form-inline">
-				<label>Name</label>
-				<input type="text" name="name" value="" data-bind="value: name ">
-		 		<label>ID</label>
-				<input type="text" name="urlid" value="" data-bind="value: urlid ">
-				<label>Order By</label>
-				<input type="text" name="order_by" value="" data-bind="value: order_by ">
-				<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: collection"> Collection</label>
-			</fieldset>
-			<legend>Fields</legend>
-			<ul class="nav nav-tabs">
-				<!-- ko foreach: fields -->
-				<li data-bind="css: { active: isActive }">
-					<a href="#" data-bind="click: $parent.clickActive"><span data-bind="text:name"></span> <!-- ko if: isRemovable -->
-					<i data-bind="click: $parent.clickRemove" class='icon-trash'></i>
-					<!-- /ko -->
-					<i data-bind='click: $parent.moveLeft' class='icon-arrow-left'></i><i data-bind='click: $parent.moveRight' class='icon-arrow-right'></i>
-					</a>
-					
-				</li>
-				<!-- /ko -->
-				<li>
-					<a href="#" class="" data-bind="click: clickAddField"><i class="icon-plus"></i></button></a>
-				</li>
-				
-			</ul>
-			<legend>Fields</legend>
-			<div data-bind="foreach: fields">
-				<!-- ko if: isActive -->
-				<div class="span9">
-				<fieldset>
-					<legend>
-						<!-- ko if: isRemovable -->
-						<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
-						<!-- /ko -->
-						<span data-bind="text: name"></span> 
-						<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-up'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-down'></i></a></span>
-					</legend>
-					<div class='field-details'>
+					<fieldset class="form-inline">
 						<label>Name</label>
-						<input type="text" name="name" value="" data-bind="value: name">
+						<input type="text" name="name" value="" data-bind="value: name ">
+				 		<label>ID</label>
+						<input type="text" name="urlid" value="" data-bind="value: urlid ">
+						<label>Order By</label>
+						<input type="text" name="order_by" value="" data-bind="value: order_by ">
+						<label class="checkbox"><input name="collection" type="checkbox" data-bind="checked: collection"> Collection</label>
+					</fieldset>
+					<div class="span5">
+						<legend>Fields</legend>
+						<ul class="nav nav-tabs">
+							<!-- ko foreach: fields -->
+							<li data-bind="css: { active: isActive }">
+								<a href="#" data-bind="click: $parent.clickActive"><span data-bind="text:name"></span> <!-- ko if: isRemovable -->
+								<i data-bind="click: $parent.clickRemove" class='icon-trash'></i>
+								<!-- /ko -->
+								<i data-bind='click: $parent.moveLeft' class='icon-arrow-left'></i><i data-bind='click: $parent.moveRight' class='icon-arrow-right'></i>
+								</a>
+								
+							</li>
+							<!-- /ko -->
+							<li>
+								<a href="#" class="" data-bind="click: clickAddField"><i class="icon-plus"></i></button></a>
+							</li>
+							
+						</ul>
 					
-						<label>Label</label>
-						<input type="text" name="label" value="" data-bind="value: label">
-					
-						<label>Type</label>
-						<select name="content_type" data-bind="options: types, optionsText: 'name', optionsValue: '_id', value: type">
-						</select>
-					
-						<label>Default value</label>
-						<input type="text" name="value" value="" data-bind="value: defaultValue">
-			
-						<label>Rules</label>
-						<div class="btn-group">
-							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
-								Add a rule <span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu" data-bind="foreach: rule_template">
-								<li><a class="rule_add" data-bind='text: fn, click: $parent.clickRulesAdd' href='#'></a></li>
-							</ul>
-						</div>
-						<dl data-bind="foreach: rules">
-							<div>
-							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickRulesUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickRulesDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickRulesRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
-							<dd data-bind="text: hint"></dd>
+						<legend>Field</legend>
+						<div data-bind="foreach: fields">
+							<!-- ko if: isActive -->
+							<div class="span4">
+							<fieldset>
+								<legend>
+									<!-- ko if: isRemovable -->
+									<a class='field-delete btn btn-small btn-warning' data-bind="click: $parent.clickRemove"><i class='icon-trash icon-white'></i></a>
+									<!-- /ko -->
+									<span data-bind="text: name"></span> 
+									<span class="btn-group"><a class='field-move-left btn btn-small' data-bind='click: $parent.moveLeft'><i class='icon-arrow-up'></i></a><a class='field-move-right btn btn-small' data-bind='click: $parent.moveRight'><i class='icon-arrow-down'></i></a></span>
+								</legend>
+								<div class='field-details'>
+									<label>Name</label>
+									<input type="text" name="name" value="" data-bind="value: name">
+								
+									<label>Label</label>
+									<input type="text" name="label" value="" data-bind="value: label">
+								
+									<label>Type</label>
+									<select name="content_type" data-bind="options: types, optionsText: 'name', optionsValue: '_id', value: type">
+									</select>
+								
+									<label>Default value</label>
+									<input type="text" name="value" value="" data-bind="value: defaultValue">
+						
+									<label>Rules</label>
+									<div class="btn-group">
+										<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
+											Add a rule <span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" data-bind="foreach: rule_template">
+											<li><a class="rule_add" data-bind='text: fn, click: $parent.clickRulesAdd' href='#'></a></li>
+										</ul>
+									</div>
+									<dl data-bind="foreach: rules">
+										<div>
+										<dt><i class="icon-arrow-up" data-bind="click: $parent.clickRulesUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickRulesDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickRulesRemove"></i> <span data-bind="text: fn"></span> <span data-bind="text: vars"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
+										<dd data-bind="text: hint"></dd>
+										</div>
+									</dl>
+									
+									<label>Transformations</label>
+									<div class="btn-group">
+										<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
+											Add a transformation <span class="caret"></span>
+										</a>
+										<ul class="dropdown-menu" data-bind="foreach: transformation_template">
+											<li><a data-bind='text: fn, click: $parent.clickTransformationsAdd' href='#'></a></li>
+										</ul>
+									</div>
+									<dl data-bind="foreach: transformations">
+										<div>
+										<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
+										<dd data-bind="text: hint"></dd>
+										</div>
+									</dl>
+									
+									<label>Import from another Content Type</label>
+									<select name="content_type" data-bind="options: $root.contentTypes, optionsText: 'name', optionsValue: 'id', value: content_types, optionsCaption: 'None'">
+									</select>
+									<div><strong>OR</strong></div>
+									
+									<label>Set pre-defined Options</label>
+									<div data-bind="foreach:options">
+										<input type="text" name="options[]" value="" data-bind="value: $data, event: { change: $parent.changeOptions }" /><br />
+									</div>
+									<input type="text" name="options[]" value="" data-bind="value: '', event: { change: newOptions }" />
+									<div><strong>OR</strong></div>
+									
+									<label>Import from a file or network</label>
+									<input type="text" name="external" value="" data-bind="value: external" />
+									
+									<label>Permitted File Types</label>
+									<input type="text" name="filetypes" value="" data-bind="value: filetypes">
+									
+									<label>Directory for Files</label>
+									<input type="text" name="directory" value="" data-bind="value: directory">
+									
+									<label class="checkbox"><input name="readonly" type="checkbox" data-bind="checked: readonly"> Read Only</label>
+									<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
+									<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
+									<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
+									<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hidden"> Do Not Render</label>
+								</div>
+							</fieldset>
 							</div>
-						</dl>
-						
-						<label>Transformations</label>
-						<div class="btn-group">
-							<a class="btn dropdown-toggle btn-mini" data-toggle="dropdown" href="#">
-								Add a transformation <span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu" data-bind="foreach: transformation_template">
-								<li><a data-bind='text: fn, click: $parent.clickTransformationsAdd' href='#'></a></li>
-							</ul>
+							<!-- /ko -->
 						</div>
-						<dl data-bind="foreach: transformations">
-							<div>
-							<dt><i class="icon-arrow-up" data-bind="click: $parent.clickTransformationsUpArrow"></i><i class="icon-arrow-down" data-bind="click: $parent.clickTransformationsDownArrow"></i><i class="icon-remove" data-bind="click: $parent.clickTransformationsRemove"></i> <span data-bind="text: fn"></span> <input type="text" data-bind="value: params" data-hint="Parameters" /></dt>
-							<dd data-bind="text: hint"></dd>
-							</div>
-						</dl>
-						
-						<label>Import from another Content Type</label>
-						<select name="content_type" data-bind="options: $root.contentTypes, optionsText: 'name', optionsValue: 'id', value: content_types, optionsCaption: 'None'">
-						</select>
-						<div><strong>OR</strong></div>
-						
-						<label>Set pre-defined Options</label>
-						<div data-bind="foreach:options">
-							<input type="text" name="options[]" value="" data-bind="value: $data, event: { change: $parent.changeOptions }" /><br />
-						</div>
-						<input type="text" name="options[]" value="" data-bind="value: '', event: { change: newOptions }" />
-						<div><strong>OR</strong></div>
-						
-						<label>Import from a file or network</label>
-						<input type="text" name="external" value="" data-bind="value: external" />
-						
-						<label>Permitted File Types</label>
-						<input type="text" name="filetypes" value="" data-bind="value: filetypes">
-						
-						<label>Directory for Files</label>
-						<input type="text" name="directory" value="" data-bind="value: directory">
-						
-						<label class="checkbox"><input name="readonly" type="checkbox" data-bind="checked: readonly"> Read Only</label>
-						<label class="checkbox"><input name="multiple" type="checkbox" data-bind="checked: multiple"> Allow Multiple Selections</label>
-						<label class="checkbox"><input name="showcount" type="checkbox" data-bind="checked: showcount"> Show Character Count</label>
-						<label class="checkbox"><input name="hidenew" type="checkbox" data-bind="checked: hidenew"> Hide New Button</label>
-						<label class="checkbox"><input name="hide" type="checkbox" data-bind="checked: hidden"> Do Not Render</label>
 					</div>
-				</fieldset>
-				</div>
+					<div class="span4">
+						<fieldset>
+							<legend>Actions</legend>
+
+							<ul class="nav nav-tabs">
+								<!-- ko foreach: actions -->
+								<li data-bind="css: { active: isActive }">
+									<a href="#" data-bind="click: $parent.clickActionActive"><span data-bind="text:name"></span> 
+									<i data-bind="click: $parent.clickActionRemove" class='icon-trash'></i>
+									
+									<i data-bind='click: $parent.moveActionLeft' class='icon-arrow-left'></i><i data-bind='click: $parent.moveActionRight' class='icon-arrow-right'></i>
+									</a>
+									
+								</li>
+								<!-- /ko -->
+								<li>
+									<a href="#" class="" data-bind="click: clickActionAdd"><i class="icon-plus"></i></button></a>
+								</li>
+							</ul>
+						</fieldset>
+						<legend>Action</legend>
+						<div data-bind="foreach: actions">
+							<!-- ko if: isActive -->
+							<div class="span4">
+								<fieldset>
+									<label>Name</label>
+									<input type="text" name="name" value="" data-bind="value: name">
+
+									<label for="on">On</label>
+									<select name="workflow" data-bind="options: workflows, optionsText: 'name', optionsValue: '_id', value: on"></select>
+
+									<label for="method">Method</label>
+									<select name="method" data-bind="options: methods, optionsText: 'name', optionsValue: '_id', value: method"></select>
+
+									<label data-bind="if: method() == 'email'">Email</label>
+									<label data-bind="if: method() != 'email'">Url</label>
+									<textarea name="value" value="" data-bind="value: value"></textarea>
+									<!-- ko if: method() != 'email' -->
+									<span class="help-inline"><strong>Hint</strong> Put a field between curly brackets to render the value, eg. http://myurl.com/{ title }?id={_id}.</span>
+									<!-- /ko -->
+
+									<!-- ko if: method() == 'email' -->
+									<label>Format</label>
+									<textarea name="format" value="" data-bind="value: format"></textarea>
+									<span class="help-inline"><strong>Hint</strong> Put a field between curly brackets to render the value, eg. { title }, {_id}.</span>
+									<!-- /ko -->
+								</fieldset>
+							</div>
+							<!-- /ko -->
+						</div>
+					</div>
 				<!-- /ko -->
-			</div>
-				<!-- /ko -->
+
 			<!-- /ko -->
-			<!-- <div id="fields"></div> -->
+			
 		</div>
 	</div>
 	

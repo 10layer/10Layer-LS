@@ -295,7 +295,10 @@
 			if (!empty($id)) {
 				//Update
 				$this->id();
+				$doc=$this->mongo_db->get_one("content");
+				$this->id();
 				$result=$this->mongo_db->upsert('content', $data);
+				$this->_fire_events($doc->_id, $doc->workflow_status, $data->workflow_status);
 				//Update any instances where we've already published
 				$this->update_manifest($id);
 				$this->load->library("socketio");
@@ -329,16 +332,16 @@
 				$this->show_error("workflow_status required");
 			}
 			$this->id();
-			//$doc = $this->mongo_db->get_one("content");
-			//$doc->workflow_status = $this->vars["workflow_status"];
+			$doc = $this->mongo_db->get_one("content");
 			$this->mongo_db->update("content", array("workflow_status"=>$this->vars["workflow_status"]));
 			$this->update_manifest($this->vars["id"]);
 			$this->m->flush(); //Clear the cache
+			$this->_fire_events($doc->id, $doc->workflow_status, $this->vars["workflow_status"]);
 			$this->data["id"] = $this->vars["id"];
 			$this->data["workflow_status"] = $this->vars["workflow_status"];
 			$this->load->library("socketio");
-			$this->socketio->emit("update", $this->vars["id"]);
-			$this->returndata();
+			// $this->socketio->emit("update", $this->vars["id"]);
+			// $this->returndata();
 		}
 		
 		/**
@@ -849,6 +852,75 @@
 				}
 			}
 		}
+
+		private function _fire_events($id, $old_workflow, $new_workflow) {
+			if ($old_workflow == $new_workflow) {
+				return true;
+			}
+			$cache=$this->mongo_db->state_save();
+			$doc = $this->mongo_db->get_where_one("content", array("_id"=>$id ));
+			$content_type = $this->mongo_db->get_where_one("content_types", array("_id"=>$doc->content_type));
+			if (empty($content_type->actions)) {
+				// Nothing to do, bailing
+				return true;
+			}
+			$actions = $content_type->actions;
+			foreach($actions as $action) {
+				// print_r($new_workflow);
+				if ($action["on"] == $new_workflow) {
+					// print $action["method"];
+					call_user_func(array($this, "_event_".$action["method"]), $action, $doc);
+				}
+			}
+			$this->mongo_db->state_restore($cache);
+		}
+
+		private function _event_email($action, $doc) {
+			$s = $this->_inject_values($action["format"], $doc);
+			$this->load->library('email');
+
+			$this->email->from('admin@10layer.com', '10Layer CMS'); //This should be configurable
+			$this->email->to($action["value"]);
+			
+			$this->email->subject($action["name"]);
+			$this->email->message($s);
+
+			$this->email->send();
+
+			$this->data["action"][] = array("type"=>"email", "result"=>$this->email->print_debugger());
+		}
+
+		private function _event_get($action, $doc) {
+			$url = $this->_inject_values($action["value"], $doc);
+			$result = file_get_contents($url);
+			$this->data["action"][] = array("type"=>"get", "result"=>$result);
+		}
+
+		private function _event_post($action, $doc) {
+			$url = $this->_inject_values($action["value"], $doc);
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($doc));
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			$result = curl_exec($ch);
+			$this->data["action"][] = array("type"=>"post", "result"=>$result);
+			// print $result;
+			// $result = file_get_contents($url);
+		}
+
+		private function _inject_values($s, $doc) {
+
+			return preg_replace_callback("/{([^{}]+)}/", function($match) use ($doc) {
+				// print_r($match);
+				$w = trim($match[1]);
+				if (isset($doc->{$w})) {
+					return $doc->{$w};
+				}
+				return "";
+			}, $s);
+
+		}
+
 		
 	}
 
