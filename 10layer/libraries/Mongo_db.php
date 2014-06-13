@@ -613,7 +613,7 @@ class Mongo_db {
 	*/
 	
 	public function get($collection = "") {
-		MongoCursor::$timeout = 20000; //20secs
+		// MongoCursor::$timeout = 20000; //20secs
 		if(empty($collection))
 			show_error("In order to retreive documents from MongoDB, a collection name must be passed", 500);
 		$results = array();
@@ -634,7 +634,7 @@ class Mongo_db {
 	}
 
 	public function get_one($collection = "") {
-		MongoCursor::$timeout = 20000; //20secs
+		// MongoCursor::$timeout = 20000; //20secs
 		if(empty($collection))
 			show_error("In order to retreive documents from MongoDB, a collection name must be passed", 500);
 		$results = array();
@@ -687,7 +687,7 @@ class Mongo_db {
 			show_error("Nothing to insert into Mongo collection or insert is not an array", 500);
 		
 		try {
-			$this->db->{$collection}->insert($insert, array('safe' => TRUE));
+			$this->db->{$collection}->insert($insert, array('w' => 1));
 			if (is_array($insert)) {
 				if(isset($insert['_id'])) {
 					return($insert['_id']);
@@ -722,7 +722,7 @@ class Mongo_db {
 			show_error("Nothing to update in Mongo collection or update is not an array", 500);
 		
 		try {
-			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('safe' => TRUE, 'multiple' => FALSE));
+			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('w' => 1, 'multiple' => FALSE));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -748,7 +748,7 @@ class Mongo_db {
 			show_error("Nothing to update in Mongo collection or update is not an array", 500);
 		
 		try {
-			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('safe' => TRUE, 'multiple' => FALSE, 'upsert'=>TRUE ));
+			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('w' => 1, 'multiple' => FALSE, 'upsert'=>TRUE ));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -773,7 +773,7 @@ class Mongo_db {
 		if(count($data) == 0 || !is_array($data))
 			show_error("Nothing to update in Mongo collection or update is not an array", 500);
 		try {
-			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('safe' => TRUE, 'multiple' => TRUE));
+			$this->db->{$collection}->update($this->wheres, array('$set' => $data), array('w' => 1, 'multiple' => TRUE));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -796,7 +796,7 @@ class Mongo_db {
 			show_error("No Mongo collection selected to delete from", 500);
 		
 		try {
-			$this->db->{$collection}->remove($this->wheres, array('safe' => TRUE, 'justOne' => TRUE));
+			$this->db->{$collection}->remove($this->wheres, array('w' => 1, 'justOne' => TRUE));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -820,7 +820,7 @@ class Mongo_db {
 			show_error("No Mongo collection selected to delete from", 500);
 		
 		try {
-			$this->db->{$collection}->remove($this->wheres, array('safe' => TRUE, 'justOne' => FALSE));
+			$this->db->{$collection}->remove($this->wheres, array('w' => 1, 'justOne' => FALSE));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -844,7 +844,7 @@ class Mongo_db {
 			show_error("Nothing to update in Mongo collection or update is not an array", 500);
 		
 		try {
-			$this->db->{$collection}->update($this->wheres, array('$inc' => $data), array('safe' => TRUE, 'multiple' => FALSE));
+			$this->db->{$collection}->update($this->wheres, array('$inc' => $data), array('w' => 1, 'multiple' => FALSE));
 			$this->_clear();
 			return(TRUE);
 		} catch(MongoCursorException $e) {
@@ -1035,7 +1035,7 @@ class Mongo_db {
 			$options['persist'] = isset($this->persist_key) && !empty($this->persist_key) ? $this->persist_key : 'ci_mongo_persist';
 		endif;
 		try {
-			$this->connection = new Mongo($this->connection_string, $options);
+			$this->connection = new MongoClient($this->connection_string, $options);
 			$this->db = $this->connection->{$this->dbname};
 			return($this);	
 		} catch(MongoConnectionException $e) {
