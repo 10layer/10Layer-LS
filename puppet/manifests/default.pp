@@ -111,6 +111,14 @@ class imagemagick {
 	}
 }
 
+class xpdf {
+	package {
+		"xpdf":
+			ensure => present,
+			require => Exec["apt-get update"],
+	}
+}
+
 class tenlayer {
 	file {
 		"/vagrant/content":
@@ -174,6 +182,7 @@ include tenlayer
 include locales
 include mongodb
 include imagemagick
+include xpdf
 
 class { "nodejs": }
 ->
