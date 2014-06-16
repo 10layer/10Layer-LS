@@ -471,6 +471,14 @@
 			hint: "Grabs an image from a file",
 		},
 		{
+			fn: "extract_pdf_text",
+			hint: "Extracts text from a pdf",
+		},
+		{
+			fn: "extract_pdf_html",
+			hint: "Extracts HTML from a pdf",
+		},
+		{
 			fn: "custom",
 			hint: "Define your own rad transformation",
 		}

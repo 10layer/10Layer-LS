@@ -210,6 +210,79 @@ class Datatransformations {
 		return false;
 	}
 
+	/**
+	 * extract_text function.
+	 * 
+	 * Takes a file upload field and extracts text from it if it's a PDF.
+	 *
+	 * @access public
+	 * @param mixed &$sender
+	 * @param string $value
+	 * @param string $field
+	 * @return string
+	 */
+	public function extract_pdf_text(&$sender, $value, $field) {
+		$pdf = $sender->getField($field)->value;
+		if (is_array($pdf)) {
+			$pdf = array_pop($pdf);
+		}
+		if (empty($pdf)) {
+			return false;
+		}
+		$parts = pathinfo($pdf);
+		$returndir = $parts["dirname"];
+		$fullpdf = realpath(".".$pdf);
+		if (file_exists(".".$pdf)) {
+			$parts = pathinfo($fullpdf);
+			if ($parts["extension"] != "pdf") {
+				return false;
+			}
+			$newpdf = $parts["dirname"]."/".$parts["filename"].".txt";
+			//if ($parts[extension] == "pdf") {
+				$success = exec("pdftotext -layout '".escapeshellarg($fullpdf)."' '{$newpdf}'", $result);
+			//}
+			return file_get_contents($newpdf);
+		}
+		return false;
+	}
+
+	/**
+	 * extract_html function.
+	 * 
+	 * Takes a file upload field and extracts text from it if it's a PDF.
+	 *
+	 * @access public
+	 * @param mixed &$sender
+	 * @param string $value
+	 * @param string $field
+	 * @return string
+	 */
+	public function extract_pdf_html(&$sender, $value, $field) {
+		$pdf = $sender->getField($field)->value;
+		if (is_array($pdf)) {
+			$pdf = array_pop($pdf);
+		}
+		if (empty($pdf)) {
+			return false;
+		}
+		$parts = pathinfo($pdf);
+		$returndir = $parts["dirname"];
+		$fullpdf = realpath(".".$pdf);
+		if (file_exists(".".$pdf)) {
+			$parts = pathinfo($fullpdf);
+			if ($parts["extension"] != "pdf") {
+				return false;
+			}
+			$newpdf = $parts["dirname"]."/".$parts["filename"].".html";
+			$succss = exec("/usr/bin/pdftohtml -noframes -enc 'UTF-8' ".escapeshellarg($fullpdf));
+			$result = file_get_contents($newpdf);
+			preg_match('/(<body .*?>)(.*)(<\/body>)/si', $result, $matches);
+			// print_r($matches[2]);
+			return $matches[2];
+		}
+		return false;
+	}
+
 	
 	/**
 	 * Remove any non-ASCII characters and convert known non-ASCII characters 
