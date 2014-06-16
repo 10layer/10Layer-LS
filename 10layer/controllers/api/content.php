@@ -762,7 +762,7 @@
 		 * @return void
 		 */
 		protected function start_date() {
-			$start_date=$this->vars["start_date"] || null;
+			$start_date = $this->vars["start_date"];
 			if (!empty($start_date)) {
 				$this->mongo_db->where_gte("start_date", (Int) $start_date); //Only ID for now - we should probably allow any field
 				$this->data["criteria"]["start_date"]=date("c", $start_date);
@@ -778,7 +778,7 @@
 		 * @return void
 		 */
 		protected function end_date() {
-			$end_date=$this->vars["end_date"] || null;
+			$end_date=$this->vars["end_date"];
 			if (!empty($end_date)) {
 				$this->mongo_db->where_lte("start_date", (Int) $end_date); //Only ID for now - we should probably allow any field
 				$this->data["criteria"]["end_date"]=date("c", $end_date);
