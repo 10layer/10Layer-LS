@@ -48,7 +48,7 @@
 			} else {
 				exclude=[];
 			}
-			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", fields: ["title", "_id", "content_type", "start_date" ] }, function(data) {
+			$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata('api_key') ?>", { content_type: self.content_types(), exclude: exclude, limit: 20, order_by: "last_modified DESC", fields: ["title", "_id", "content_type", "start_date" ] }, function(data) {
 				var mapped = _.map(data.content, function(item) { return new Content(item) });
 				self.content(mapped);
 			});
@@ -141,8 +141,13 @@
 		
 		$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
 			self.collection = data.content[0];
-			mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
-			self.zones(mapped);
+			if (self.collection.zones) {
+				mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
+				self.zones(mapped);
+			} else {
+				var newzone = new Zone({ zone_name: "Default", zone_urlid: "default" }, 0);
+				self.zones([newzone]);
+			}
 			if (self.zones().length) {
 				self.zones()[0].isActive(true);
 			}
