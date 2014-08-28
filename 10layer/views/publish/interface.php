@@ -141,6 +141,9 @@
 		
 		$.getJSON("/api/content/listing?api_key=<?= $this->session->userdata("api_key") ?>", { id: "<?= $collection->_id ?>" }, function(data) {
 			self.collection = data.content[0];
+			if (self.collection.zone && !(self.collection.zones)) {
+				self.collection.zones = self.collection.zone;
+			}
 			if (self.collection.zones) {
 				mapped = _.map(data.content[0].zone, function(item, key) { return new Zone(item, key) });
 				self.zones(mapped);
